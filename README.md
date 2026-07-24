@@ -69,6 +69,9 @@ app/
   privacy/          Privacy policy (template — have a lawyer review)
   terms/            Terms of service (template — have a lawyer review)
   layout.tsx        Fonts, metadata, Schema.org, nav + footer
+  icon.png          Favicon (512px) — Next serves this automatically
+  apple-icon.png    Home-screen icon (180px)
+  favicon.ico       Legacy fallback (16/32/48/64)
   globals.css       Type scale, component classes, reduced-motion
 components/
   Hero.tsx          Headline + live pipeline panel
@@ -84,6 +87,7 @@ components/
   Trust.tsx         Trust indicators + testimonials
   Questions.tsx     Objection handling + FAQ
   LeadCapture.tsx   Checklist opt-in, before the booking close
+  Guarantee.tsx     The Ship-It Guarantee — clauses and exclusions
   FinalCTA.tsx      Risk reversals + the two doors restated
   StickyCTA.tsx     Mobile-only sticky bar
   Apply.tsx         The qualification flow + currency config
@@ -223,3 +227,50 @@ Any button can skip the gate — swap `href="/apply"` for
 `href={BOOKING_URL}` with `target="_blank"`. If you A/B test one, make it the
 hero button: gating the very first click costs some volume in exchange for
 lead quality, and that trade is worth measuring rather than assuming.
+
+
+## Favicon
+
+Generated from your logo, cropped square to the mark itself with the flat black
+surround trimmed, then padded and centred on `#050605` so it matches the site
+background rather than sitting on pure black.
+
+Next.js App Router picks these up automatically from `app/` — there are no
+`<link>` tags to maintain:
+
+| File | Size | Used for |
+|---|---|---|
+| `app/icon.png` | 512×512 | Browser tabs, bookmarks, PWA |
+| `app/apple-icon.png` | 180×180 | iOS home screen |
+| `app/favicon.ico` | 16/32/48/64 | Older browsers |
+
+To regenerate after a logo change, drop the new file in and re-export at those
+three sizes. Keep the mark centred with roughly 16% padding — at 16px a tightly
+cropped mark turns to mush.
+
+`public/logo.png` was re-exported from the same square crop, so the nav and
+footer marks are sharper than the original screenshot.
+
+## The Ship-It Guarantee
+
+`components/Guarantee.tsx`, placed immediately before the final CTA — a
+guarantee works hardest directly before the ask.
+
+Four clauses, each one something you confirmed you can honour: ship it or it's
+free, fee tied to the number, you own everything from day one, thirty days'
+notice. All four are written as contract clauses rather than website promises,
+because that's the claim being made.
+
+**Don't delete the exclusions block.** The section states three things the
+guarantee explicitly does not cover — a revenue figure, a timeline the client
+delays, and money spent on ad platforms. A guarantee with no limits reads as
+marketing; a guarantee with stated limits reads as a contract, and converts
+better for exactly that reason. It also means nothing in the promise can be
+quietly walked back later, which is what makes it safe for you to publish.
+
+If you add a fifth clause, the test is: could a client hold you to it in a
+document? If not, it belongs somewhere else in the copy.
+
+To keep the page from repeating itself, two Trust indicators and the three
+risk-reversal cards in the final CTA were replaced when this section landed —
+the close now carries a four-item strip that links back up to the full terms.

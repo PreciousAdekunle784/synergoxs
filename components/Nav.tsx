@@ -10,7 +10,7 @@ const links = [
   { href: "/#paths", label: "Two paths" },
   { href: "/services", label: "Done for you" },
   { href: "/learn", label: "Learn it" },
-  { href: "/#proof", label: "Proof" },
+  { href: "/#guarantee", label: "Guarantee" },
 ];
 
 export default function Nav() {

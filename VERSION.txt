@@ -1,25 +1,27 @@
-SYNERGOX SITE — BUILD 4  (qualification gate)
-=============================================
+SYNERGOX SITE — BUILD 5  (favicon + guarantee)
+==============================================
 
 New in this build:
-  /apply  — ten-question qualification flow, currency first,
-            then the Calendly embed with answers prefilled.
+  · Favicon set generated from your logo:
+      app/icon.png        512x512  (tabs, bookmarks)
+      app/apple-icon.png  180x180  (iOS home screen)
+      app/favicon.ico     16/32/48/64
+    public/logo.png re-exported square and sharper.
 
-Every "book a call" button now routes to /apply instead of
-straight to Calendly: hero, nav, teardown, both path cards,
-final CTA, mobile sticky bar, footer, services and learn pages.
+  · The Ship-It Guarantee — components/Guarantee.tsx
+    Sits immediately before the final CTA.
+    Four clauses:
+       01  Ship it, or it's free.
+       02  Our fee moves with your number.
+       03  You own everything from day one.
+       04  Thirty days' notice. No exit fee.
+    Plus a "what it does not cover" block — revenue figures,
+    timelines you delay, and ad platform spend.
 
-Question order:
-   1. Currency          (asked BEFORE any money question)
-   2. Market
-   3. Business model
-   4. Monthly revenue   (bands shown in chosen currency)
-   5. Monthly ad spend  (bands shown in chosen currency)
-   6. Biggest bottleneck
-   7. What they've tried
-   8. Timeline
-   9. Decision authority
-  10. Contact details
+  · De-duplicated: two Trust indicators and the three risk-reversal
+    cards in the final CTA were replaced, since the guarantee now
+    owns that ground. The close carries a short strip instead.
 
-Lowest revenue band + no ad spend routes to /learn instead of
-the calendar, with a "book anyway" link still offered.
+Page order:
+  hero, problem, method, teardown, paths, services, journey, proof,
+  difference, trust, questions, lead capture, GUARANTEE, final CTA

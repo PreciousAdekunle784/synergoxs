@@ -10,6 +10,7 @@ import Difference from "@/components/Difference";
 import Trust from "@/components/Trust";
 import Questions from "@/components/Questions";
 import LeadCapture from "@/components/LeadCapture";
+import Guarantee from "@/components/Guarantee";
 import FinalCTA from "@/components/FinalCTA";
 import ScrollProgress from "@/components/ScrollProgress";
 import StickyCTA from "@/components/StickyCTA";
@@ -30,6 +31,7 @@ export default function Home() {
       <Trust />
       <Questions />
       <LeadCapture />
+      <Guarantee />
       <FinalCTA />
       <StickyCTA />
     </>

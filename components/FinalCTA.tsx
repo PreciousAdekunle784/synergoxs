@@ -3,19 +3,11 @@
 import Link from "next/link";
 import { Reveal } from "./Primitives";
 
-const reversals = [
-  {
-    t: "Don't ship it, don't bill it",
-    d: "Every stage of the build is scoped and priced separately. If a stage doesn't get delivered, it doesn't appear on an invoice. Written into the agreement, not promised on a call.",
-  },
-  {
-    t: "Fee tied to the number",
-    d: "Where the maths supports it, part of our fee moves with the metric we agreed to improve. We'd rather carry some of the risk than argue about it in month four.",
-  },
-  {
-    t: "You own it from day one",
-    d: "Accounts, code, list, creative — all in your name from the start. Leaving costs you nothing but the notice period.",
-  },
+const reminders = [
+  "Ship it or it's free",
+  "Fee tied to the number",
+  "You own it from day one",
+  "Thirty days' notice",
 ];
 
 export default function FinalCTA() {
@@ -77,38 +69,45 @@ export default function FinalCTA() {
           </Reveal>
         </div>
 
-        {/* Risk reversal */}
-        <div className="mt-20 grid gap-px overflow-hidden rounded-slab bg-hair shadow-lift md:grid-cols-3">
-          {reversals.map((r, i) => (
-            <Reveal key={r.t} delay={i * 0.06}>
-              <div className="h-full bg-panel p-8 md:p-10">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-signal/30 bg-signal/[0.07]">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
-                    <path
-                      d="M7.5 1.5 2.5 3.6v4c0 3 2.1 5 5 5.9 2.9-.9 5-2.9 5-5.9v-4L7.5 1.5Z"
-                      stroke="#00C551"
-                      strokeWidth="1.2"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M5.6 7.4 7 8.8l2.6-3"
-                      stroke="#00C551"
-                      strokeWidth="1.4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <h3 className="mt-6 font-display text-[1.2rem] font-extrabold tracking-tighter2 text-ink">
-                  {r.t}
-                </h3>
-                <p className="mt-3 text-[0.92rem] leading-relaxed text-inkMute">
-                  {r.d}
-                </p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        {/* Risk reversal — the full terms live in the guarantee section */}
+        <Reveal delay={0.08}>
+          <div className="mt-16 rounded-slab border border-hair bg-panel p-7 shadow-lift md:p-9">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
+                {reminders.map((r) => (
+                  <li
+                    key={r}
+                    className="flex items-center gap-2.5 text-[0.92rem] text-ink/85"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 15 15"
+                      fill="none"
+                      className="shrink-0 text-signal"
+                      aria-hidden
+                    >
+                      <path
+                        d="M3.5 8l3 3 5-7"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {r}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="#guarantee"
+                className="shrink-0 font-mono text-[0.72rem] uppercase tracking-[0.16em] text-signal hover:underline"
+              >
+                Read the full terms ↑
+              </a>
+            </div>
+          </div>
+        </Reveal>
 
         {/* Two doors, restated at the close */}
         <Reveal delay={0.1}>

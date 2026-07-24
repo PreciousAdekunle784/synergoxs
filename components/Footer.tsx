@@ -41,6 +41,7 @@ export default function Footer() {
                 ["/services", "Done for you"],
                 ["/learn", "Learn the system"],
                 ["/#proof", "Case study"],
+                ["/#guarantee", "Guarantee"],
                 ["/#questions", "Questions"],
               ].map(([href, label]) => (
                 <li key={href}>

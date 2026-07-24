@@ -44,20 +44,20 @@ const testimonials = [
 /* These are all true today. Don't add one you can't defend on a call. */
 const indicators = [
   {
-    t: "You own every asset",
-    d: "Ad accounts, code, list, creative — in your name from day one, not ours.",
+    t: "Weekly reviews, not monthly",
+    d: "You see the numbers while there's still time to act on them, not in a deck four weeks later.",
   },
   {
-    t: "Scope guarantee in writing",
-    d: "A stage that doesn't ship doesn't get billed. It's a clause, not a promise.",
+    t: "The teardown comes first",
+    d: "Nobody gets quoted before we've found the leak. We don't price work we can't point at.",
   },
   {
     t: "No junior handoff",
     d: "The people on your first call are the people who build it. There is no B team.",
   },
   {
-    t: "30-day exit",
-    d: "Month-to-month after the build. Leave with everything and nothing to rebuild.",
+    t: "We'll turn work down",
+    d: "If the numbers say a retainer would cost you more than it returns, we say so and don't quote.",
   },
   {
     t: "NDA on request",
