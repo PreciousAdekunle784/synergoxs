@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Reveal } from "./Primitives";
-import { BOOKING_URL } from "@/lib/site";
 
 const reversals = [
   {
@@ -56,10 +55,8 @@ export default function FinalCTA() {
           </Reveal>
           <Reveal delay={0.18}>
             <div className="mt-10 flex flex-col items-center gap-4">
-              <a
-                href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/apply"
                 className="btn-signal shadow-press px-9 py-5 text-[1rem]"
               >
                 Book your strategy call
@@ -72,7 +69,7 @@ export default function FinalCTA() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </a>
+              </Link>
               <p className="font-mono text-[0.74rem] uppercase tracking-[0.16em] text-inkFaint">
                 We take on three builds a month · No pitch deck · No pressure
               </p>
@@ -125,14 +122,12 @@ export default function FinalCTA() {
                 Six weeks to first ship. You approve the direction; we do
                 everything else and report against cost per customer.
               </p>
-              <a
-                href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/apply"
                 className="btn-signal mt-7 w-full shadow-press sm:w-auto"
               >
                 Let&apos;s scale your business
-              </a>
+              </Link>
             </div>
             <div className="bg-pitch p-9 md:p-11">
               <p className="eyebrow">Door two</p>

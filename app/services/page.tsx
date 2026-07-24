@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { services } from "@/lib/services";
-import { BOOKING_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -30,14 +29,9 @@ export default function ServicesPage() {
             costing you the most.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-signal"
-            >
+            <Link href="/apply" className="btn-signal shadow-press">
               Book a strategy call
-            </a>
+            </Link>
             <Link href="/#teardown" className="btn-ghost">
               Run the teardown
             </Link>
@@ -93,14 +87,9 @@ export default function ServicesPage() {
             Not sure which one you need?{" "}
             <span className="text-inkFaint">That&apos;s the call.</span>
           </h2>
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-signal mt-9"
-          >
+          <Link href="/apply" className="btn-signal mt-9 shadow-press">
             Book a strategy call
-          </a>
+          </Link>
         </div>
       </section>
     </>

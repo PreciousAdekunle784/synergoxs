@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { BOOKING_URL, EMAIL } from "@/lib/site";
+import { EMAIL } from "@/lib/site";
 
 export default function Footer() {
   return (
@@ -57,14 +57,9 @@ export default function Footer() {
 
           <div>
             <p className="eyebrow">Start</p>
-            <a
-              href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-signal mt-5 w-full sm:w-auto"
-            >
+            <Link href="/apply" className="btn-signal mt-5 w-full sm:w-auto">
               Book a strategy call
-            </a>
+            </Link>
             <ul className="mt-8 space-y-3 text-[0.92rem]">
               <li>
                 <Link

@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { BOOKING_URL } from "@/lib/site";
 
 const links = [
   { href: "/#teardown", label: "Teardown" },
@@ -61,14 +60,12 @@ export default function Nav() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/apply"
             className="hidden rounded-full bg-signal px-5 py-2.5 text-[0.875rem] font-semibold text-void transition-colors hover:bg-[#12E062] sm:inline-flex"
           >
             Book a strategy call
-          </a>
+          </Link>
           <button
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -112,14 +109,13 @@ export default function Nav() {
                   {l.label}
                 </Link>
               ))}
-              <a
-                href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/apply"
+                onClick={() => setOpen(false)}
                 className="btn-signal mt-5 w-full"
               >
                 Book a strategy call
-              </a>
+              </Link>
             </div>
           </motion.nav>
         )}

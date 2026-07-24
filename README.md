@@ -64,6 +64,7 @@ app/
   page.tsx          Home — the funnel, twelve sections in order
   services/         Services detail page (the "done for you" path)
   learn/            Courses, workshops, community (the "learn it" path)
+  apply/            Ten-question qualification gate before the calendar
   guide/            Post-booking lead magnet page (noindex)
   privacy/          Privacy policy (template — have a lawyer review)
   terms/            Terms of service (template — have a lawyer review)
@@ -85,6 +86,7 @@ components/
   LeadCapture.tsx   Checklist opt-in, before the booking close
   FinalCTA.tsx      Risk reversals + the two doors restated
   StickyCTA.tsx     Mobile-only sticky bar
+  Apply.tsx         The qualification flow + currency config
 lib/
   site.ts           Booking URL, email, form endpoint
   services.ts       Service data (shared by home + /services)
@@ -159,3 +161,65 @@ ignore. Alternates worth A/B testing against the live one:
 
 Swap in `components/Hero.tsx` — the `lines` array at the top, where `g: true`
 marks the words that render in green.
+
+
+## The qualification gate
+
+Every "book a call" button on the site points at `/apply`, not straight at
+Calendly. Ten questions, roughly ninety seconds, then the calendar appears with
+name and email prefilled and the answers attached.
+
+**Currency is question one, deliberately.** Every money question after it is
+rendered in the currency chosen, so a Lagos founder sees naira bands and a
+London founder sees sterling. Nobody has to convert anything in their head, and
+you get a revenue figure you can trust instead of one someone guessed at.
+
+### Editing the currencies — `components/Apply.tsx`
+
+```ts
+const CURRENCIES = {
+  NGN: { symbol: "₦", label: "Nigerian Naira", rate: 1550, locale: "en-NG" },
+  ...
+}
+```
+
+`rate` is units per 1 USD and is used *only* to generate readable answer bands.
+It never touches billing and is never shown to the visitor as an exchange rate.
+Bands round to two significant figures, so a stale rate makes a band slightly
+wide — it can never make the form wrong. Worth refreshing once or twice a year,
+NGN especially. Add or remove currencies freely; the form adapts.
+
+To change the bands themselves, edit `REVENUE_BANDS` and `SPEND_BANDS`. They're
+expressed in USD and converted per currency, so you only maintain one list.
+
+### The disqualification branch
+
+If someone reports the lowest revenue band **and** no current ad spend, they
+don't reach the calendar. They get an honest explanation that a retainer would
+eat the margin it's meant to create, and a route to the learn track — with a
+"book the call anyway" link still available, because occasionally the model is
+wrong about someone.
+
+Tune the rule in `Apply.tsx`:
+
+```ts
+const underServed = a.revenueIndex === 0 && (a.spendIndex === 0 || a.spendIndex === -1);
+```
+
+This protects your calendar and your reputation at the same time. Delete it if
+you'd rather speak to everyone.
+
+### Where the answers go
+
+The whole set POSTs to `FORM_ENDPOINT` as flat JSON — currency, market, model,
+revenue, spend, bottleneck, what they've tried, timeline, decision authority,
+contact details, plus a `recommendation` field reading "Done for you" or
+"Learn track". If the POST fails, the visitor still reaches the calendar and
+sees a note asking them to email instead. Never block a booking on a form.
+
+### Reverting a CTA to direct booking
+
+Any button can skip the gate — swap `href="/apply"` for
+`href={BOOKING_URL}` with `target="_blank"`. If you A/B test one, make it the
+hero button: gating the very first click costs some volume in exchange for
+lead quality, and that trade is worth measuring rather than assuming.

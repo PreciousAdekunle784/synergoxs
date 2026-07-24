@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BOOKING_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Learn the system",
@@ -212,14 +211,9 @@ export default function LearnPage() {
               they didn&apos;t need.
             </p>
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <a
-                href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-signal shadow-press"
-              >
+              <Link href="/apply" className="btn-signal shadow-press">
                 Book a strategy call
-              </a>
+              </Link>
               <Link href="/#teardown" className="btn-ghost">
                 Run the teardown now
               </Link>

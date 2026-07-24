@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Reveal } from "./Primitives";
-import { BOOKING_URL } from "@/lib/site";
 
 const paths = [
   {
@@ -25,8 +24,8 @@ const paths = [
     forYou: "You have demand, budget and no time. You'd rather own the outcome than the calendar.",
     notForYou: "You want to be in every decision, or you're pre-revenue and testing whether the thing sells at all.",
     cta: "Let's scale your business",
-    href: BOOKING_URL,
-    external: true,
+    href: "/apply",
+    external: false,
     meta: "Six weeks to first ship · Three builds a month",
   },
   {

@@ -1,0 +1,25 @@
+SYNERGOX SITE — BUILD 4  (qualification gate)
+=============================================
+
+New in this build:
+  /apply  — ten-question qualification flow, currency first,
+            then the Calendly embed with answers prefilled.
+
+Every "book a call" button now routes to /apply instead of
+straight to Calendly: hero, nav, teardown, both path cards,
+final CTA, mobile sticky bar, footer, services and learn pages.
+
+Question order:
+   1. Currency          (asked BEFORE any money question)
+   2. Market
+   3. Business model
+   4. Monthly revenue   (bands shown in chosen currency)
+   5. Monthly ad spend  (bands shown in chosen currency)
+   6. Biggest bottleneck
+   7. What they've tried
+   8. Timeline
+   9. Decision authority
+  10. Contact details
+
+Lowest revenue band + no ad spend routes to /learn instead of
+the calendar, with a "book anyway" link still offered.

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { BOOKING_URL } from "@/lib/site";
 
 /**
  * Mobile-only sticky bar. Appears once the hero has been passed and hides
@@ -48,14 +48,12 @@ export default function StickyCTA() {
                 30 min · No pitch
               </p>
             </div>
-            <a
-              href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/apply"
               className="shrink-0 rounded-full bg-signal px-5 py-3 text-[0.88rem] font-semibold text-void shadow-press"
             >
               Book a call
-            </a>
+            </Link>
           </div>
         </motion.div>
       )}

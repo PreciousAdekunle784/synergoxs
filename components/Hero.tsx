@@ -1,7 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { BOOKING_URL } from "@/lib/site";
 import SystemPanel from "./SystemPanel";
 
 const lines = [
@@ -99,12 +99,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.58 }}
             className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
           >
-            <a
-              href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-signal shadow-press"
-            >
+            <Link href="/apply" className="btn-signal shadow-press">
               Book a strategy call
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
                 <path
@@ -115,7 +110,7 @@ export default function Hero() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </a>
+            </Link>
             <a href="#teardown" className="btn-ghost">
               Find your leak first
             </a>

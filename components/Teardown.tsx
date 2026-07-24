@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Reveal, SectionHead } from "./Primitives";
-import { BOOKING_URL } from "@/lib/site";
 
 /* Benchmarks are stated as targets, not promises. */
 const TARGET = { toLead: 0.15, toCall: 0.3, toClose: 0.25 };
@@ -357,14 +357,9 @@ export default function Teardown() {
               </div>
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <a
-                  href={BOOKING_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-signal"
-                >
+                <Link href="/apply" className="btn-signal shadow-press">
                   Put your real numbers on this
-                </a>
+                </Link>
                 <p className="text-[0.78rem] leading-relaxed text-inkFaint">
                   Targets are typical mid-range benchmarks, not a forecast. On
                   the call we throw them out and use your analytics instead.
