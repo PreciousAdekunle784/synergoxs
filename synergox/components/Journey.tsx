@@ -7,47 +7,47 @@ import { SectionHead } from "./Primitives";
 const steps = [
   {
     n: "Cold traffic",
-    w: "A stranger sees an angle that names a problem they already have.",
+    w: "A stranger meets an angle that names a problem they already have — before they've heard of you.",
     keep: "100%",
   },
   {
     n: "Landing page",
-    w: "One page, one action, and the three objections that stop the click answered above the fold.",
+    w: "One page, one action, and the three objections that stop the click answered before they have to scroll.",
     keep: "≈38%",
   },
   {
     n: "Lead magnet",
-    w: "Something useful enough to be worth an email address on its own.",
+    w: "Something useful enough to be worth an email address even if they never buy anything.",
     keep: "≈24%",
   },
   {
     n: "Email sequence",
-    w: "Six to nine touches that do the convincing you'd otherwise do on the phone.",
+    w: "Six to nine touches that do the convincing you'd otherwise have to do on the phone, one prospect at a time.",
     keep: "≈19%",
   },
   {
     n: "Sales call",
-    w: "Reminders, a pre-call brief, and a qualification filter so the calendar holds real buyers.",
+    w: "Reminders, a pre-call brief and a qualification filter, so the calendar fills with buyers instead of browsers.",
     keep: "≈29%",
   },
   {
     n: "Customer",
-    w: "Onboarding that sets the expectation the next two steps depend on.",
+    w: "Onboarding that sets the expectation the next three steps quietly depend on.",
     keep: "Won",
   },
   {
     n: "Upsell",
-    w: "The natural second purchase, offered at the moment the first one proves itself.",
-    keep: "+ value",
+    w: "The natural second purchase, offered at the exact moment the first one has proved itself.",
+    keep: "+ margin",
   },
   {
     n: "Retention",
-    w: "Lifecycle email that keeps you in the room between purchases.",
-    keep: "+ value",
+    w: "Lifecycle email that keeps you in the room between purchases, so the third sale costs nothing to win.",
+    keep: "+ margin",
   },
   {
     n: "Referral",
-    w: "A prompt at the peak of satisfaction, not six months after it.",
+    w: "Asked at the peak of satisfaction, not six months later when the feeling has gone cold.",
     keep: "Free traffic",
   },
 ];
@@ -69,16 +69,14 @@ export default function Journey() {
     <section id="journey" className="relative py-28 md:py-36">
       <div className="shell">
         <SectionHead
-          eyebrow="Objection: how does a stranger become a customer?"
+          eyebrow="Objection: how does a stranger become a buyer?"
           title={
             <>
-              The path, end to end.{" "}
-              <span className="text-inkFaint">
-                Nine steps, none of them optional.
-              </span>
+              Nine steps from stranger{" "}
+              <span className="text-inkFaint">to referral.</span>
             </>
           }
-          lede="Most agencies build steps one through three and call it a funnel. The revenue sits in four through nine."
+          lede="Steps one to three get you a lead, and that\u2019s where most agencies stop and hand you an invoice. Steps four to nine are where the revenue actually lives \u2014 and where almost nobody builds."
         />
 
         <div ref={ref} className="relative mt-16 md:mt-20">

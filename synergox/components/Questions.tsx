@@ -133,11 +133,13 @@ export default function Questions() {
     >
       <div className="shell">
         <SectionHead
-          eyebrow="Objection: everything you haven't asked yet"
+          eyebrow="Objection: everything you haven't asked out loud"
           title={
             <>
-              The questions people ask{" "}
-              <span className="text-inkFaint">right before they book.</span>
+              What people ask{" "}
+              <span className="text-inkFaint">
+                in the last ten minutes before they book.
+              </span>
             </>
           }
         />

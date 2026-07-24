@@ -4,28 +4,28 @@ import { Reveal, SectionHead } from "./Primitives";
 
 const symptoms = [
   {
-    t: "Leads arrive in waves, never in a line",
-    d: "Two good weeks, then silence. You can't hire, forecast or commit to anything on that rhythm.",
+    t: "Two good weeks. Then the phone stops.",
+    d: "You can't hire on that rhythm, can't forecast on it, and can't sleep on it. Feast and famine isn't a season your business goes through. It's a symptom.",
   },
   {
-    t: "Nobody can name what actually worked",
-    d: "Revenue moved last quarter. The reason lives in someone's head, so it can't be repeated on purpose.",
+    t: "Your best month is a mystery.",
+    d: "Revenue jumped and nobody can say why. Ask five people, get five answers. What you can't explain, you can't repeat — so you're sat waiting for another accident.",
   },
   {
-    t: "Traffic goes to a page that was never built to sell",
-    d: "Ad spend is judged on click cost while the page it lands on quietly loses 96 out of every 100 visitors.",
+    t: "You're buying clicks for a page that can't close.",
+    d: "Spend gets judged on cost per click while the page it lands on quietly loses 96 of every 100 visitors. You're paying the full price and collecting four percent of it.",
   },
   {
-    t: "Cost per customer climbs every quarter",
-    d: "The same offer, the same creative, a rising bill. Nothing downstream improved, so the auction takes the difference.",
+    t: "Every customer costs more than the last one.",
+    d: "Same offer, same creative, a bigger bill each quarter. Nothing downstream improved, so the auction takes the difference — and that gap compounds while you wait.",
   },
   {
-    t: "The follow-up ends after one email",
-    d: "Most people who were going to buy needed six more touches. They didn't get them, so they bought elsewhere.",
+    t: "You quit on buyers who were nearly ready.",
+    d: "Most people who would have bought needed six more touches. They got one. So they bought from whoever was still in front of them in week three.",
   },
   {
-    t: "You sound like the four competitors beside you",
-    d: "When positioning is generic, price becomes the only variable a buyer can compare you on.",
+    t: "A buyer can't tell you apart from the four beside you.",
+    d: "When positioning is generic, price becomes the only thing left to compare. You end up defending a number instead of making a case.",
   },
 ];
 
@@ -36,29 +36,29 @@ export default function Problem() {
         <div className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
           <div className="lg:sticky lg:top-28 lg:self-start">
             <SectionHead
-              eyebrow="Objection: why isn't it working?"
+              eyebrow="Objection: so why isn't it working?"
               title={
                 <>
-                  Most businesses don&apos;t have a marketing problem.{" "}
-                  <span className="text-inkFaint">
-                    They have an unfinished system.
-                  </span>
+                  You already paid for the customers{" "}
+                  <span className="text-inkFaint">you never got.</span>
                 </>
               }
               lede={
                 <>
-                  There is usually no shortage of activity — posts, ads, a
-                  redesign, someone&apos;s cousin running Meta. What&apos;s
-                  missing is the connective tissue between those parts: a path a
-                  stranger can walk from first impression to paying customer
-                  without falling through a gap.
+                  Most of them are still sitting in your funnel. There was
+                  never a shortage of activity — posts, ads, a redesign,
+                  someone&apos;s cousin running Meta. What&apos;s missing is the
+                  connective tissue: a path a stranger can walk from first
+                  impression to paid invoice without falling through a gap.
+                  Read the six below slowly. You&apos;ll recognise at least
+                  three.
                 </>
               }
             />
             <Reveal delay={0.2}>
               <p className="mt-8 border-l-2 border-signal pl-5 font-display text-[1.25rem] font-semibold leading-snug tracking-tighter2 text-ink">
-                Every one of these is a leak with a location. Leaks can be
-                found, priced and closed.
+                None of this is bad luck. Every one of them is a leak with a
+                street address — findable, priceable, and closable in weeks.
               </p>
             </Reveal>
           </div>

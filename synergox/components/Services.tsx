@@ -17,14 +17,16 @@ export default function Services() {
     >
       <div className="shell">
         <SectionHead
-          eyebrow="Objection: what am I actually buying?"
+          eyebrow="Objection: what am I actually paying for?"
           title={
             <>
               Eight capabilities.{" "}
-              <span className="text-inkFaint">One system they plug into.</span>
+              <span className="text-inkFaint">
+                You almost certainly need three.
+              </span>
             </>
           }
-          lede="We rarely sell these individually. The teardown decides which ones your business needs first — the rest wait until they'd actually change a number."
+          lede="We don't sell these à la carte, and we don't sell all eight at once. The teardown decides which two or three would move a number this quarter. The others wait until they'd earn their invoice."
         />
 
         <div className="mt-14 border-t border-hair">

@@ -151,16 +151,16 @@ export default function Teardown() {
     <section id="teardown" className="relative py-28 md:py-36">
       <div className="shell">
         <SectionHead
-          eyebrow="Objection: prove you understand my numbers"
+          eyebrow="Objection: prove you understand my business"
           title={
             <>
-              The teardown.{" "}
+              Sixty seconds{" "}
               <span className="text-inkFaint">
-                Find the stage that&apos;s costing you the most.
+                to the most expensive number in your business.
               </span>
             </>
           }
-          lede="Move the sliders to roughly match your business. The model finds the single weakest stage and shows what closing it alone would be worth — at the same ad spend."
+          lede="Move the sliders until they roughly match your business. The model finds the single stage bleeding the most, then prices what closing that one alone would be worth — on the traffic and the budget you already have."
         />
 
         <Reveal delay={0.1}>
@@ -168,7 +168,7 @@ export default function Teardown() {
             {/* Inputs */}
             <div className="bg-panel p-8 md:p-10">
               <div className="flex items-center justify-between">
-                <p className="eyebrow">Your inputs</p>
+                <p className="eyebrow">Your numbers</p>
                 <div className="flex rounded-full border border-hair p-0.5">
                   {(["USD", "NGN"] as Cur[]).map((c) => (
                     <button
@@ -310,16 +310,17 @@ export default function Teardown() {
               <div className="mt-10 rounded-card border border-signal/25 bg-signal/[0.05] p-6">
                 {r.hasGap ? (
                   <>
-                    <p className="eyebrow text-signal">Where the money is</p>
+                    <p className="eyebrow text-signal">Here&apos;s where the money is</p>
                     <p className="mt-3 font-display text-[1.28rem] font-semibold leading-snug tracking-tighter2 text-ink">
                       Your weakest stage is{" "}
                       <span className="text-signal">{r.worst.name}</span>. Bring
-                      it to {Math.round(r.worst.target * 100)}% and — with the
-                      same {money(r.spend)} of spend — you&apos;d add{" "}
+                      it to {Math.round(r.worst.target * 100)}% and — without
+                      buying a single extra visitor, on the same{" "}
+                      {money(r.spend)} — you&apos;d add{" "}
                       <span className="text-signal">
                         {Math.round(r.fixedCustomers - r.customers).toLocaleString()}
                       </span>{" "}
-                      customers a month.
+                      customers a month. Every month.
                     </p>
                     <div className="mt-6 grid grid-cols-2 gap-6 border-t border-signal/15 pt-5 sm:grid-cols-3">
                       <div>
@@ -329,7 +330,7 @@ export default function Teardown() {
                         </p>
                       </div>
                       <div>
-                        <p className="eyebrow">Added revenue / mo</p>
+                        <p className="eyebrow">Found revenue / mo</p>
                         <p className="num mt-1.5 text-[1.05rem] text-signal">
                           {money(r.gainMonthly)}
                         </p>
@@ -344,11 +345,12 @@ export default function Teardown() {
                   </>
                 ) : (
                   <>
-                    <p className="eyebrow text-signal">No obvious leak</p>
+                    <p className="eyebrow text-signal">Nothing obviously broken</p>
                     <p className="mt-3 font-display text-[1.28rem] font-semibold leading-snug tracking-tighter2 text-ink">
-                      Every stage is at or above the target range. At this point
-                      growth comes from volume and offer, not repair — which is
-                      a different conversation, and a good one to have.
+                      Every stage sits at or above the target range. From here
+                      growth comes from volume and offer, not repair. That&apos;s
+                      a different conversation — and a considerably better one to
+                      be having.
                     </p>
                   </>
                 )}
@@ -361,11 +363,11 @@ export default function Teardown() {
                   rel="noopener noreferrer"
                   className="btn-signal"
                 >
-                  Pressure-test this with real data
+                  Put your real numbers on this
                 </a>
                 <p className="text-[0.78rem] leading-relaxed text-inkFaint">
-                  Targets are typical mid-range benchmarks, not a forecast. On a
-                  call we replace them with your analytics.
+                  Targets are typical mid-range benchmarks, not a forecast. On
+                  the call we throw them out and use your analytics instead.
                 </p>
               </div>
             </div>

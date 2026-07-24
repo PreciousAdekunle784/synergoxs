@@ -12,7 +12,8 @@ const caseStudy = {
   client: "Kings Food Mart",
   sector: "Grocery & foodstuff retail · Abuja, Nigeria",
   url: "https://kingsfoodstoreabuja.com.ng",
-  headline: "A storefront with no path from 'interested' to 'ordered'.",
+  headline:
+    "Fifteen years of reputation, and nowhere online to send a single customer who'd heard about it.",
   tabs: [
     {
       k: "Problem",
@@ -51,14 +52,16 @@ export default function Proof() {
     >
       <div className="shell">
         <SectionHead
-          eyebrow="Objection: has this worked for anyone?"
+          eyebrow="Objection: has any of this worked for anyone?"
           title={
             <>
-              What a finished system looks like{" "}
-              <span className="text-inkFaint">when it ships.</span>
+              One build, shown in full.{" "}
+              <span className="text-inkFaint">
+                Instead of ten logos with nothing behind them.
+              </span>
             </>
           }
-          lede="We'd rather show one build in full than list ten logos with nothing underneath them."
+          lede="A logo wall is unverifiable by design. This one opens in a new tab, and you can click through every part of it before deciding whether we could do the same for you."
         />
 
         <Reveal delay={0.1}>
