@@ -4,8 +4,15 @@ import { motion, useReducedMotion } from "framer-motion";
 import { BOOKING_URL } from "@/lib/site";
 import SystemPanel from "./SystemPanel";
 
-const words = ["Predictable", "customers."];
-const words2 = ["Not", "lucky", "months."];
+const lines = [
+  [{ t: "Your competitors aren't", g: false }],
+  [{ t: "outspending you.", g: false }],
+  [
+    { t: "They're ", g: false },
+    { t: "out-converting", g: true },
+    { t: " you.", g: false },
+  ],
+];
 
 export default function Hero() {
   const reduce = useReducedMotion();
@@ -57,19 +64,16 @@ export default function Hero() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal opacity-60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-signal" />
             </span>
-            <span className="eyebrow">Revenue growth partner</span>
+            <span className="eyebrow">Revenue architects · Not an ad agency</span>
           </motion.div>
 
-          <h1 className="h-display mt-7 text-[3.15rem] text-ink sm:text-[4.4rem] lg:text-[5.05rem]">
-            {[words, words2].map((line, li) => (
-              <span key={li} className="block overflow-hidden pb-[0.06em]">
+          <h1 className="h-display mt-7 text-[2.75rem] text-ink sm:text-[3.6rem] lg:text-[4.15rem]">
+            {lines.map((line, li) => (
+              <span key={li} className="block overflow-hidden pb-[0.07em]">
                 <motion.span className="block" {...rise(li)}>
-                  {line.map((w, i) => (
-                    <span
-                      key={i}
-                      className={li === 1 && i === 2 ? "text-signal" : ""}
-                    >
-                      {w}{" "}
+                  {line.map((part, i) => (
+                    <span key={i} className={part.g ? "text-signal" : ""}>
+                      {part.t}
                     </span>
                   ))}
                 </motion.span>
@@ -83,10 +87,10 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.45 }}
             className="body-lg mt-8 max-w-xl"
           >
-            We don&apos;t sell marketing. We build the acquisition system
-            underneath it — offer, funnel, traffic and follow-up assembled into
-            one machine, so next quarter is something you forecast instead of
-            hope for.
+            Ninety-six out of every hundred people who reach your site leave
+            without buying. We find the one stage where most of them go, close
+            it, and hand you an acquisition system with a cost per customer you
+            can forecast. Same traffic. Same budget.
           </motion.p>
 
           <motion.div
@@ -99,7 +103,7 @@ export default function Hero() {
               href={BOOKING_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-signal"
+              className="btn-signal shadow-press"
             >
               Book a strategy call
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>

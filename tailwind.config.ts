@@ -34,6 +34,15 @@ const config: Config = {
       maxWidth: {
         shell: "1240px",
       },
+      borderRadius: {
+        card: "22px",
+        slab: "28px",
+      },
+      boxShadow: {
+        lift: "0 24px 70px -28px rgba(0,0,0,0.85), 0 2px 0 0 rgba(255,255,255,0.04) inset",
+        halo: "0 0 90px -20px rgba(0,197,81,0.35)",
+        press: "0 10px 34px -16px rgba(0,0,0,0.9)",
+      },
       keyframes: {
         drift: {
           "0%,100%": { transform: "translate3d(0,0,0)" },

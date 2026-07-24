@@ -7,11 +7,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { BOOKING_URL } from "@/lib/site";
 
 const links = [
-  { href: "/#method", label: "Method" },
   { href: "/#teardown", label: "Teardown" },
-  { href: "/services", label: "Services" },
+  { href: "/#paths", label: "Two paths" },
+  { href: "/services", label: "Done for you" },
+  { href: "/learn", label: "Learn it" },
   { href: "/#proof", label: "Proof" },
-  { href: "/#questions", label: "Questions" },
 ];
 
 export default function Nav() {

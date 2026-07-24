@@ -43,7 +43,7 @@ export default function LegalPage({
           ))}
         </div>
 
-        <p className="mt-16 rounded-xl border border-hair bg-panel p-6 text-[0.85rem] leading-relaxed text-inkFaint">
+        <p className="mt-16 rounded-card border border-hair bg-panel p-6 text-[0.85rem] leading-relaxed text-inkFaint">
           This document is a starting template, not legal advice. Have a
           qualified lawyer review it against your jurisdiction and how you
           actually handle data before you publish it.

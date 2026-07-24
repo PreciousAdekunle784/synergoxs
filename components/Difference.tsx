@@ -5,8 +5,8 @@ import { Reveal, SectionHead } from "./Primitives";
 const rows = [
   {
     axis: "What you're sold",
-    them: "Deliverables — posts, ads, a redesign",
-    us: "A system with a named cost per customer",
+    them: "Deliverables. Posts, ads, a redesign",
+    us: "A system with a cost per customer you can name",
   },
   {
     axis: "What gets reported",
@@ -25,7 +25,7 @@ const rows = [
   },
   {
     axis: "Who does the work",
-    them: "A junior, after the pitch team leaves",
+    them: "A junior you never met, once the pitch team leaves",
     us: "The people who were on your first call",
   },
   {
@@ -44,7 +44,7 @@ const process = [
   {
     n: "Discovery",
     t: "Week 1",
-    d: "Your numbers, your offer, your last twelve months of what worked. No proposal is written before this.",
+    d: "Your numbers, your offer, and an honest look at the last twelve months. Nobody writes a proposal before this happens.",
   },
   {
     n: "Research",
@@ -83,18 +83,20 @@ export default function Difference() {
     <section id="difference" className="relative py-28 md:py-36">
       <div className="shell">
         <SectionHead
-          eyebrow="Objection: how are you different?"
+          eyebrow="Objection: aren't you just another agency?"
           title={
             <>
               Same category.{" "}
-              <span className="text-inkFaint">Different contract with you.</span>
+              <span className="text-inkFaint">
+                Completely different deal for you.
+              </span>
             </>
           }
         />
 
         {/* Comparison */}
         <Reveal delay={0.1}>
-          <div className="mt-14 overflow-hidden rounded-2xl border border-hair">
+          <div className="mt-14 overflow-hidden rounded-slab border border-hair shadow-lift">
             <div className="grid grid-cols-[1fr_1fr] border-b border-hair bg-panel md:grid-cols-[0.9fr_1.05fr_1.05fr]">
               <div className="hidden px-8 py-6 md:block">
                 <span className="eyebrow">Axis</span>
@@ -172,17 +174,21 @@ export default function Difference() {
           <Reveal>
             <div className="flex items-center gap-4">
               <span className="h-px w-8 bg-signal" />
-              <span className="eyebrow">Objection: what happens after I book?</span>
+              <span className="eyebrow">
+                Objection: so what happens after I book?
+              </span>
             </div>
           </Reveal>
           <Reveal delay={0.06}>
             <h3 className="h-section mt-6 max-w-3xl text-ink">
               Seven stages.{" "}
-              <span className="text-inkFaint">Six weeks to the first ship.</span>
+              <span className="text-inkFaint">
+                Six weeks to the first thing that ships.
+              </span>
             </h3>
           </Reveal>
 
-          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-hair sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-px overflow-hidden rounded-slab bg-hair shadow-lift sm:grid-cols-2 lg:grid-cols-4">
             {process.map((p, i) => (
               <Reveal key={p.n} delay={Math.min(i * 0.05, 0.3)}>
                 <div className="group h-full bg-pitch p-8 transition-colors duration-500 hover:bg-panel">

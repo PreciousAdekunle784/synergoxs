@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import Link from "next/link";
 import { Reveal } from "./Primitives";
-import { BOOKING_URL, FORM_ENDPOINT } from "@/lib/site";
+import { BOOKING_URL } from "@/lib/site";
 
 const reversals = [
   {
@@ -21,30 +20,6 @@ const reversals = [
 ];
 
 export default function FinalCTA() {
-  const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "done" | "error">(
-    "idle"
-  );
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.includes("@")) {
-      setState("error");
-      return;
-    }
-    setState("sending");
-    try {
-      const res = await fetch(FORM_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ email, source: "synergox.co/final-cta" }),
-      });
-      setState(res.ok ? "done" : "error");
-    } catch {
-      setState("error");
-    }
-  }
-
   return (
     <section id="book" className="relative overflow-hidden py-28 md:py-36">
       <div
@@ -85,7 +60,7 @@ export default function FinalCTA() {
                 href={BOOKING_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-signal px-9 py-5 text-[1rem]"
+                className="btn-signal shadow-press px-9 py-5 text-[1rem]"
               >
                 Book your strategy call
                 <svg width="16" height="16" viewBox="0 0 15 15" fill="none" aria-hidden>
@@ -106,7 +81,7 @@ export default function FinalCTA() {
         </div>
 
         {/* Risk reversal */}
-        <div className="mt-20 grid gap-px overflow-hidden rounded-2xl bg-hair md:grid-cols-3">
+        <div className="mt-20 grid gap-px overflow-hidden rounded-slab bg-hair shadow-lift md:grid-cols-3">
           {reversals.map((r, i) => (
             <Reveal key={r.t} delay={i * 0.06}>
               <div className="h-full bg-panel p-8 md:p-10">
@@ -138,75 +113,43 @@ export default function FinalCTA() {
           ))}
         </div>
 
-        {/* Email capture */}
+        {/* Two doors, restated at the close */}
         <Reveal delay={0.1}>
-          <div className="mt-8 rounded-2xl border border-hair bg-pitch p-8 md:p-12">
-            <div className="grid gap-8 md:grid-cols-[1fr_0.9fr] md:items-center">
-              <div>
-                <p className="eyebrow">Not ready to talk yet</p>
-                <h3 className="mt-4 font-display text-[1.6rem] font-extrabold leading-tight tracking-tightest text-ink sm:text-[1.9rem]">
-                  Get the teardown checklist instead.
-                </h3>
-                <p className="mt-3 max-w-md text-[0.95rem] leading-relaxed text-inkMute">
-                  The same nine checks we run on a paid engagement, written so
-                  you can run them yourself this week. One email, no sequence you
-                  have to escape from.
-                </p>
-              </div>
-
-              {state === "done" ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-signal/30 bg-signal/[0.06] p-6"
-                >
-                  <p className="font-display text-[1.1rem] font-semibold tracking-tighter2 text-ink">
-                    Check your inbox.
-                  </p>
-                  <p className="mt-2 text-[0.9rem] text-inkMute">
-                    The checklist is on its way. If it hasn&apos;t arrived in
-                    five minutes, look in promotions.
-                  </p>
-                </motion.div>
-              ) : (
-                <form onSubmit={submit} className="w-full">
-                  <label htmlFor="cta-email" className="sr-only">
-                    Work email
-                  </label>
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <input
-                      id="cta-email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        if (state === "error") setState("idle");
-                      }}
-                      placeholder="you@company.com"
-                      className="w-full rounded-full border border-hair bg-void px-6 py-4 text-[0.95rem] text-ink placeholder:text-inkFaint focus:border-signal/50"
-                    />
-                    <button
-                      type="submit"
-                      disabled={state === "sending"}
-                      className="btn-signal shrink-0 disabled:opacity-60"
-                    >
-                      {state === "sending" ? "Sending…" : "Send it to me"}
-                    </button>
-                  </div>
-                  <p
-                    className="mt-3 text-[0.78rem] text-inkFaint"
-                    role={state === "error" ? "alert" : undefined}
-                  >
-                    {state === "error"
-                      ? "That didn't send. Check the address and try again, or email hello@synergox.co."
-                      : "One email. Unsubscribe in one click."}
-                  </p>
-                </form>
-              )}
+          <div className="mt-8 grid gap-px overflow-hidden rounded-slab bg-hair shadow-lift md:grid-cols-2">
+            <div className="bg-pitch p-9 md:p-11">
+              <p className="eyebrow">Door one</p>
+              <h3 className="mt-4 font-display text-[1.6rem] font-extrabold leading-tight tracking-tightest text-ink">
+                We build it for you.
+              </h3>
+              <p className="mt-3 max-w-sm text-[0.95rem] leading-relaxed text-inkMute">
+                Six weeks to first ship. You approve the direction; we do
+                everything else and report against cost per customer.
+              </p>
+              <a
+                href={BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-signal mt-7 w-full shadow-press sm:w-auto"
+              >
+                Let&apos;s scale your business
+              </a>
+            </div>
+            <div className="bg-pitch p-9 md:p-11">
+              <p className="eyebrow">Door two</p>
+              <h3 className="mt-4 font-display text-[1.6rem] font-extrabold leading-tight tracking-tightest text-ink">
+                You learn to build it.
+              </h3>
+              <p className="mt-3 max-w-sm text-[0.95rem] leading-relaxed text-inkMute">
+                The same teardown methodology, frameworks and templates, taught
+                in the open — so the capability stays with you.
+              </p>
+              <Link href="/learn" className="btn-ghost mt-7 w-full sm:w-auto">
+                Start learning
+              </Link>
             </div>
           </div>
         </Reveal>
+
       </div>
     </section>
   );

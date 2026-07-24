@@ -21,7 +21,7 @@ const stages: Stage[] = [
     key: "acquire",
     name: "Acquire",
     question: "Where do qualified strangers come from, on demand?",
-    body: "We pick the two channels your buyers already sit in and build a repeatable intake for them — audiences, creative angles, and a spend floor that produces enough data to learn from instead of enough to guess with.",
+    body: "Two channels your buyers already live in — not six you'd have to learn. We build a repeatable intake for them: angles, audiences, and a spend floor high enough to produce data you can learn from instead of noise you have to guess at.",
     outputs: ["Channel selection", "Creative angles", "Audience map", "Spend model"],
     diagram: (
       <svg viewBox="0 0 240 150" className="w-full" aria-hidden>
@@ -48,8 +48,8 @@ const stages: Stage[] = [
   {
     key: "convert",
     name: "Convert",
-    question: "What happens in the 40 seconds after they land?",
-    body: "The offer gets rewritten before the page gets rebuilt. Then message, page and form are set up as one argument, with the friction removed at the exact points where people currently leave.",
+    question: "What happens in the forty seconds after they land?",
+    body: "The offer gets rewritten before the page gets rebuilt — that order matters, and almost nobody respects it. Then message, page and form become a single argument, with friction stripped from the exact points where people currently leave.",
     outputs: ["Offer rewrite", "Landing system", "Objection order", "Form friction audit"],
     diagram: (
       <svg viewBox="0 0 240 150" className="w-full" aria-hidden>
@@ -75,7 +75,7 @@ const stages: Stage[] = [
     key: "scale",
     name: "Scale",
     question: "What can safely take more money?",
-    body: "Only the parts that already return get more budget. We widen the winning angle, add the second channel, and hold the losing half flat instead of averaging everything together and calling it growth.",
+    body: "Only what already returns gets more budget. We widen the winning angle, open the second channel, and hold the losing half flat — instead of averaging the two together and calling the result growth.",
     outputs: ["Winner isolation", "Budget rules", "Channel two", "Volume ceiling test"],
     diagram: (
       <svg viewBox="0 0 240 150" className="w-full" aria-hidden>
@@ -100,7 +100,7 @@ const stages: Stage[] = [
     key: "automate",
     name: "Automate",
     question: "What still needs a human on a Tuesday?",
-    body: "Every step that a person repeats becomes a sequence: lead routing, reminders, nurture, reactivation, reporting. The team keeps the conversations and hands the mechanics to the system.",
+    body: "Anything a person repeats becomes a sequence: routing, reminders, nurture, reactivation, reporting. Your team keeps the conversations that genuinely need a human and hands back the mechanics that never did.",
     outputs: ["Lead routing", "Email sequences", "Booking reminders", "Reporting"],
     diagram: (
       <svg viewBox="0 0 240 150" className="w-full" aria-hidden>
@@ -127,7 +127,7 @@ const stages: Stage[] = [
     key: "optimize",
     name: "Optimize",
     question: "What gets better this month, and by how much?",
-    body: "One number is targeted at a time — cost per booked call, close rate, order value — with a test queue behind it. Wins get written into the system so they hold after the test ends.",
+    body: "One number at a time — cost per booked call, close rate, order value — with a queue of tests behind it. Wins get written into the system so they survive long after the test that found them.",
     outputs: ["Test queue", "Single target metric", "Win documentation", "Monthly review"],
     diagram: (
       <svg viewBox="0 0 240 150" className="w-full" aria-hidden>
@@ -152,14 +152,16 @@ export default function Method() {
     <section id="method" className="relative border-y border-hair bg-pitch py-28 md:py-36">
       <div className="shell">
         <SectionHead
-          eyebrow="Objection: what exactly do you do?"
+          eyebrow="Objection: what exactly is it you do?"
           title={
             <>
               The Synergox Method.{" "}
-              <span className="text-inkFaint">Five stages, in order.</span>
+              <span className="text-inkFaint">
+                Skip a stage and the next one leaks.
+              </span>
             </>
           }
-          lede="Each stage answers one question and produces something you can hold. Nothing moves forward until the stage before it is honest."
+          lede="Each stage answers a single question and produces something you can hold in your hand. Nothing moves forward until the stage before it survives an honest look."
         />
 
         {/* Stage rail */}
@@ -167,7 +169,7 @@ export default function Method() {
           <div
             role="tablist"
             aria-label="The Synergox Method stages"
-            className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-hair sm:grid-cols-3 lg:grid-cols-5"
+            className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-slab bg-hair sm:grid-cols-3 lg:grid-cols-5"
           >
             {stages.map((st, i) => {
               const on = i === active;
@@ -209,7 +211,7 @@ export default function Method() {
           <div
             id="method-panel"
             role="tabpanel"
-            className="mt-px grid gap-10 rounded-xl border border-hair bg-panel p-8 md:grid-cols-[1.25fr_0.75fr] md:p-12"
+            className="mt-px grid gap-10 rounded-slab border border-hair bg-panel shadow-lift p-8 md:grid-cols-[1.25fr_0.75fr] md:p-12"
           >
             <AnimatePresence mode="wait">
               <motion.div
@@ -224,7 +226,7 @@ export default function Method() {
                 </p>
                 <p className="body-lg mt-5 max-w-xl text-ink/85">{s.body}</p>
                 <div className="mt-8">
-                  <p className="eyebrow">What you get out of this stage</p>
+                  <p className="eyebrow">What you walk away holding</p>
                   <ul className="mt-4 flex flex-wrap gap-2">
                     {s.outputs.map((o) => (
                       <li

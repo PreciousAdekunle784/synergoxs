@@ -36,9 +36,10 @@ export default function Footer() {
             <p className="eyebrow">Explore</p>
             <ul className="mt-5 space-y-3 text-[0.92rem]">
               {[
-                ["/#method", "The method"],
                 ["/#teardown", "CAC teardown"],
-                ["/services", "Services"],
+                ["/#paths", "Two paths"],
+                ["/services", "Done for you"],
+                ["/learn", "Learn the system"],
                 ["/#proof", "Case study"],
                 ["/#questions", "Questions"],
               ].map(([href, label]) => (

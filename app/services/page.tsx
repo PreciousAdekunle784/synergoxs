@@ -57,7 +57,7 @@ export default function ServicesPage() {
                   {stage}
                 </h2>
               </div>
-              <div className="grid gap-px overflow-hidden rounded-2xl bg-hair sm:grid-cols-2">
+              <div className="grid gap-px overflow-hidden rounded-slab bg-hair shadow-lift sm:grid-cols-2">
                 {inStage.map((s) => (
                   <div key={s.name} className="bg-panel p-8">
                     <h3 className="font-display text-[1.35rem] font-extrabold tracking-tightest text-ink">

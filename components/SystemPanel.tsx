@@ -36,7 +36,7 @@ export default function SystemPanel() {
     .join(" ");
 
   return (
-    <div className="glass relative rounded-2xl p-5 sm:p-7">
+    <div className="glass relative rounded-slab shadow-lift p-5 sm:p-7">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-signal/50 to-transparent"
