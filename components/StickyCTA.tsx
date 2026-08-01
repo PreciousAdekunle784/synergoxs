@@ -43,17 +43,17 @@ export default function StickyCTA() {
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-[0.95rem] font-extrabold tracking-tighter2 text-ink">
-                Find your leak
+                The free playbook
               </p>
               <p className="truncate font-mono text-[0.66rem] uppercase tracking-[0.14em] text-inkFaint">
-                30 min · No pitch
+                74 pages · Free
               </p>
             </div>
             <button
               onClick={openOptIn}
               className="shrink-0 rounded-full bg-signal px-5 py-3 text-[0.88rem] font-semibold text-void shadow-press"
             >
-              Get the playbook
+              Get the book
             </button>
           </div>
         </motion.div>

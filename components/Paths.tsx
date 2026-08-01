@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Reveal } from "./Primitives";
-import { useOptIn } from "./OptInProvider";
+import BookCTA from "./BookCTA";
 
 const paths = [
   {
@@ -24,11 +24,11 @@ const paths = [
     ],
     forYou: "You have demand, budget and no time. You'd rather own the outcome than the calendar.",
     notForYou: "You want to be in every decision, or you're pre-revenue and testing whether the thing sells at all.",
-    cta: "Get the free playbook",
-    href: "#optin",
+    cta: "Get the free growth playbook",
+    href: "/apply",
     external: false,
-    optin: true,
-    meta: "Six weeks to first ship · Three builds a month",
+    book: true,
+    meta: "Free · 74 pages · Then the next step",
   },
   {
     id: "diy",
@@ -48,10 +48,10 @@ const paths = [
     ],
     forYou: "You're an operator or marketer who wants the capability permanently, not rented by the month.",
     notForYou: "You need revenue moving in the next thirty days and don't have time to learn on the way.",
-    cta: "Book your call",
-    href: "/apply",
+    cta: "Start learning",
+    href: "/learn",
     external: false,
-    optin: false,
+    book: false,
     meta: "Self-paced · Community included · Cancel anytime",
   },
 ];
@@ -81,7 +81,6 @@ function DIYIcon() {
 
 export default function Paths() {
   const reduce = useReducedMotion();
-  const { openOptIn } = useOptIn();
 
   return (
     <section id="paths" className="relative overflow-hidden py-32 md:py-44">
@@ -211,24 +210,14 @@ export default function Paths() {
               </div>
 
               <div className="mt-auto pt-9">
-                {p.optin ? (
-                  <button
-                    onClick={openOptIn}
-                    className="btn-signal w-full shadow-press"
-                  >
-                    {p.cta}
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
-                      <path
-                        d="M3 7.5h9m0 0L8.5 4M12 7.5 8.5 11"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
+                {p.book ? (
+                  <BookCTA
+                    className="btn-signal shadow-press"
+                    label={p.cta}
+                    full
+                  />
                 ) : (
-                  <Link href={p.href} className="btn-signal w-full shadow-press">
+                  <Link href={p.href} className="btn-ghost w-full">
                     {p.cta}
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
                       <path

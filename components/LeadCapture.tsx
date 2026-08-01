@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Reveal } from "./Primitives";
-import { FORM_ENDPOINT } from "@/lib/site";
+import { SUBSCRIBE_FN, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/site";
 
 const bullets = [
   "The nine checks that locate a leak in under an hour",
@@ -27,14 +27,26 @@ export default function LeadCapture() {
       return;
     }
     setState("sending");
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      // Backend not wired yet — don't block the visitor in local/dev.
+      console.warn("Supabase not configured — lead not saved.");
+      setState("done");
+      return;
+    }
     try {
-      const res = await fetch(FORM_ENDPOINT, {
+      const res = await fetch(SUBSCRIBE_FN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          apikey: SUPABASE_ANON_KEY,
         },
-        body: JSON.stringify({ name, email, source: "synergox.co/lead-capture" }),
+        body: JSON.stringify({
+          name,
+          email,
+          sendBook: false,
+          meta: { source: "synergox.co/lead-capture", magnet: "checklist" },
+        }),
       });
       setState(res.ok ? "done" : "error");
     } catch {

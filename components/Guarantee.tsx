@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Reveal } from "./Primitives";
-import { useOptIn } from "./OptInProvider";
+import BookCTA from "./BookCTA";
 
 /* ------------------------------------------------------------------ *
  * Every clause here is one Ukong confirmed Synergox can actually honour.
@@ -46,7 +47,6 @@ const exclusions = [
 
 export default function Guarantee() {
   const reduce = useReducedMotion();
-  const { openOptIn } = useOptIn();
 
   return (
     <section id="guarantee" className="relative overflow-hidden py-32 md:py-40">
@@ -219,21 +219,13 @@ export default function Guarantee() {
 
             <Reveal delay={0.18}>
               <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                <button onClick={openOptIn} className="btn-signal shadow-press">
-                  Get the free playbook
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
-                    <path
-                      d="M3 7.5h9m0 0L8.5 4M12 7.5 8.5 11"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
+                <BookCTA
+                  className="btn-signal shadow-press"
+                  label="Get the free growth playbook"
+                />
                 <p className="max-w-xs text-[0.85rem] leading-relaxed text-inkFaint">
-                  We&apos;ll send the agreement before you commit to anything,
-                  not after.
+                  The playbook lays the terms out in full. You&apos;ll see the
+                  agreement before you commit to anything, not after.
                 </p>
               </div>
             </Reveal>

@@ -23,16 +23,14 @@ There is no backend and no environment variables, so nothing can 40x on you.
 
 ## The three things to fill in before launch
 
-### 1. Email form endpoint — `lib/site.ts`
+### 1. The funnel backend — Supabase + Paystack
 
-```ts
-export const FORM_ENDPOINT = "https://formspree.io/f/REPLACE_WITH_YOUR_ID";
-```
+Set your env vars (`.env.example` → `.env.local` and Vercel), run the database
+migration, and deploy the two Edge Functions. Full step-by-step is in
+**"The funnel backend (Supabase + Paystack)"** below — this is what makes the
+opt-in save leads, email the book, and take payment.
 
-Create a form at formspree.io (or getform.io / usebasin.com), paste the endpoint
-URL here. The form posts JSON `{ email, source }`. That's the only change needed.
-
-Also in this file:
+Also in `lib/site.ts`:
 - `BOOKING_URL` — your Calendly link (already set)
 - `EMAIL` — currently `hello@synergox.co`, change if different
 
@@ -215,11 +213,12 @@ you'd rather speak to everyone.
 
 ### Where the answers go
 
-The whole set POSTs to `FORM_ENDPOINT` as flat JSON — currency, market, model,
+The whole set is saved to your Supabase `leads` table via the `subscribe` Edge
+Function — the answers land in the row's `meta` JSON (currency, market, model,
 revenue, spend, bottleneck, what they've tried, timeline, decision authority,
-contact details, plus a `recommendation` field reading "Done for you" or
-"Learn track". If the POST fails, the visitor still reaches the calendar and
-sees a note asking them to email instead. Never block a booking on a form.
+plus a `recommendation` field reading "Done for you" or "Learn track"). If the
+save fails, the visitor still reaches the calendar and sees a note asking them
+to email instead. Never block a booking on a form.
 
 ### Reverting a CTA to direct booking
 
@@ -277,87 +276,145 @@ the close now carries a four-item strip that links back up to the full terms.
 
 ## The lead-magnet funnel (the free book)
 
-A visitor who isn't ready to book a call can still enter the funnel through the
-free book. The flow:
+Every conversion CTA on the site does the **same thing**: opens the book opt-in.
+The opt-in saves the lead to your database, emails the book, and then offers the
+paid next step through a Paystack checkout popup. One message, one destination,
+everywhere.
 
-1. Hero primary CTA — **"Get the free growth playbook"** — opens an opt-in modal
-   (`components/OptIn.tsx`), driven by a small context provider
-   (`components/OptInProvider.tsx`) so any component can trigger it via the
-   `useOptIn()` hook.
-2. The visitor enters first name + email. On submit, their details POST to
-   `FORM_ENDPOINT` (same endpoint as every other form) with
-   `source: "synergox.co/optin"` and `leadMagnet: "The Compounding Business"`.
-3. The modal switches to a success screen, opens the book
-   (`/public/growth-playbook.pdf`) in a new tab, and counts down
-   `REDIRECT_DELAY` seconds.
-4. It then redirects to `PAYMENT_URL` — the paid next step.
+The single exception, by design, is the **`/learn` page**, which keeps a direct
+**"Book a strategy call" → `/apply`** CTA — that page is for people who chose the
+do-it-yourself path.
+
+### One button, used everywhere
+
+`components/BookCTA.tsx` is the single site-wide conversion button (Nav, Hero,
+Teardown, Paths done-for-you card, Guarantee, final CTA, services, footer). It
+opens the opt-in modal via `useOptIn()`. Change it once, it changes everywhere.
+
+### The flow, end to end
+
+1. A CTA opens the opt-in modal (`components/OptIn.tsx`).
+2. Visitor enters first name + email and submits.
+3. The modal calls your **Supabase Edge Function** (`subscribe`), which
+   **saves the lead** to the `leads` table and **emails the book** via Resend.
+4. The success screen appears and the book also opens in a new tab as a backstop.
+5. Visitor clicks **"Continue to the next step"** → the **Paystack popup** opens
+   (inline checkout, your public key) for the paid offer.
+6. On successful payment, `purchase_completed` fires and they're sent to `/guide`.
+
+Every step degrades gracefully: if Supabase isn't set, the success screen still
+shows and links the book; if Paystack isn't set, "Continue" falls back to
+`/apply`. So the site never dead-ends, even mid-setup.
 
 ### The book
 
 `public/growth-playbook.pdf` — **The Compounding Business**, a 74-page premium
-guide written and designed for this funnel (source lives outside the site repo).
-It's a real lead magnet: it teaches the whole seven-lever system, then closes by
-transitioning to the done-for-you offer. Swap the file (keep the filename, or
-change `PLAYBOOK_URL`) if you revise it.
+guide. It's a real lead magnet: teaches the whole seven-lever system, then
+transitions to the done-for-you offer. Swap the file (keep the name) to revise.
 
-### What you MUST set before this earns money
+---
 
-Two constants in `lib/site.ts`:
+## The funnel backend (Supabase + Paystack)
 
-- **`PAYMENT_URL`** — paste your real checkout link (Paystack, Flutterwave,
-  Stripe Payment Link, etc.). Until you do, it falls back to `/apply`, so no one
-  hits a dead end — but no one can pay either.
-- **`FORM_ENDPOINT`** — your Formspree / Getform / Basin URL (the placeholder
-  `REPLACE_WITH_YOUR_ID` must be replaced or no lead is captured).
+This is the part that turns the funnel from a demo into something that captures
+leads, emails the book, and takes payment. Three pieces: **frontend env vars**,
+**a database table**, and **two Edge Functions**.
 
-### Emailing the book automatically — the honest setup
+### 1. Frontend env vars
 
-**A static site on Vercel cannot email a file or write to a CRM by itself.** It
-has no server that runs after the form submits. So the opt-in does the two
-things it *can* do client-side — it opens the book for the visitor immediately,
-and it POSTs the lead to `FORM_ENDPOINT`. The actual "email the PDF to every new
-subscriber" step is one connection in an email tool, not a code change.
+Copy `.env.example` to `.env.local` and fill in the public values (also add them
+in Vercel → Project → Settings → Environment Variables):
 
-Since you don't have an email tool yet, the simplest setup that does everything:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_live_xxxx
+NEXT_PUBLIC_OFFER_AMOUNT_KOBO=5000000        # ₦50,000 — set your price (kobo)
+NEXT_PUBLIC_OFFER_CURRENCY=NGN
+NEXT_PUBLIC_OFFER_LABEL=Growth System Build — Deposit
+```
 
-1. **Create a free MailerLite or Brevo account** (both have a permanent free
-   tier that covers a few hundred to a few thousand contacts). Either works;
-   MailerLite is the friendlier of the two to start with.
-2. **Upload `growth-playbook.pdf`** to that tool's file manager, or host it where
-   it already is (it's public at `/growth-playbook.pdf` on your live site).
-3. **Build a one-email automation:** trigger = "subscriber joins group",
-   action = send an email containing the download link. This is the email that
-   actually delivers the book.
-4. **Point the form at it.** Two options:
-   - Easiest: replace the opt-in form's `FORM_ENDPOINT` with the email tool's
-     own embedded-form action URL, so new emails land straight in your list and
-     the automation fires.
-   - Or keep Formspree and connect Formspree → your email tool with a Zapier /
-     Make automation ("new Formspree submission → add subscriber").
+These are all **public** keys — safe in the browser. Secret keys never go here.
 
-Once that automation exists, every opt-in gets the book by email automatically,
-and you have the lead on a list you can follow up with — which, per the book's
-own Chapter 6, is where most of the money actually is.
+### 2. The database
+
+In the Supabase SQL editor, run `supabase/migrations/0001_leads.sql`. It creates
+a `leads` table (email, name, source, paid status, a `meta` JSON column for the
+qualification answers) with **Row Level Security on and no public policies** —
+so leads can only be written by your Edge Functions, never read from the browser.
+
+Every form on the site writes here: the opt-in (with the book emailed), the
+homepage checklist capture (`sendBook:false`), and the `/apply` qualification
+flow (answers stored in `meta`).
+
+### 3. The Edge Functions
+
+Two functions live in `supabase/functions/`. Deploy with the Supabase CLI:
+
+```bash
+supabase login
+supabase link --project-ref YOUR-PROJECT-REF
+supabase functions deploy subscribe
+supabase functions deploy verify-payment
+```
+
+Then set their **secrets** (these are the sensitive keys — they live in Supabase,
+never in the repo or the browser):
+
+```bash
+supabase secrets set RESEND_API_KEY=re_xxxx
+supabase secrets set BOOK_URL=https://synergox.co/growth-playbook.pdf
+supabase secrets set FROM_EMAIL="Synergox <hello@synergox.co>"
+supabase secrets set PAYSTACK_SECRET_KEY=sk_live_xxxx
+```
+
+- **`subscribe`** — saves the lead and emails the book via Resend.
+- **`verify-payment`** — optional but recommended: verifies a Paystack
+  transaction server-side so a "paid" state can't be faked, and marks the lead
+  paid. Call it from a thank-you page with the transaction `reference` if you
+  want server-verified payments.
+
+### Emailing the book — Resend setup
+
+1. Create a free [Resend](https://resend.com) account.
+2. **Verify your sending domain** (add the DNS records Resend gives you). Until
+   you do, you can only send from `onboarding@resend.dev` for testing.
+3. Create an API key, set it as the `RESEND_API_KEY` secret above.
+4. Set `FROM_EMAIL` to an address on your verified domain.
+
+That's it — every opt-in now gets the book automatically, from your own domain,
+and every lead is on a list (your `leads` table) you can export or follow up.
+
+### Paystack setup
+
+1. In your Paystack dashboard, grab your **public** key (`pk_live_…`) → put it in
+   `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`.
+2. Grab your **secret** key (`sk_live_…`) → set it as the `PAYSTACK_SECRET_KEY`
+   Supabase secret (for `verify-payment`). It never touches the frontend.
+3. Set the offer price in `NEXT_PUBLIC_OFFER_AMOUNT_KOBO` (kobo: ₦50,000 =
+   `5000000`), plus currency and label.
+
+The popup uses **inline checkout** (`lib/paystack.ts`), so payment happens right
+on your site — no redirect away. On success it fires `purchase_completed` and
+sends the buyer to `/guide`.
+
+> **The book is free.** The Paystack popup charges for your **paid offer** (the
+> done-for-you build/deposit), which is the upsell *after* the free book. The
+> book is always delivered for free the moment someone opts in.
 
 ### Analytics
 
 `lib/analytics.ts` fires five funnel events to `dataLayer` / `gtag`, with a safe
-no-op fallback so nothing breaks before you install tracking:
+no-op fallback:
 
 | Event | Fires when |
 |---|---|
 | `lead_email_submitted` | opt-in form submitted |
 | `lead_book_sent` | success screen shown, book delivered |
-| `redirect_to_payment` | visitor sent to `PAYMENT_URL` |
-| `payment_page_viewed` | `/apply` (or your payment page) loads |
-| `purchase_completed` | **you call this** from your checkout success page |
+| `payment_page_viewed` | Paystack popup opened (or `/apply` loaded) |
+| `redirect_to_payment` | fallback redirect when Paystack isn't set |
+| `purchase_completed` | Paystack payment succeeded |
 
-To capture the full funnel, add Google Tag Manager or GA4 in `app/layout.tsx`,
-and on your checkout's "thank you" page call:
-
-```html
-<script>
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: "purchase_completed" });
-</script>
-```
+Add Google Tag Manager or GA4 in `app/layout.tsx` and these start reporting the
+full funnel automatically — `purchase_completed` now fires on its own from the
+Paystack success callback, so you no longer need to wire it manually.

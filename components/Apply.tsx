@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { BOOKING_URL, FORM_ENDPOINT } from "@/lib/site";
+import { BOOKING_URL, SUBSCRIBE_FN, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/site";
 import { track } from "@/lib/analytics";
 
 /* ------------------------------------------------------------------ *
@@ -179,7 +179,7 @@ export default function Apply() {
   // This page doubles as the post-opt-in destination (PAYMENT_URL fallback),
   // so treat a view here as the payment step being reached.
   useEffect(() => {
-    track("payment_page_viewed", { page: "apply" });
+    track("payment_page_viewed", { page: "apply", context: "qualification_flow" });
   }, []);
 
   const set = <K extends keyof Answers>(k: K, v: Answers[K]) =>
@@ -485,29 +485,39 @@ export default function Apply() {
   async function finish() {
     setSending(true);
     setFailed(false);
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      console.warn("Supabase not configured — application not saved.");
+      setSending(false);
+      setSent(true);
+      return;
+    }
     try {
-      const res = await fetch(FORM_ENDPOINT, {
+      const res = await fetch(SUBSCRIBE_FN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          apikey: SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
-          source: "synergox.co/apply",
-          currency: a.currency,
-          market: a.market,
-          businessModel: a.model,
-          monthlyRevenue: a.revenue,
-          monthlyAdSpend: a.spend,
-          biggestBottleneck: a.bottleneck,
-          alreadyTried: a.tried.join(", "),
-          timeline: a.timeline,
-          decisionMaker: a.authority,
           name: a.name,
           email: a.email,
-          company: a.company,
-          website: a.website,
-          recommendation: underServed ? "Learn track" : "Done for you",
+          sendBook: false,
+          meta: {
+            source: "synergox.co/apply",
+            currency: a.currency,
+            market: a.market,
+            businessModel: a.model,
+            monthlyRevenue: a.revenue,
+            monthlyAdSpend: a.spend,
+            biggestBottleneck: a.bottleneck,
+            alreadyTried: a.tried.join(", "),
+            timeline: a.timeline,
+            decisionMaker: a.authority,
+            company: a.company,
+            website: a.website,
+            recommendation: underServed ? "Learn track" : "Done for you",
+          },
         }),
       });
       if (!res.ok) setFailed(true);

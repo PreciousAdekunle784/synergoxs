@@ -1,40 +1,56 @@
-SYNERGOX SITE — BUILD 6  (lead-magnet funnel + free book)
-=========================================================
+SYNERGOX SITE — BUILD 8  (real backend: Supabase + Paystack + Resend)
+=====================================================================
 
-NEW IN THIS BUILD
+WHAT CHANGED FROM BUILD 7
 
-  The free book — public/growth-playbook.pdf
-    "The Compounding Business" — a 74-page premium guide.
-    Seven growth levers (Offer -> Traffic -> Conversion -> Ascension ->
-    Retention -> Referral -> Compounding), 8 chapters, a 9-tool toolkit
-    (checklists, audits, weekly scorecard, 90-day plan), and a close
-    that transitions to your done-for-you offer.
+  The funnel now has a REAL backend. The old "post to Formspree +
+  redirect to a payment URL" placeholder is replaced with:
 
-  The opt-in funnel
-    Hero primary CTA is now "Get the free growth playbook".
-    It opens a modal (components/OptIn.tsx):
-        first name + email
-        -> POST lead to FORM_ENDPOINT
-        -> success screen, book opens in a new tab
-        -> 3-second countdown
-        -> redirect to PAYMENT_URL
-    Any component can open it via useOptIn() (OptInProvider.tsx).
+    opt-in form
+      -> Supabase Edge Function "subscribe"
+           saves the lead to a `leads` table
+           emails the book via Resend
+      -> success screen (book also opens in a new tab as a backstop)
+      -> "Continue to the next step"
+      -> Paystack INLINE popup (checkout on your own site, public key)
+      -> on payment: purchase_completed fires -> /guide
 
-  Analytics — lib/analytics.ts
-    Fires 5 funnel events (lead_email_submitted, lead_book_sent,
-    redirect_to_payment, payment_page_viewed, purchase_completed)
-    to dataLayer/gtag, with a safe no-op fallback.
+  Everything degrades gracefully: no Supabase set -> success still
+  shows and links the book; no Paystack set -> "Continue" falls back
+  to /apply. The site never dead-ends, even mid-setup.
 
-BEFORE IT EARNS MONEY — set two things in lib/site.ts
-    PAYMENT_URL     paste your real checkout link (Paystack/Flutterwave/
-                    Stripe). Falls back to /apply until you do.
-    FORM_ENDPOINT   your Formspree/Getform/Basin URL.
+NEW FILES
+  supabase/functions/subscribe/index.ts       save lead + email book (Resend)
+  supabase/functions/verify-payment/index.ts  verify Paystack server-side
+  supabase/migrations/0001_leads.sql          leads table, RLS on, no public policies
+  lib/paystack.ts                             loads Paystack inline + opens popup
+  .env.example                                the env vars to set
+  .gitignore                                  keeps .env.local and keys out of git
 
-EMAILING THE BOOK AUTOMATICALLY
-    A static Vercel site can't email a file by itself. The opt-in opens
-    the book instantly AND posts the lead; the auto-email is one
-    connection in an email tool. Full step-by-step (MailerLite/Brevo
-    free tier) is in README.md -> "Emailing the book automatically".
+CHANGED
+  lib/site.ts        now reads public keys from env vars (Supabase URL + anon
+                     key, Paystack public key, offer price/currency/label)
+  components/OptIn.tsx      Supabase subscribe + Paystack popup flow
+  components/LeadCapture.tsx / Apply.tsx  now save to Supabase (apply answers
+                     stored in a `meta` JSON column; neither emails the book)
+
+THE BOOK IS FREE. The Paystack popup charges for your PAID OFFER (the
+done-for-you build/deposit) — the upsell AFTER the free book. The book is
+always delivered free the moment someone opts in.
+
+TO GO LIVE (full guide in README -> "The funnel backend (Supabase + Paystack)")
+  1. Create Supabase project; run supabase/migrations/0001_leads.sql
+  2. Deploy both Edge Functions (supabase functions deploy subscribe / verify-payment)
+  3. Set Supabase secrets:
+        RESEND_API_KEY, BOOK_URL, FROM_EMAIL, PAYSTACK_SECRET_KEY
+  4. Verify your sending domain in Resend
+  5. Put PUBLIC keys in .env.local / Vercel:
+        NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+        NEXT_PUBLIC_OFFER_AMOUNT_KOBO (kobo: N50,000 = 5000000), CURRENCY, LABEL
+
+ANALYTICS (lib/analytics.ts) — purchase_completed now fires automatically from
+the Paystack success callback; no manual wiring needed.
 
 Page order (unchanged):
   hero, problem, method, teardown, paths, services, journey, proof,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { services } from "@/lib/services";
+import BookCTA from "@/components/BookCTA";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -29,9 +30,7 @@ export default function ServicesPage() {
             costing you the most.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link href="/apply" className="btn-signal shadow-press">
-              Book a strategy call
-            </Link>
+            <BookCTA className="btn-signal shadow-press" label="Get the free growth playbook" />
             <Link href="/#teardown" className="btn-ghost">
               Run the teardown
             </Link>
@@ -87,9 +86,7 @@ export default function ServicesPage() {
             Not sure which one you need?{" "}
             <span className="text-inkFaint">That&apos;s the call.</span>
           </h2>
-          <Link href="/apply" className="btn-signal mt-9 shadow-press">
-            Book a strategy call
-          </Link>
+          <BookCTA className="btn-signal mt-9 shadow-press" label="Get the free growth playbook" />
         </div>
       </section>
     </>

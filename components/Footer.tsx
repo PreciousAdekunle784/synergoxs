@@ -1,13 +1,9 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { EMAIL } from "@/lib/site";
-import { useOptIn } from "./OptInProvider";
+import BookCTA from "./BookCTA";
 
 export default function Footer() {
-  const { openOptIn } = useOptIn();
-
   return (
     <footer className="border-t border-hair bg-pitch">
       <div className="shell py-16 md:py-20">
@@ -63,9 +59,11 @@ export default function Footer() {
 
           <div>
             <p className="eyebrow">Start</p>
-            <button onClick={openOptIn} className="btn-signal mt-5 w-full sm:w-auto">
-              Get the free playbook
-            </button>
+            <BookCTA
+              className="btn-signal mt-5 shadow-press"
+              label="Get the free playbook"
+              full
+            />
             <ul className="mt-8 space-y-3 text-[0.92rem]">
               <li>
                 <Link

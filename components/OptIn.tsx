@@ -4,13 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  FORM_ENDPOINT,
+  SUBSCRIBE_FN,
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
   PLAYBOOK_URL,
   PLAYBOOK_TITLE,
-  PAYMENT_URL,
-  REDIRECT_DELAY,
+  PAYSTACK_PUBLIC_KEY,
+  PAYMENT_FALLBACK_URL,
+  OFFER_LABEL,
 } from "@/lib/site";
 import { track } from "@/lib/analytics";
+import { usePaystackScript, openPaystack } from "@/lib/paystack";
 
 type Phase = "form" | "success";
 
@@ -22,67 +26,54 @@ export default function OptIn({
   onClose: () => void;
 }) {
   const reduce = useReducedMotion();
+  const paystackReady = usePaystackScript();
   const [mounted, setMounted] = useState(false);
   const [phase, setPhase] = useState<Phase>("form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [count, setCount] = useState(REDIRECT_DELAY);
+  const [paying, setPaying] = useState(false);
   const firstField = useRef<HTMLInputElement>(null);
 
   useEffect(() => setMounted(true), []);
 
-  // Focus + lock scroll while open
   useEffect(() => {
     if (!open) return;
     const t = setTimeout(() => firstField.current?.focus(), 120);
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && phase === "form" && onClose();
+    const onKey = (e: KeyboardEvent) =>
+      e.key === "Escape" && phase === "form" && !busy && onClose();
     window.addEventListener("keydown", onKey);
     return () => {
       clearTimeout(t);
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, onClose, phase]);
+  }, [open, onClose, phase, busy]);
 
-  // Reset when closed
+  // Reset shortly after closing.
   useEffect(() => {
     if (!open) {
       const t = setTimeout(() => {
         setPhase("form");
         setError(null);
         setBusy(false);
-        setCount(REDIRECT_DELAY);
+        setPaying(false);
       }, 300);
       return () => clearTimeout(t);
     }
   }, [open]);
 
-  // Success countdown → redirect to payment
+  // On reaching success: deliver the book in-tab as a backstop and fire event.
   useEffect(() => {
     if (phase !== "success") return;
-
     track("lead_book_sent", { title: PLAYBOOK_TITLE });
-
-    // Trigger the download/open of the book in a new tab
     const a = document.createElement("a");
     a.href = PLAYBOOK_URL;
     a.target = "_blank";
     a.rel = "noopener";
     a.click();
-
-    const tick = setInterval(() => setCount((c) => c - 1), 1000);
-    const go = setTimeout(() => {
-      track("redirect_to_payment", { destination: PAYMENT_URL });
-      window.location.href = PAYMENT_URL;
-    }, REDIRECT_DELAY * 1000);
-
-    return () => {
-      clearInterval(tick);
-      clearTimeout(go);
-    };
   }, [phase]);
 
   async function submit(e: React.FormEvent) {
@@ -95,24 +86,53 @@ export default function OptIn({
     setError(null);
     track("lead_email_submitted", { source: "optin_modal" });
 
-    try {
-      await fetch(FORM_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          source: "synergox.co/optin",
-          leadMagnet: PLAYBOOK_TITLE,
-        }),
-      });
-      // We advance regardless — the visitor still gets the book and the next
-      // step, and the lead is retried client-side below if the POST failed.
-    } catch {
-      /* swallow — see note above */
+    // Call the Supabase Edge Function: saves the lead + emails the book.
+    if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+      try {
+        const res = await fetch(SUBSCRIBE_FN, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            apikey: SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ name, email }),
+        });
+        if (!res.ok) {
+          console.error("subscribe failed:", res.status, await res.text());
+        }
+      } catch (err) {
+        console.error("subscribe error:", err);
+      }
+    } else {
+      console.warn(
+        "Supabase not configured — set NEXT_PUBLIC_SUPABASE_URL and _ANON_KEY. " +
+          "Showing success anyway so the flow is testable."
+      );
     }
+
     setBusy(false);
     setPhase("success");
+  }
+
+  function continueToPayment() {
+    track("payment_page_viewed", { offer: OFFER_LABEL });
+
+    // Try the Paystack popup. If it isn't configured/ready, fall back.
+    if (PAYSTACK_PUBLIC_KEY && paystackReady) {
+      setPaying(true);
+      const opened = openPaystack(email, (r) => {
+        setPaying(false);
+        if (r.status === "success") {
+          track("purchase_completed", { reference: r.reference });
+          window.location.href = "/guide"; // post-purchase thank-you page
+        }
+      });
+      if (opened) return;
+    }
+    // Fallback: no Paystack yet → send them to the qualification flow.
+    track("redirect_to_payment", { destination: PAYMENT_FALLBACK_URL });
+    window.location.href = PAYMENT_FALLBACK_URL;
   }
 
   if (!mounted) return null;
@@ -127,10 +147,9 @@ export default function OptIn({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
         >
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-void/85 backdrop-blur-sm"
-            onClick={() => phase === "form" && onClose()}
+            onClick={() => phase === "form" && !busy && onClose()}
             aria-hidden
           />
 
@@ -144,7 +163,6 @@ export default function OptIn({
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-lg overflow-hidden rounded-slab border border-hair bg-panel shadow-lift"
           >
-            {/* top signal line */}
             <div
               aria-hidden
               className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-signal/60 to-transparent"
@@ -235,6 +253,16 @@ export default function OptIn({
                   transition={{ duration: 0.35 }}
                   className="p-8 text-center md:p-12"
                 >
+                  <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full border border-hair text-inkMute transition-colors hover:border-inkFaint hover:text-ink"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 15 15" fill="none">
+                      <path d="M4 4l7 7M11 4l-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  </button>
+
                   <motion.span
                     initial={reduce ? {} : { scale: 0 }}
                     animate={{ scale: 1 }}
@@ -260,19 +288,23 @@ export default function OptIn({
                   </p>
 
                   <div className="mx-auto mt-8 max-w-sm rounded-card border border-signal/25 bg-signal/[0.05] p-6">
-                    <p className="eyebrow text-signal">While the email lands</p>
+                    <p className="eyebrow text-signal">Ready to skip the trial and error?</p>
                     <p className="mt-3 text-[0.95rem] leading-relaxed text-ink/85">
-                      Reading the book is step one. If you&apos;d rather we build the
-                      system with you, we&apos;re taking you to the next step now.
+                      Reading the book is step one. If you&apos;d rather we build
+                      the system with you, take the next step now.
                     </p>
-                    <p className="mt-4 font-mono text-[0.78rem] uppercase tracking-[0.14em] text-inkFaint">
-                      Continuing in {count}…
-                    </p>
+                    <button
+                      onClick={continueToPayment}
+                      disabled={paying}
+                      className="btn-signal mt-5 w-full shadow-press disabled:opacity-60"
+                    >
+                      {paying ? "Opening secure checkout…" : "Continue to the next step"}
+                    </button>
                   </div>
 
-                  <a href={PAYMENT_URL} className="mt-6 inline-block text-[0.85rem] text-inkMute hover:text-ink">
-                    Take me there now →
-                  </a>
+                  <button onClick={onClose} className="mt-6 text-[0.85rem] text-inkMute hover:text-ink">
+                    I&apos;ll just read the book for now
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>

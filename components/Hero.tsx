@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import SystemPanel from "./SystemPanel";
-import { useOptIn } from "./OptInProvider";
+import BookCTA from "./BookCTA";
 
 const lines = [
   [{ t: "Your competitors aren't", g: false }],
@@ -16,7 +16,6 @@ const lines = [
 
 export default function Hero() {
   const reduce = useReducedMotion();
-  const { openOptIn } = useOptIn();
 
   const rise = (i: number) => ({
     initial: reduce ? false : { y: "110%" },
@@ -100,18 +99,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.58 }}
             className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
           >
-            <button onClick={openOptIn} className="btn-signal shadow-press">
-              Get the free growth playbook
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
-                <path
-                  d="M3 7.5h9m0 0L8.5 4M12 7.5 8.5 11"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+            <BookCTA className="btn-signal shadow-press" />
             <a href="#teardown" className="btn-ghost">
               Find your leak first
             </a>
@@ -123,11 +111,8 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.72 }}
             className="mt-5 max-w-md text-[0.85rem] leading-relaxed text-inkFaint"
           >
-            74 pages, free — the exact system we install for clients. Or{" "}
-            <button onClick={openOptIn} className="text-inkMute underline decoration-hair underline-offset-4 transition-colors hover:text-ink">
-              get the book
-            </button>{" "}
-            if you already know you want the team.
+            74 pages, free — the exact system we install for clients. Read it,
+            then take the next step when you&apos;re ready.
           </motion.p>
         </div>
 
