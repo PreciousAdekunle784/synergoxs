@@ -68,9 +68,9 @@ export default function PayButton({
       setPaying(false);
     }
 
-    // Paystack not configured yet → don't dead-end.
-    track("redirect_to_payment", { destination: PAYMENT_FALLBACK_URL, reason: "paystack_unset" });
-    window.location.href = PAYMENT_FALLBACK_URL;
+    // Paystack not configured yet → don't dead-end to /apply, alert the user.
+    track("redirect_to_payment", { destination: "alert", reason: "paystack_unset" });
+    alert("Payment is currently offline. Please configure NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY in .env.local to test payments.");
   }
 
   return (
