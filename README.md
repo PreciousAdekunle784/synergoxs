@@ -274,3 +274,90 @@ document? If not, it belongs somewhere else in the copy.
 To keep the page from repeating itself, two Trust indicators and the three
 risk-reversal cards in the final CTA were replaced when this section landed —
 the close now carries a four-item strip that links back up to the full terms.
+
+## The lead-magnet funnel (the free book)
+
+A visitor who isn't ready to book a call can still enter the funnel through the
+free book. The flow:
+
+1. Hero primary CTA — **"Get the free growth playbook"** — opens an opt-in modal
+   (`components/OptIn.tsx`), driven by a small context provider
+   (`components/OptInProvider.tsx`) so any component can trigger it via the
+   `useOptIn()` hook.
+2. The visitor enters first name + email. On submit, their details POST to
+   `FORM_ENDPOINT` (same endpoint as every other form) with
+   `source: "synergox.co/optin"` and `leadMagnet: "The Compounding Business"`.
+3. The modal switches to a success screen, opens the book
+   (`/public/growth-playbook.pdf`) in a new tab, and counts down
+   `REDIRECT_DELAY` seconds.
+4. It then redirects to `PAYMENT_URL` — the paid next step.
+
+### The book
+
+`public/growth-playbook.pdf` — **The Compounding Business**, a 74-page premium
+guide written and designed for this funnel (source lives outside the site repo).
+It's a real lead magnet: it teaches the whole seven-lever system, then closes by
+transitioning to the done-for-you offer. Swap the file (keep the filename, or
+change `PLAYBOOK_URL`) if you revise it.
+
+### What you MUST set before this earns money
+
+Two constants in `lib/site.ts`:
+
+- **`PAYMENT_URL`** — paste your real checkout link (Paystack, Flutterwave,
+  Stripe Payment Link, etc.). Until you do, it falls back to `/apply`, so no one
+  hits a dead end — but no one can pay either.
+- **`FORM_ENDPOINT`** — your Formspree / Getform / Basin URL (the placeholder
+  `REPLACE_WITH_YOUR_ID` must be replaced or no lead is captured).
+
+### Emailing the book automatically — the honest setup
+
+**A static site on Vercel cannot email a file or write to a CRM by itself.** It
+has no server that runs after the form submits. So the opt-in does the two
+things it *can* do client-side — it opens the book for the visitor immediately,
+and it POSTs the lead to `FORM_ENDPOINT`. The actual "email the PDF to every new
+subscriber" step is one connection in an email tool, not a code change.
+
+Since you don't have an email tool yet, the simplest setup that does everything:
+
+1. **Create a free MailerLite or Brevo account** (both have a permanent free
+   tier that covers a few hundred to a few thousand contacts). Either works;
+   MailerLite is the friendlier of the two to start with.
+2. **Upload `growth-playbook.pdf`** to that tool's file manager, or host it where
+   it already is (it's public at `/growth-playbook.pdf` on your live site).
+3. **Build a one-email automation:** trigger = "subscriber joins group",
+   action = send an email containing the download link. This is the email that
+   actually delivers the book.
+4. **Point the form at it.** Two options:
+   - Easiest: replace the opt-in form's `FORM_ENDPOINT` with the email tool's
+     own embedded-form action URL, so new emails land straight in your list and
+     the automation fires.
+   - Or keep Formspree and connect Formspree → your email tool with a Zapier /
+     Make automation ("new Formspree submission → add subscriber").
+
+Once that automation exists, every opt-in gets the book by email automatically,
+and you have the lead on a list you can follow up with — which, per the book's
+own Chapter 6, is where most of the money actually is.
+
+### Analytics
+
+`lib/analytics.ts` fires five funnel events to `dataLayer` / `gtag`, with a safe
+no-op fallback so nothing breaks before you install tracking:
+
+| Event | Fires when |
+|---|---|
+| `lead_email_submitted` | opt-in form submitted |
+| `lead_book_sent` | success screen shown, book delivered |
+| `redirect_to_payment` | visitor sent to `PAYMENT_URL` |
+| `payment_page_viewed` | `/apply` (or your payment page) loads |
+| `purchase_completed` | **you call this** from your checkout success page |
+
+To capture the full funnel, add Google Tag Manager or GA4 in `app/layout.tsx`,
+and on your checkout's "thank you" page call:
+
+```html
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: "purchase_completed" });
+</script>
+```

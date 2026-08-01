@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
+import OptInProvider from "@/components/OptInProvider";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
@@ -77,9 +78,11 @@ export default function RootLayout({
           Skip to content
         </a>
         <SmoothScroll />
-        <Nav />
-        <main id="main">{children}</main>
-        <Footer />
+        <OptInProvider>
+          <Nav />
+          <main id="main">{children}</main>
+          <Footer />
+        </OptInProvider>
       </body>
     </html>
   );

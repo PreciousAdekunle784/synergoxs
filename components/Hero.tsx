@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import SystemPanel from "./SystemPanel";
+import { useOptIn } from "./OptInProvider";
 
 const lines = [
   [{ t: "Your competitors aren't", g: false }],
@@ -16,6 +17,7 @@ const lines = [
 
 export default function Hero() {
   const reduce = useReducedMotion();
+  const { openOptIn } = useOptIn();
 
   const rise = (i: number) => ({
     initial: reduce ? false : { y: "110%" },
@@ -99,8 +101,8 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.58 }}
             className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
           >
-            <Link href="/apply" className="btn-signal shadow-press">
-              Book a strategy call
+            <button onClick={openOptIn} className="btn-signal shadow-press">
+              Get the free growth playbook
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
                 <path
                   d="M3 7.5h9m0 0L8.5 4M12 7.5 8.5 11"
@@ -110,7 +112,7 @@ export default function Hero() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </Link>
+            </button>
             <a href="#teardown" className="btn-ghost">
               Find your leak first
             </a>
@@ -122,8 +124,11 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.72 }}
             className="mt-5 max-w-md text-[0.85rem] leading-relaxed text-inkFaint"
           >
-            30 minutes, no pitch deck. You leave with the map of your acquisition
-            system whether or not we work together.
+            74 pages, free — the exact system we install for clients. Or{" "}
+            <Link href="/apply" className="text-inkMute underline decoration-hair underline-offset-4 transition-colors hover:text-ink">
+              book a strategy call
+            </Link>{" "}
+            if you already know you want the team.
           </motion.p>
         </div>
 

@@ -1,27 +1,41 @@
-SYNERGOX SITE — BUILD 5  (favicon + guarantee)
-==============================================
+SYNERGOX SITE — BUILD 6  (lead-magnet funnel + free book)
+=========================================================
 
-New in this build:
-  · Favicon set generated from your logo:
-      app/icon.png        512x512  (tabs, bookmarks)
-      app/apple-icon.png  180x180  (iOS home screen)
-      app/favicon.ico     16/32/48/64
-    public/logo.png re-exported square and sharper.
+NEW IN THIS BUILD
 
-  · The Ship-It Guarantee — components/Guarantee.tsx
-    Sits immediately before the final CTA.
-    Four clauses:
-       01  Ship it, or it's free.
-       02  Our fee moves with your number.
-       03  You own everything from day one.
-       04  Thirty days' notice. No exit fee.
-    Plus a "what it does not cover" block — revenue figures,
-    timelines you delay, and ad platform spend.
+  The free book — public/growth-playbook.pdf
+    "The Compounding Business" — a 74-page premium guide.
+    Seven growth levers (Offer -> Traffic -> Conversion -> Ascension ->
+    Retention -> Referral -> Compounding), 8 chapters, a 9-tool toolkit
+    (checklists, audits, weekly scorecard, 90-day plan), and a close
+    that transitions to your done-for-you offer.
 
-  · De-duplicated: two Trust indicators and the three risk-reversal
-    cards in the final CTA were replaced, since the guarantee now
-    owns that ground. The close carries a short strip instead.
+  The opt-in funnel
+    Hero primary CTA is now "Get the free growth playbook".
+    It opens a modal (components/OptIn.tsx):
+        first name + email
+        -> POST lead to FORM_ENDPOINT
+        -> success screen, book opens in a new tab
+        -> 3-second countdown
+        -> redirect to PAYMENT_URL
+    Any component can open it via useOptIn() (OptInProvider.tsx).
 
-Page order:
+  Analytics — lib/analytics.ts
+    Fires 5 funnel events (lead_email_submitted, lead_book_sent,
+    redirect_to_payment, payment_page_viewed, purchase_completed)
+    to dataLayer/gtag, with a safe no-op fallback.
+
+BEFORE IT EARNS MONEY — set two things in lib/site.ts
+    PAYMENT_URL     paste your real checkout link (Paystack/Flutterwave/
+                    Stripe). Falls back to /apply until you do.
+    FORM_ENDPOINT   your Formspree/Getform/Basin URL.
+
+EMAILING THE BOOK AUTOMATICALLY
+    A static Vercel site can't email a file by itself. The opt-in opens
+    the book instantly AND posts the lead; the auto-email is one
+    connection in an email tool. Full step-by-step (MailerLite/Brevo
+    free tier) is in README.md -> "Emailing the book automatically".
+
+Page order (unchanged):
   hero, problem, method, teardown, paths, services, journey, proof,
-  difference, trust, questions, lead capture, GUARANTEE, final CTA
+  difference, trust, questions, lead capture, guarantee, final CTA

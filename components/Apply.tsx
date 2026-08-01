@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BOOKING_URL, FORM_ENDPOINT } from "@/lib/site";
+import { track } from "@/lib/analytics";
 
 /* ------------------------------------------------------------------ *
  * CURRENCIES — EDIT ME OCCASIONALLY
@@ -174,6 +175,12 @@ export default function Apply() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [failed, setFailed] = useState(false);
+
+  // This page doubles as the post-opt-in destination (PAYMENT_URL fallback),
+  // so treat a view here as the payment step being reached.
+  useEffect(() => {
+    track("payment_page_viewed", { page: "apply" });
+  }, []);
 
   const set = <K extends keyof Answers>(k: K, v: Answers[K]) =>
     setA((prev) => ({ ...prev, [k]: v }));
