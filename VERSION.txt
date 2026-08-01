@@ -1,57 +1,50 @@
-SYNERGOX SITE — BUILD 8  (real backend: Supabase + Paystack + Resend)
-=====================================================================
+SYNERGOX SITE — BUILD 9  (no-tab redirect + conversion payment page)
+====================================================================
 
-WHAT CHANGED FROM BUILD 7
+WHAT CHANGED FROM BUILD 8
 
-  The funnel now has a REAL backend. The old "post to Formspree +
-  redirect to a payment URL" placeholder is replaced with:
+  1. NO MORE DISTRACTING NEW TAB
+     Submitting the opt-in no longer force-opens the book in a new tab
+     (that pulled people out of the funnel). Now:
+        submit -> success screen (~3s, with a countdown)
+               -> AUTO-REDIRECT to the payment page (/offer)
+     The book still gets delivered — by email — so nothing is lost.
+     A "Take me there now" button lets impatient people skip the wait.
 
-    opt-in form
-      -> Supabase Edge Function "subscribe"
-           saves the lead to a `leads` table
-           emails the book via Resend
-      -> success screen (book also opens in a new tab as a backstop)
-      -> "Continue to the next step"
-      -> Paystack INLINE popup (checkout on your own site, public key)
-      -> on payment: purchase_completed fires -> /guide
+  2. PRICE = N199,999
+     Set as the default in lib/site.ts
+     (NEXT_PUBLIC_OFFER_AMOUNT_KOBO = 19999900 kobo).
+     Change it in that one place / via env.
 
-  Everything degrades gracefully: no Supabase set -> success still
-  shows and links the book; no Paystack set -> "Continue" falls back
-  to /apply. The site never dead-ends, even mid-setup.
+  3. NEW CONVERSION PAYMENT PAGE — /offer  (app/offer/page.tsx)
+     A long-form, direct-response sales page for your PAID
+     done-for-you offer, written in a Hormozi / Suby / Brunson style:
+        pattern-interrupt hero
+        the real problem (knowing != doing)
+        what we build (6 concrete deliverables)
+        value stack + price anchoring (N199,999 vs N2.45M+ of value)
+        risk reversal (ship-it, own-it, no lock-in)
+        real proof (Kings Food Mart only — no invented quotes)
+        objection handling (the 3 real hesitations)
+        final close
+     The Paystack INLINE checkout button (components/PayButton.tsx)
+     appears three times down the page and prefills the email
+     captured at opt-in. Falls back to /apply if Paystack isn't set.
 
-NEW FILES
-  supabase/functions/subscribe/index.ts       save lead + email book (Resend)
-  supabase/functions/verify-payment/index.ts  verify Paystack server-side
-  supabase/migrations/0001_leads.sql          leads table, RLS on, no public policies
-  lib/paystack.ts                             loads Paystack inline + opens popup
-  .env.example                                the env vars to set
-  .gitignore                                  keeps .env.local and keys out of git
+FLOW NOW
+  any CTA -> opt-in modal -> subscribe fn (save lead + email book)
+          -> success (3s countdown) -> /offer (sales page)
+          -> Paystack button -> purchase_completed -> /guide
 
-CHANGED
-  lib/site.ts        now reads public keys from env vars (Supabase URL + anon
-                     key, Paystack public key, offer price/currency/label)
-  components/OptIn.tsx      Supabase subscribe + Paystack popup flow
-  components/LeadCapture.tsx / Apply.tsx  now save to Supabase (apply answers
-                     stored in a `meta` JSON column; neither emails the book)
+THE BOOK IS FREE. /offer sells the paid done-for-you build. The book
+is delivered by email the moment someone opts in.
 
-THE BOOK IS FREE. The Paystack popup charges for your PAID OFFER (the
-done-for-you build/deposit) — the upsell AFTER the free book. The book is
-always delivered free the moment someone opts in.
+EDIT THESE FOR YOUR BUSINESS
+  - Price: NEXT_PUBLIC_OFFER_AMOUNT_KOBO (env) — currently N199,999
+  - Value-stack line items in app/offer/page.tsx (illustrative anchors)
+  - Add real client results in components/OfferProof.tsx as you get them
 
-TO GO LIVE (full guide in README -> "The funnel backend (Supabase + Paystack)")
-  1. Create Supabase project; run supabase/migrations/0001_leads.sql
-  2. Deploy both Edge Functions (supabase functions deploy subscribe / verify-payment)
-  3. Set Supabase secrets:
-        RESEND_API_KEY, BOOK_URL, FROM_EMAIL, PAYSTACK_SECRET_KEY
-  4. Verify your sending domain in Resend
-  5. Put PUBLIC keys in .env.local / Vercel:
-        NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-        NEXT_PUBLIC_OFFER_AMOUNT_KOBO (kobo: N50,000 = 5000000), CURRENCY, LABEL
+Backend setup (Supabase + Paystack + Resend) is unchanged from build 8 —
+full guide in README -> "The funnel backend (Supabase + Paystack)".
 
-ANALYTICS (lib/analytics.ts) — purchase_completed now fires automatically from
-the Paystack success callback; no manual wiring needed.
-
-Page order (unchanged):
-  hero, problem, method, teardown, paths, services, journey, proof,
-  difference, trust, questions, lead capture, guarantee, final CTA
+Routes: 16 (adds /offer). Build verified clean.

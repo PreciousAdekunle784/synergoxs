@@ -298,13 +298,32 @@ opens the opt-in modal via `useOptIn()`. Change it once, it changes everywhere.
 3. The modal calls your **Supabase Edge Function** (`subscribe`), which
    **saves the lead** to the `leads` table and **emails the book** via Resend.
 4. The success screen appears and the book also opens in a new tab as a backstop.
-5. Visitor clicks **"Continue to the next step"** → the **Paystack popup** opens
-   (inline checkout, your public key) for the paid offer.
-6. On successful payment, `purchase_completed` fires and they're sent to `/guide`.
+5. The success screen shows briefly (~3s) and **auto-redirects to `/offer`** —
+   the conversion-focused payment page. It does NOT open the book in a new tab
+   (that pulled people out of the funnel); the book arrives by email.
+6. On `/offer`, the visitor reads the sales page and clicks the Paystack button
+   (`components/PayButton.tsx`) — **inline checkout, on your own site**. The
+   email captured at opt-in is prefilled.
+7. On successful payment, `purchase_completed` fires and they're sent to `/guide`.
 
 Every step degrades gracefully: if Supabase isn't set, the success screen still
-shows and links the book; if Paystack isn't set, "Continue" falls back to
-`/apply`. So the site never dead-ends, even mid-setup.
+shows; if Paystack isn't set, the `/offer` button falls back to `/apply`. So the
+site never dead-ends, even mid-setup.
+
+### The payment page — `/offer`
+
+`app/offer/page.tsx` is a long-form, conversion-focused sales page for your
+**paid done-for-you offer** (written in a direct-response style). Structure:
+pattern-interrupt hero → the real problem (knowing ≠ doing) → what we build
+(6 deliverables) → value stack with price anchoring → risk reversal → real proof
+→ objections → final close. The Paystack button appears three times down the
+page. Proof uses ONLY the real Kings Food Mart result (no invented quotes) —
+add more via `components/OfferProof.tsx` as you're cleared to share them.
+
+The price shows **₦199,999** by default. Change it in one place:
+`NEXT_PUBLIC_OFFER_AMOUNT_KOBO` (kobo — ₦199,999 = `19999900`). The value-stack
+line items inside the page are illustrative anchors — edit them in
+`app/offer/page.tsx` to match what you actually deliver.
 
 ### The book
 

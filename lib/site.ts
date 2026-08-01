@@ -36,17 +36,23 @@ export const PAYSTACK_PUBLIC_KEY =
 
 /** Price of the paid offer, in the smallest currency unit (kobo for NGN). */
 export const OFFER_AMOUNT_KOBO = Number(
-  process.env.NEXT_PUBLIC_OFFER_AMOUNT_KOBO ?? "5000000" // ₦50,000 default — change this
+  process.env.NEXT_PUBLIC_OFFER_AMOUNT_KOBO ?? "19999900" // ₦199,999 — change via env
 );
 export const OFFER_CURRENCY = process.env.NEXT_PUBLIC_OFFER_CURRENCY ?? "NGN";
 export const OFFER_LABEL =
-  process.env.NEXT_PUBLIC_OFFER_LABEL ?? "Growth System Build — Deposit";
+  process.env.NEXT_PUBLIC_OFFER_LABEL ?? "Growth System Build";
 
 /**
- * Fallback if Paystack isn't configured yet: where the success screen sends
- * people instead of opening the popup. Keeps the flow alive during setup.
+ * The conversion-focused payment page the success screen redirects to. The
+ * Paystack checkout button lives on that page (see app/offer/page.tsx).
+ */
+export const PAYMENT_PAGE = "/offer";
+
+/**
+ * Fallback for the payment page's checkout button if Paystack isn't set up yet:
+ * where it sends people instead. Keeps the flow alive during setup.
  */
 export const PAYMENT_FALLBACK_URL = "/apply";
 
-/** Seconds on the success screen before the payment step is offered. */
+/** Seconds on the success screen before auto-redirecting to the payment page. */
 export const REDIRECT_DELAY = 3;

@@ -7,14 +7,11 @@ import {
   SUBSCRIBE_FN,
   SUPABASE_ANON_KEY,
   SUPABASE_URL,
-  PLAYBOOK_URL,
   PLAYBOOK_TITLE,
-  PAYSTACK_PUBLIC_KEY,
-  PAYMENT_FALLBACK_URL,
-  OFFER_LABEL,
+  PAYMENT_PAGE,
+  REDIRECT_DELAY,
 } from "@/lib/site";
 import { track } from "@/lib/analytics";
-import { usePaystackScript, openPaystack } from "@/lib/paystack";
 
 type Phase = "form" | "success";
 
@@ -26,14 +23,13 @@ export default function OptIn({
   onClose: () => void;
 }) {
   const reduce = useReducedMotion();
-  const paystackReady = usePaystackScript();
   const [mounted, setMounted] = useState(false);
   const [phase, setPhase] = useState<Phase>("form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paying, setPaying] = useState(false);
+  const [count, setCount] = useState(REDIRECT_DELAY);
   const firstField = useRef<HTMLInputElement>(null);
 
   useEffect(() => setMounted(true), []);
@@ -59,21 +55,29 @@ export default function OptIn({
         setPhase("form");
         setError(null);
         setBusy(false);
-        setPaying(false);
+        setCount(REDIRECT_DELAY);
       }, 300);
       return () => clearTimeout(t);
     }
   }, [open]);
 
-  // On reaching success: deliver the book in-tab as a backstop and fire event.
+  // On reaching success: fire the delivery event, then count down and
+  // auto-redirect to the payment page. We deliberately do NOT open the book in
+  // a new tab — that pulled people out of the funnel. The book arrives by email.
   useEffect(() => {
     if (phase !== "success") return;
     track("lead_book_sent", { title: PLAYBOOK_TITLE });
-    const a = document.createElement("a");
-    a.href = PLAYBOOK_URL;
-    a.target = "_blank";
-    a.rel = "noopener";
-    a.click();
+
+    const tick = setInterval(() => setCount((c) => c - 1), 1000);
+    const go = setTimeout(() => {
+      track("redirect_to_payment", { destination: PAYMENT_PAGE });
+      window.location.href = PAYMENT_PAGE;
+    }, REDIRECT_DELAY * 1000);
+
+    return () => {
+      clearInterval(tick);
+      clearTimeout(go);
+    };
   }, [phase]);
 
   async function submit(e: React.FormEvent) {
@@ -85,6 +89,13 @@ export default function OptIn({
     setBusy(true);
     setError(null);
     track("lead_email_submitted", { source: "optin_modal" });
+
+    // Remember the email so the payment page can prefill the Paystack checkout.
+    try {
+      sessionStorage.setItem("syx_email", email);
+    } catch {
+      /* ignore */
+    }
 
     // Call the Supabase Edge Function: saves the lead + emails the book.
     if (SUPABASE_URL && SUPABASE_ANON_KEY) {
@@ -113,26 +124,6 @@ export default function OptIn({
 
     setBusy(false);
     setPhase("success");
-  }
-
-  function continueToPayment() {
-    track("payment_page_viewed", { offer: OFFER_LABEL });
-
-    // Try the Paystack popup. If it isn't configured/ready, fall back.
-    if (PAYSTACK_PUBLIC_KEY && paystackReady) {
-      setPaying(true);
-      const opened = openPaystack(email, (r) => {
-        setPaying(false);
-        if (r.status === "success") {
-          track("purchase_completed", { reference: r.reference });
-          window.location.href = "/guide"; // post-purchase thank-you page
-        }
-      });
-      if (opened) return;
-    }
-    // Fallback: no Paystack yet → send them to the qualification flow.
-    track("redirect_to_payment", { destination: PAYMENT_FALLBACK_URL });
-    window.location.href = PAYMENT_FALLBACK_URL;
   }
 
   if (!mounted) return null;
@@ -279,30 +270,28 @@ export default function OptIn({
                   </h2>
                   <p className="mx-auto mt-4 max-w-sm text-[0.97rem] leading-relaxed text-inkMute">
                     <strong className="text-ink">{PLAYBOOK_TITLE}</strong> is on its
-                    way to <span className="text-ink">{email}</span>. It should also
-                    have opened in a new tab — if not,{" "}
-                    <a href={PLAYBOOK_URL} target="_blank" rel="noopener noreferrer" className="text-signal hover:underline">
-                      grab it here
-                    </a>
-                    .
+                    way to <span className="text-ink">{email}</span>. Give it a
+                    minute to land — check spam if you don&apos;t see it.
                   </p>
 
                   <div className="mx-auto mt-8 max-w-sm rounded-card border border-signal/25 bg-signal/[0.05] p-6">
-                    <p className="eyebrow text-signal">Ready to skip the trial and error?</p>
+                    <p className="eyebrow text-signal">One more thing</p>
                     <p className="mt-3 text-[0.95rem] leading-relaxed text-ink/85">
-                      Reading the book is step one. If you&apos;d rather we build
-                      the system with you, take the next step now.
+                      Reading the book is step one. We&apos;re taking you to
+                      something most readers wish they&apos;d seen first.
                     </p>
-                    <button
-                      onClick={continueToPayment}
-                      disabled={paying}
-                      className="btn-signal mt-5 w-full shadow-press disabled:opacity-60"
-                    >
-                      {paying ? "Opening secure checkout…" : "Continue to the next step"}
-                    </button>
+                    <p className="mt-4 font-mono text-[0.78rem] uppercase tracking-[0.14em] text-inkFaint">
+                      Taking you there in {count}…
+                    </p>
                   </div>
 
-                  <button onClick={onClose} className="mt-6 text-[0.85rem] text-inkMute hover:text-ink">
+                  <button
+                    onClick={() => { track("redirect_to_payment", { destination: PAYMENT_PAGE, via: "manual" }); window.location.href = PAYMENT_PAGE; }}
+                    className="btn-signal mt-6 w-full max-w-sm shadow-press"
+                  >
+                    Take me there now
+                  </button>
+                  <button onClick={onClose} className="mt-4 text-[0.85rem] text-inkMute hover:text-ink">
                     I&apos;ll just read the book for now
                   </button>
                 </motion.div>
