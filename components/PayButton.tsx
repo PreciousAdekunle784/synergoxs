@@ -68,9 +68,16 @@ export default function PayButton({
       setPaying(false);
     }
 
-    // Paystack not configured yet → don't dead-end to /apply, alert the user.
-    track("redirect_to_payment", { destination: "alert", reason: "paystack_unset" });
-    alert("Payment is currently offline. Please configure NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY in .env.local to test payments.");
+    if (!PAYSTACK_PUBLIC_KEY) {
+      track("redirect_to_payment", { destination: "alert", reason: "paystack_key_missing" });
+      alert("Payment is currently offline. Please configure NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY in .env.local.");
+    } else if (!ready) {
+      track("redirect_to_payment", { destination: "alert", reason: "paystack_script_blocked" });
+      alert("Payment script is still loading or was blocked by an adblocker. Please disable your adblocker and try again.");
+    } else {
+      track("redirect_to_payment", { destination: "alert", reason: "unknown_error" });
+      alert("An unknown error occurred while launching the payment gateway.");
+    }
   }
 
   return (
