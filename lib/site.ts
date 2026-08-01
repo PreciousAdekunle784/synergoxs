@@ -19,7 +19,7 @@ export const PLAYBOOK_TITLE = "The Compounding Business";
  * PASTE YOUR REAL CHECKOUT LINK HERE — Paystack, Flutterwave, Stripe, etc.
  * Until you do, it falls back to /apply so no one hits a dead end.
  */
-export const PAYMENT_URL = "/apply";
+export const PAYMENT_URL = "/payment";
 
 /** Seconds to show the success screen before redirecting to PAYMENT_URL. */
 export const REDIRECT_DELAY = 3;
