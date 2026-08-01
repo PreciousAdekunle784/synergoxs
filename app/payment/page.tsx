@@ -1,8 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import { Reveal, SectionHead } from "@/components/Primitives";
 
-export const metadata = {
-  title: "Payment Options | Synergox",
-  description: "Select a plan to start compounding your business growth.",
+type Cur = "USD" | "NGN";
+const CUR: Record<Cur, { sym: string; mult: number; locale: string }> = {
+  USD: { sym: "$", mult: 1, locale: "en-US" },
+  NGN: { sym: "₦", mult: 1500, locale: "en-NG" },
 };
 
 const plans = [
@@ -10,7 +14,7 @@ const plans = [
     id: "dfy",
     name: "Done For You",
     description: "We build and run the entire acquisition system for you.",
-    price: "$5,000",
+    basePrice: 5000,
     period: " / month",
     popular: true,
     features: [
@@ -20,7 +24,7 @@ const plans = [
       "Conversion optimisation, monthly",
       "Direct-response copywriting",
     ],
-    // TODO: Replace with actual Paystack payment link
+    // TODO: Replace with actual Paystack payment links
     checkoutUrl: "https://paystack.com/pay/YOUR_DFY_LINK_HERE",
     cta: "Start Done For You",
   },
@@ -28,7 +32,7 @@ const plans = [
     id: "diy",
     name: "Learn The System",
     description: "Master the frameworks and build it yourself with our guidance.",
-    price: "$997",
+    basePrice: 997,
     period: " one-time",
     popular: false,
     features: [
@@ -38,20 +42,27 @@ const plans = [
       "Live workshops and teardowns",
       "Private community of operators",
     ],
-    // TODO: Replace with actual Paystack payment link
+    // TODO: Replace with actual Paystack payment links
     checkoutUrl: "https://paystack.com/pay/YOUR_DIY_LINK_HERE",
     cta: "Start Learning",
   },
 ];
 
 export default function PaymentPage() {
+  const [cur, setCur] = useState<Cur>("USD");
+  const m = CUR[cur].mult;
+
+  const formatMoney = (n: number) =>
+    `${CUR[cur].sym}${Math.round(n * m).toLocaleString(CUR[cur].locale)}`;
+
   return (
-    <main className="min-h-screen bg-void pt-32 pb-24 md:pt-40">
+    <main className="min-h-screen bg-void pb-24 pt-32 md:pt-40">
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0"
         style={{
-          background: "radial-gradient(1000px 600px at 50% 0%, rgba(0,197,81,0.06), transparent 100%)",
+          background:
+            "radial-gradient(1000px 600px at 50% 0%, rgba(0,197,81,0.06), transparent 100%)",
         }}
       />
 
@@ -66,9 +77,28 @@ export default function PaymentPage() {
             }
             lede="Your playbook is on the way. Choose how you want to work with us to implement the system and start growing."
           />
+
+          <div className="mt-8 flex justify-center">
+            <div className="flex rounded-full border border-hair bg-panel p-1 shadow-lift">
+              {(["USD", "NGN"] as Cur[]).map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCur(c)}
+                  className={`rounded-full px-5 py-2 font-mono text-[0.8rem] transition-colors ${
+                    cur === c
+                      ? "bg-signal text-void"
+                      : "text-inkFaint hover:text-inkMute"
+                  }`}
+                  aria-pressed={cur === c}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="mx-auto mt-20 grid max-w-5xl gap-8 md:grid-cols-2 lg:gap-10">
+        <div className="mx-auto mt-16 grid max-w-5xl gap-8 md:grid-cols-2 lg:gap-10">
           {plans.map((plan, i) => (
             <Reveal key={plan.id} delay={i * 0.1}>
               <div
@@ -83,7 +113,7 @@ export default function PaymentPage() {
                     Most Popular
                   </div>
                 )}
-                
+
                 <h3 className="font-display text-[1.8rem] font-bold tracking-tightest text-ink">
                   {plan.name}
                 </h3>
@@ -93,7 +123,7 @@ export default function PaymentPage() {
 
                 <div className="mt-8 flex items-baseline gap-1">
                   <span className="font-display text-[2.8rem] font-bold text-ink">
-                    {plan.price}
+                    {formatMoney(plan.basePrice)}
                   </span>
                   <span className="text-[1rem] text-inkMute">{plan.period}</span>
                 </div>
@@ -101,7 +131,10 @@ export default function PaymentPage() {
                 <div className="mt-8 flex-1 border-t border-hair pt-8">
                   <ul className="space-y-4">
                     {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3 text-[0.92rem] text-ink/90">
+                      <li
+                        key={feature}
+                        className="flex items-start gap-3 text-[0.92rem] text-ink/90"
+                      >
                         <svg
                           width="16"
                           height="16"
@@ -134,10 +167,17 @@ export default function PaymentPage() {
                 >
                   {plan.cta}
                 </a>
-                
-                <p className="mt-4 text-center font-mono text-[0.7rem] text-inkFaint flex items-center justify-center gap-2">
+
+                <p className="mt-4 flex items-center justify-center gap-2 text-center font-mono text-[0.7rem] text-inkFaint">
                   <svg width="12" height="12" viewBox="0 0 15 15" fill="none">
-                    <rect x="2.5" y="5.5" width="10" height="7" rx="1.5" stroke="currentColor" />
+                    <rect
+                      x="2.5"
+                      y="5.5"
+                      width="10"
+                      height="7"
+                      rx="1.5"
+                      stroke="currentColor"
+                    />
                     <path d="M5.5 5.5v-2a2 2 0 1 1 4 0v2" stroke="currentColor" />
                   </svg>
                   Secure payment via Paystack
