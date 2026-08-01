@@ -1,50 +1,41 @@
-SYNERGOX SITE — BUILD 10  (routing fix + working Paystack)
-==========================================================
+SYNERGOX SITE — BUILD 12  (Supabase restored — Formspree removed)
+=================================================================
 
-THE FIX YOU ASKED FOR
+WHY THIS BUILD
+  Formspree's autoresponse (needed to email the book) is a PAID feature,
+  so it isn't free for this use. Supabase does storage + book email on
+  its FREE tier. This build puts Supabase back and removes Formspree.
 
-  The opt-in was landing people on the "book your call" page (/apply)
-  instead of the payment page. Cause: the Paystack button on the offer
-  page fell back to /apply whenever Paystack wasn't configured yet.
+WHAT CHANGED FROM THE FORMSPREE BUILD
+  - All three forms (opt-in, checklist, apply) now call the Supabase
+    `subscribe` Edge Function again — saves the lead to a `leads` table
+    AND emails the book via Resend. Apply's answers go in a `meta` JSON.
+  - The Paystack pay button verifies the payment SERVER-SIDE via the
+    `verify-payment` Edge Function before marking paid / sending to /guide
+    (rejects underpayment).
+  - Restored: supabase/functions/subscribe, supabase/functions/verify-payment,
+    supabase/migrations/0001_leads.sql.
+  - lib/site.ts now holds Supabase URL + anon key (both browser-safe,
+    paste-in-file, no redeploy trap) instead of a Formspree endpoint.
 
-  Fixed. Now:
-    - Every conversion CTA -> opt-in -> /offer (the payment page). Never /apply.
-    - The Paystack button on /offer opens inline checkout ON the page.
-      If Paystack isn't set up yet, it shows a short "checkout is being
-      set up" note and STAYS on /offer — it never bounces to /apply.
-    - ONLY the /learn page routes to "book a call" (/apply), exactly as
-      you wanted, plus one small "not ready? book a call" link at the
-      very bottom of /offer.
+KEPT FROM BEFORE (all the good fixes)
+  - Every conversion CTA -> opt-in -> /offer (payment page). Only /learn
+    goes to book-a-call (/apply).
+  - Paystack public key is paste-in-file in lib/site.ts (avoids the
+    "checkout being set up" env-var/redeploy trap). Clear error messages
+    + browser-console diagnostics if the key is missing.
+  - Conversion-focused /offer page (hero, problem, 6 deliverables,
+    "this is / isn't for you", value stack ₦199,999 vs ₦2.45M+, scarcity,
+    risk reversal, real proof, objections, close). Paystack button x3.
+  - Price ₦199,999 = 19999900 kobo.
 
-PAYSTACK — NOW VERIFIED & CORRECT
-  - Integration matches Paystack's official inline v1 API (checked
-    against their docs): PaystackPop.setup({ key, email, amount,
-    currency, ref, metadata.custom_fields, callback, onClose }) +
-    handler.openIframe().
-  - metadata now uses custom_fields so the offer/source show on your
-    Paystack dashboard.
-  - amount is forced to an integer (kobo).
-  - Payment is VERIFIED SERVER-SIDE: on success the button calls your
-    verify-payment Edge Function, which re-checks the transaction with
-    your secret key before marking the buyer paid and sending them to
-    /guide. A "paid" state can't be faked from the browser.
-  - Set an EXPECTED_AMOUNT_KOBO secret (= 19999900) so an underpayment
-    is rejected.
+SET THESE BEFORE LAUNCH  (all in SETUP.txt — read it)
+  In lib/site.ts (paste, browser-safe):
+    SUPABASE_URL, SUPABASE_ANON_KEY, PAYSTACK_PUBLIC_KEY (pk_live_)
+  In Supabase secrets (server-side):
+    RESEND_API_KEY, BOOK_URL, FROM_EMAIL, PAYSTACK_SECRET_KEY,
+    EXPECTED_AMOUNT_KOBO=19999900
+  Then: run the SQL migration + deploy the two Edge Functions, and
+  verify a sending domain in Resend.
 
-OFFER PAGE — MORE CONVERSION-FOCUSED
-  Added a "This is / is NOT for you" qualifier section (self-selection
-  lifts conversion by repelling the wrong buyer), plus a genuine
-  capacity line near the price ("limited builds each month"). Existing
-  structure kept: hero, the real problem, 6 deliverables, value stack
-  (N199,999 vs N2.45M+ anchor), risk reversal, real proof (Kings Food
-  Mart only), objections, final close. Paystack button appears 3x.
-
-TO GO LIVE (unchanged setup + one new secret)
-  Env (.env.local / Vercel): NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY (pk_live_),
-    NEXT_PUBLIC_OFFER_AMOUNT_KOBO=19999900, plus Supabase URL + anon key.
-  Supabase secrets: RESEND_API_KEY, BOOK_URL, FROM_EMAIL,
-    PAYSTACK_SECRET_KEY, and NEW: EXPECTED_AMOUNT_KOBO=19999900.
-  Deploy both Edge Functions. Full guide in README.
-
-Build verified clean (16 routes). Live click-through needs your real
-Paystack key — test one payment after deploying to confirm end to end.
+Build verified clean (16 routes). SETUP.txt has the full walkthrough.

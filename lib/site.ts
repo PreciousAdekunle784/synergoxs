@@ -7,39 +7,55 @@ export const PLAYBOOK_TITLE = "The Compounding Business";
 
 /**
  * ── Supabase ────────────────────────────────────────────────────────────
- * The opt-in calls a Supabase Edge Function that (1) saves the email to your
- * `leads` table and (2) emails the book via Resend. Only the PUBLIC anon key
- * and project URL live here — they're safe in the browser. Your Resend key and
- * service-role key stay as secrets inside Supabase, never in this repo.
+ * Every form (opt-in, checklist, apply) calls a Supabase Edge Function that
+ * (1) saves the lead to your `leads` table and (2) emails the book via Resend.
+ * Only the PUBLIC url + anon key live here — both are browser-safe. Your Resend
+ * key, Paystack secret, and service-role key stay as Supabase SECRETS, never in
+ * this repo.
  *
- * Set these in .env.local (see .env.example):
- *   NEXT_PUBLIC_SUPABASE_URL       https://xxxx.supabase.co
- *   NEXT_PUBLIC_SUPABASE_ANON_KEY  eyJhbGci...  (the anon/public key)
+ * You can hardcode the two public values here (simplest — no redeploy gotcha),
+ * or set NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel and
+ * REDEPLOY after (NEXT_PUBLIC_* vars are baked in at build time).
+ *
+ * ►►► PASTE YOUR PROJECT URL + ANON KEY BETWEEN THE QUOTES BELOW. ◄◄◄
+ * Both are in Supabase → Project Settings → API.
  */
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+export const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ??
+  "PASTE_YOUR_https://xxxx.supabase.co_URL_HERE";
+export const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+  "PASTE_YOUR_ANON_PUBLIC_KEY_HERE";
 
-/** The Edge Function that saves the lead and sends the book. */
+/** Edge Functions. These resolve automatically from SUPABASE_URL. */
 export const SUBSCRIBE_FN = `${SUPABASE_URL}/functions/v1/subscribe`;
-
-/** The Edge Function that verifies a Paystack payment server-side. */
 export const VERIFY_FN = `${SUPABASE_URL}/functions/v1/verify-payment`;
+
+/** True only once real Supabase values are in place (not the placeholders). */
+export const SUPABASE_IS_SET =
+  !!SUPABASE_URL &&
+  !SUPABASE_URL.startsWith("PASTE_") &&
+  !!SUPABASE_ANON_KEY &&
+  !SUPABASE_ANON_KEY.startsWith("PASTE_");
 
 /**
  * ── Paystack ────────────────────────────────────────────────────────────
- * After the book is sent, the success screen offers the paid next step via
- * Paystack's inline popup. Only your PUBLIC key belongs here (pk_live_… or
- * pk_test_…). The secret key stays in Supabase for payment verification.
+ * Only your PUBLIC key belongs here. A Paystack public key (pk_live_… / pk_test_…)
+ * is MEANT to be visible in the browser — there is no security risk in putting it
+ * straight in this file, and doing so avoids the #1 gotcha: NEXT_PUBLIC_* env vars
+ * are baked in at BUILD time, so setting one in Vercel without a fresh deploy
+ * leaves it empty and the checkout won't open.
  *
- * Set in .env.local:
- *   NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY  pk_live_xxxx
+ * ►►► PASTE YOUR LIVE PUBLIC KEY BETWEEN THE QUOTES BELOW. ◄◄◄
+ * (It starts with pk_live_ — NOT the secret sk_live_ key.)
  */
 export const PAYSTACK_PUBLIC_KEY =
-  process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY ?? "";
+  process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY ??
+  "PASTE_YOUR_pk_live_KEY_HERE";
 
 /** Price of the paid offer, in the smallest currency unit (kobo for NGN). */
 export const OFFER_AMOUNT_KOBO = Number(
-  process.env.NEXT_PUBLIC_OFFER_AMOUNT_KOBO ?? "19999900" // ₦199,999 — change via env
+  process.env.NEXT_PUBLIC_OFFER_AMOUNT_KOBO ?? "19999900" // ₦199,999
 );
 export const OFFER_CURRENCY = process.env.NEXT_PUBLIC_OFFER_CURRENCY ?? "NGN";
 export const OFFER_LABEL =

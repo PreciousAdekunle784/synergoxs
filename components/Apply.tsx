@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { BOOKING_URL, SUBSCRIBE_FN, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/site";
+import { BOOKING_URL, SUBSCRIBE_FN, SUPABASE_ANON_KEY, SUPABASE_IS_SET } from "@/lib/site";
 import { track } from "@/lib/analytics";
 
 /* ------------------------------------------------------------------ *
@@ -485,8 +485,8 @@ export default function Apply() {
   async function finish() {
     setSending(true);
     setFailed(false);
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      console.warn("Supabase not configured — application not saved.");
+    if (!SUPABASE_IS_SET) {
+      console.warn("Supabase not set — application not saved (paste keys in lib/site.ts).");
       setSending(false);
       setSent(true);
       return;

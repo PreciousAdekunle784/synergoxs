@@ -68,7 +68,7 @@ export function openPaystack(
   onResult: (r: PayResult) => void,
 ): boolean {
   if (typeof window === "undefined" || !window.PaystackPop) return false;
-  if (!PAYSTACK_PUBLIC_KEY) return false;
+  if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.startsWith("PASTE_")) return false;
 
   const handler = window.PaystackPop.setup({
     key: PAYSTACK_PUBLIC_KEY,

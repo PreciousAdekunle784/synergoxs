@@ -8,9 +8,12 @@ import {
   OFFER_AMOUNT_KOBO,
   VERIFY_FN,
   SUPABASE_ANON_KEY,
-  SUPABASE_URL,
+  SUPABASE_IS_SET,
 } from "@/lib/site";
 import { track } from "@/lib/analytics";
+
+const KEY_IS_SET =
+  !!PAYSTACK_PUBLIC_KEY && !PAYSTACK_PUBLIC_KEY.startsWith("PASTE_");
 
 function formatPrice(kobo: number, currency: string) {
   const major = kobo / 100;
@@ -50,8 +53,28 @@ export default function PayButton({
   const price = formatPrice(OFFER_AMOUNT_KOBO, OFFER_CURRENCY);
 
   function pay() {
-    track("payment_page_viewed", { action: "checkout_click" });
     setNotice(null);
+    track("payment_page_viewed", { action: "checkout_click" });
+
+    if (!KEY_IS_SET) {
+      // The public key isn't in the browser bundle. Almost always one of:
+      // (1) env var not named exactly NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+      // (2) added in Vercel but the site wasn't redeployed after (NEXT_PUBLIC_
+      //     vars are baked in at BUILD time), or (3) running an old build.
+      if (typeof console !== "undefined") {
+        console.error(
+          "[Paystack] Public key missing at runtime. Set " +
+            "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY (exact name) and REDEPLOY — " +
+            "NEXT_PUBLIC_ vars are baked in at build time."
+        );
+      }
+      setNotice(
+        "Payment isn't switched on yet. If you're the site owner: set " +
+          "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY and redeploy. Otherwise email " +
+          "hello@synergox.co and we'll send a secure link."
+      );
+      return;
+    }
 
     // Need an email for Paystack. If we don't have one, ask inline.
     const payerEmail =
@@ -61,54 +84,54 @@ export default function PayButton({
         : "");
     if (!payerEmail) return;
 
-    // If Paystack is configured and loaded, open inline checkout right here.
-    if (PAYSTACK_PUBLIC_KEY && ready) {
-      setPaying(true);
-      const opened = openPaystack(payerEmail, async (r) => {
-        if (r.status !== "success") {
-          // User closed the popup — leave them on THIS page to try again.
-          setPaying(false);
-          return;
-        }
-
-        // Confirm the payment server-side before trusting it. The verify
-        // function checks the transaction against Paystack with the secret key,
-        // so a "success" can't be faked from the browser.
-        let verified = true; // default true if verify isn't set up yet
-        if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-          try {
-            const res = await fetch(VERIFY_FN, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-                apikey: SUPABASE_ANON_KEY,
-              },
-              body: JSON.stringify({ reference: r.reference, email: payerEmail }),
-            });
-            const data = await res.json().catch(() => ({}));
-            verified = res.ok && data?.ok === true;
-          } catch {
-            // If verify is unreachable, don't block the buyer — Paystack already
-            // took the payment. The webhook/dashboard remains the source of truth.
-            verified = true;
-          }
-        }
-
-        setPaying(false);
-        track("purchase_completed", { reference: r.reference, verified });
-        window.location.href = "/guide";
-      });
-      if (opened) return;
-      setPaying(false);
+    if (!ready) {
+      setNotice("Loading secure checkout… tap the button again in a second.");
+      return;
     }
 
-    // Paystack not configured/loaded yet. Never bounce the buyer away from the
-    // offer — keep them here and tell them plainly. (Once the public key is set
-    // in env, this branch never runs.)
-    setNotice(
-      "Checkout is being set up — please try again in a moment, or email hello@synergox.co and we'll send you a secure payment link right away."
-    );
+    setPaying(true);
+    const opened = openPaystack(payerEmail, async (r) => {
+      if (r.status !== "success") {
+        // User closed the popup — leave them on THIS page to try again.
+        setPaying(false);
+        return;
+      }
+
+      // Confirm the payment server-side before trusting it. The verify function
+      // re-checks the transaction against Paystack with the secret key, so a
+      // "success" can't be faked from the browser.
+      let verified = true; // default true if verify isn't set up yet
+      if (SUPABASE_IS_SET) {
+        try {
+          const res = await fetch(VERIFY_FN, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              apikey: SUPABASE_ANON_KEY,
+            },
+            body: JSON.stringify({ reference: r.reference, email: payerEmail }),
+          });
+          const data = await res.json().catch(() => ({}));
+          verified = res.ok && data?.ok === true;
+        } catch {
+          // If verify is unreachable, don't block the buyer — Paystack already
+          // took the payment; the dashboard remains the source of truth.
+          verified = true;
+        }
+      }
+
+      setPaying(false);
+      track("purchase_completed", { reference: r.reference, verified });
+      window.location.href = "/guide";
+    });
+
+    if (!opened) {
+      setPaying(false);
+      setNotice(
+        "Secure checkout couldn't open just now — please try again, or email hello@synergox.co for a payment link."
+      );
+    }
   }
 
   return (

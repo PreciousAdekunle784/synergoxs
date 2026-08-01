@@ -1,0 +1,87 @@
+SYNERGOX — SETUP (Supabase version)
+===================================
+
+This build uses SUPABASE (free tier) for everything Formspree wanted to
+charge for: it stores every lead AND emails the book automatically. You
+set it up once.
+
+There are 3 places to put things:
+  A) lib/site.ts        <- 3 PUBLIC values you paste (browser-safe)
+  B) Supabase secrets   <- the SECRET keys (never in the code)
+  C) Supabase dashboard <- run one SQL file, deploy two functions
+
+
+──────────────────────────────────────────────────────────────────────
+A) PASTE 3 PUBLIC VALUES INTO lib/site.ts   (simplest — no redeploy trap)
+──────────────────────────────────────────────────────────────────────
+Open lib/site.ts and replace these placeholders:
+
+  SUPABASE_URL        -> "https://xxxx.supabase.co"     (Supabase > Settings > API)
+  SUPABASE_ANON_KEY   -> "eyJhbGciOi..."                (same page, the anon/public key)
+  PAYSTACK_PUBLIC_KEY -> "pk_live_xxxx"                  (Paystack dashboard; pk_live_ or pk_test_)
+
+All three are PUBLIC and safe to sit in the file. (A Paystack public key
+and a Supabase anon key are both designed to be seen by the browser.)
+
+Price is already set: OFFER_AMOUNT_KOBO = 19999900  (= ₦199,999).
+
+
+──────────────────────────────────────────────────────────────────────
+B) SET SUPABASE SECRETS   (the sensitive keys — CLI or dashboard)
+──────────────────────────────────────────────────────────────────────
+  supabase secrets set RESEND_API_KEY=re_xxxx
+  supabase secrets set BOOK_URL=https://synergox.co/growth-playbook.pdf
+  supabase secrets set FROM_EMAIL="Synergox <hello@synergox.co>"
+  supabase secrets set PAYSTACK_SECRET_KEY=sk_live_xxxx
+  supabase secrets set EXPECTED_AMOUNT_KOBO=19999900
+
+(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided automatically
+ inside the Edge runtime — you don't set those.)
+
+
+──────────────────────────────────────────────────────────────────────
+C) DATABASE + FUNCTIONS  (one-time, in Supabase)
+──────────────────────────────────────────────────────────────────────
+  1. SQL editor -> paste & run: supabase/migrations/0001_leads.sql
+     (creates the `leads` table with security locked down)
+
+  2. Deploy the two Edge Functions with the Supabase CLI:
+       supabase login
+       supabase link --project-ref YOUR-PROJECT-REF
+       supabase functions deploy subscribe
+       supabase functions deploy verify-payment
+
+
+──────────────────────────────────────────────────────────────────────
+EMAIL — Resend (free)
+──────────────────────────────────────────────────────────────────────
+  1. Create a free account at resend.com
+  2. Verify your sending domain (add the DNS records they give you).
+     Until then you can only send from onboarding@resend.dev for testing.
+  3. Create an API key -> that's your RESEND_API_KEY secret (step B).
+  4. FROM_EMAIL must be an address on your verified domain.
+
+Once done, every opt-in is saved to `leads` AND the book is emailed
+automatically. No monthly fee.
+
+
+──────────────────────────────────────────────────────────────────────
+HOW THE MONEY FLOW WORKS
+──────────────────────────────────────────────────────────────────────
+  opt-in (name+email) -> subscribe fn saves lead + emails FREE book
+    -> success screen (3s) -> /offer sales page
+    -> Paystack button (pk_live_) opens inline checkout
+    -> on success, verify-payment re-checks it with your SECRET key
+       (and rejects underpayment) -> buyer marked paid -> /guide
+
+The BOOK IS FREE. Paystack charges for the PAID done-for-you offer
+(₦199,999) on /offer — the upsell after the free book.
+
+
+──────────────────────────────────────────────────────────────────────
+IF THE PAY BUTTON SAYS "payment isn't switched on"
+──────────────────────────────────────────────────────────────────────
+Your PAYSTACK_PUBLIC_KEY is still the placeholder. Paste your pk_live_
+key in lib/site.ts (step A) and redeploy. If you used a Vercel env var
+instead, you MUST redeploy after adding it (NEXT_PUBLIC_ vars bake in at
+build time). Open the browser console on /offer for the exact reason.

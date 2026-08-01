@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   SUBSCRIBE_FN,
   SUPABASE_ANON_KEY,
-  SUPABASE_URL,
+  SUPABASE_IS_SET,
   PLAYBOOK_TITLE,
   PAYMENT_PAGE,
   REDIRECT_DELAY,
@@ -97,8 +97,10 @@ export default function OptIn({
       /* ignore */
     }
 
-    // Call the Supabase Edge Function: saves the lead + emails the book.
-    if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    // Call the Supabase Edge Function: saves the lead + emails the book via
+    // Resend. We advance to success even if this fails so the visitor is never
+    // blocked (they can still reach the offer; the book retries server-side).
+    if (SUPABASE_IS_SET) {
       try {
         const res = await fetch(SUBSCRIBE_FN, {
           method: "POST",
@@ -107,7 +109,11 @@ export default function OptIn({
             Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
             apikey: SUPABASE_ANON_KEY,
           },
-          body: JSON.stringify({ name, email }),
+          body: JSON.stringify({
+            name,
+            email,
+            meta: { source: "synergox.co/optin", leadMagnet: PLAYBOOK_TITLE },
+          }),
         });
         if (!res.ok) {
           console.error("subscribe failed:", res.status, await res.text());
@@ -117,7 +123,7 @@ export default function OptIn({
       }
     } else {
       console.warn(
-        "Supabase not configured — set NEXT_PUBLIC_SUPABASE_URL and _ANON_KEY. " +
+        "Supabase not set — paste SUPABASE_URL + SUPABASE_ANON_KEY in lib/site.ts. " +
           "Showing success anyway so the flow is testable."
       );
     }

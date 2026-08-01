@@ -25,10 +25,10 @@ There is no backend and no environment variables, so nothing can 40x on you.
 
 ### 1. The funnel backend — Supabase + Paystack
 
-Set your env vars (`.env.example` → `.env.local` and Vercel), run the database
-migration, and deploy the two Edge Functions. Full step-by-step is in
-**"The funnel backend (Supabase + Paystack)"** below — this is what makes the
-opt-in save leads, email the book, and take payment.
+See **SETUP.txt** for the full walkthrough. In short: paste your Supabase URL +
+anon key and your Paystack public key into `lib/site.ts` (captures
+leads + emails the book) and your Paystack public key (the checkout). Full
+step-by-step is in **SETUP.txt** and in the backend section below.
 
 Also in `lib/site.ts`:
 - `BOOKING_URL` — your Calendly link (already set)
@@ -213,12 +213,11 @@ you'd rather speak to everyone.
 
 ### Where the answers go
 
-The whole set is saved to your Supabase `leads` table via the `subscribe` Edge
-Function — the answers land in the row's `meta` JSON (currency, market, model,
-revenue, spend, bottleneck, what they've tried, timeline, decision authority,
-plus a `recommendation` field reading "Done for you" or "Learn track"). If the
-save fails, the visitor still reaches the calendar and sees a note asking them
-to email instead. Never block a booking on a form.
+The whole set is saved to your Supabase `leads` table (answers in a `meta` JSON blob: currency, market,
+model, revenue, spend, bottleneck, what they've tried, timeline, decision
+authority, plus a `recommendation` field reading "Done for you" or "Learn
+track"). If the POST fails, the visitor still reaches the calendar and sees a
+note asking them to email instead. Never block a booking on a form.
 
 ### Reverting a CTA to direct booking
 
@@ -295,8 +294,9 @@ opens the opt-in modal via `useOptIn()`. Change it once, it changes everywhere.
 
 1. A CTA opens the opt-in modal (`components/OptIn.tsx`).
 2. Visitor enters first name + email and submits.
-3. The modal calls your **Supabase Edge Function** (`subscribe`), which
-   **saves the lead** to the `leads` table and **emails the book** via Resend.
+3. The modal **calls the Supabase `subscribe` function**, which saves the lead
+   to your `leads` table and emails the book via Resend (with
+   autoresponse on) **emails the person the book link** automatically.
 4. The success screen appears and the book also opens in a new tab as a backstop.
 5. The success screen shows briefly (~3s) and **auto-redirects to `/offer`** —
    the conversion-focused payment page. It does NOT open the book in a new tab
@@ -307,8 +307,8 @@ opens the opt-in modal via `useOptIn()`. Change it once, it changes everywhere.
 7. On successful payment, `purchase_completed` fires and they're sent to `/guide`.
 
 Every step degrades gracefully: if Supabase isn't set, the success screen still
-shows; if Paystack isn't set, the `/offer` button falls back to `/apply`. So the
-site never dead-ends, even mid-setup.
+shows and the redirect still happens; if Paystack isn't set, the `/offer` button
+shows a short notice and stays put (it never bounces anyone to `/apply`).
 
 ### The payment page — `/offer`
 
@@ -328,12 +328,9 @@ add more via `components/OfferProof.tsx` as you're cleared to share them.
 - Only the **`/learn`** page routes to `/apply` (book a call), plus one small
   "not ready? book a call first" link at the very bottom of `/offer`.
 
-**Payment is verified server-side.** When Paystack's popup reports success, the
-button calls your `verify-payment` Edge Function, which re-checks the transaction
-against Paystack with your secret key before the buyer is marked paid and sent to
-`/guide`. Set an `EXPECTED_AMOUNT_KOBO` secret (= your price in kobo, `19999900`)
-so an underpayment can't be accepted. This means a "paid" state can't be faked
-from the browser.
+**Payment confirmation.** For going live fast, the button trusts Paystack's
+in-popup success. To harden it later, add a Paystack webhook (see the backend
+section) — no backend of your own required.
 
 The price shows **₦199,999** by default. Change it in one place:
 `NEXT_PUBLIC_OFFER_AMOUNT_KOBO` (kobo — ₦199,999 = `19999900`). The value-stack
@@ -350,106 +347,25 @@ transitions to the done-for-you offer. Swap the file (keep the name) to revise.
 
 ## The funnel backend (Supabase + Paystack)
 
-This is the part that turns the funnel from a demo into something that captures
-leads, emails the book, and takes payment. Three pieces: **frontend env vars**,
-**a database table**, and **two Edge Functions**.
+Full step-by-step is in **SETUP.txt**. Summary:
 
-### 1. Frontend env vars
+**Supabase (free) does lead storage + book email.** Paste your project URL and
+anon key into `lib/site.ts`. Run `supabase/migrations/0001_leads.sql` to create
+the `leads` table (RLS on, no public policies — only your Edge Functions can
+write). Deploy the two functions:
 
-Copy `.env.example` to `.env.local` and fill in the public values (also add them
-in Vercel → Project → Settings → Environment Variables):
+- `subscribe` — saves the lead and emails the book via Resend.
+- `verify-payment` — re-checks a Paystack transaction with your secret key
+  before the buyer is marked paid (and rejects underpayment).
 
-```
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
-NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_live_xxxx
-NEXT_PUBLIC_OFFER_AMOUNT_KOBO=5000000        # ₦50,000 — set your price (kobo)
-NEXT_PUBLIC_OFFER_CURRENCY=NGN
-NEXT_PUBLIC_OFFER_LABEL=Growth System Build — Deposit
-```
+Set these Supabase **secrets** (never in the repo): `RESEND_API_KEY`, `BOOK_URL`,
+`FROM_EMAIL`, `PAYSTACK_SECRET_KEY`, `EXPECTED_AMOUNT_KOBO=19999900`.
 
-These are all **public** keys — safe in the browser. Secret keys never go here.
+**Resend (free) sends the book.** Verify your sending domain, create an API key,
+set it as `RESEND_API_KEY`. Every opt-in then gets the book automatically.
 
-### 2. The database
+**Paystack** — paste your **public** key (`pk_live_…`) into `lib/site.ts`; the
+**secret** key (`sk_live_…`) goes only into the `PAYSTACK_SECRET_KEY` Supabase
+secret. The checkout is inline on `/offer`; on success it verifies server-side
+and sends the buyer to `/guide`.
 
-In the Supabase SQL editor, run `supabase/migrations/0001_leads.sql`. It creates
-a `leads` table (email, name, source, paid status, a `meta` JSON column for the
-qualification answers) with **Row Level Security on and no public policies** —
-so leads can only be written by your Edge Functions, never read from the browser.
-
-Every form on the site writes here: the opt-in (with the book emailed), the
-homepage checklist capture (`sendBook:false`), and the `/apply` qualification
-flow (answers stored in `meta`).
-
-### 3. The Edge Functions
-
-Two functions live in `supabase/functions/`. Deploy with the Supabase CLI:
-
-```bash
-supabase login
-supabase link --project-ref YOUR-PROJECT-REF
-supabase functions deploy subscribe
-supabase functions deploy verify-payment
-```
-
-Then set their **secrets** (these are the sensitive keys — they live in Supabase,
-never in the repo or the browser):
-
-```bash
-supabase secrets set RESEND_API_KEY=re_xxxx
-supabase secrets set BOOK_URL=https://synergox.co/growth-playbook.pdf
-supabase secrets set FROM_EMAIL="Synergox <hello@synergox.co>"
-supabase secrets set PAYSTACK_SECRET_KEY=sk_live_xxxx
-supabase secrets set EXPECTED_AMOUNT_KOBO=19999900   # your price in kobo — blocks underpayment
-```
-
-- **`subscribe`** — saves the lead and emails the book via Resend.
-- **`verify-payment`** — optional but recommended: verifies a Paystack
-  transaction server-side so a "paid" state can't be faked, and marks the lead
-  paid. Call it from a thank-you page with the transaction `reference` if you
-  want server-verified payments.
-
-### Emailing the book — Resend setup
-
-1. Create a free [Resend](https://resend.com) account.
-2. **Verify your sending domain** (add the DNS records Resend gives you). Until
-   you do, you can only send from `onboarding@resend.dev` for testing.
-3. Create an API key, set it as the `RESEND_API_KEY` secret above.
-4. Set `FROM_EMAIL` to an address on your verified domain.
-
-That's it — every opt-in now gets the book automatically, from your own domain,
-and every lead is on a list (your `leads` table) you can export or follow up.
-
-### Paystack setup
-
-1. In your Paystack dashboard, grab your **public** key (`pk_live_…`) → put it in
-   `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`.
-2. Grab your **secret** key (`sk_live_…`) → set it as the `PAYSTACK_SECRET_KEY`
-   Supabase secret (for `verify-payment`). It never touches the frontend.
-3. Set the offer price in `NEXT_PUBLIC_OFFER_AMOUNT_KOBO` (kobo: ₦50,000 =
-   `5000000`), plus currency and label.
-
-The popup uses **inline checkout** (`lib/paystack.ts`), so payment happens right
-on your site — no redirect away. On success it fires `purchase_completed` and
-sends the buyer to `/guide`.
-
-> **The book is free.** The Paystack popup charges for your **paid offer** (the
-> done-for-you build/deposit), which is the upsell *after* the free book. The
-> book is always delivered for free the moment someone opts in.
-
-### Analytics
-
-`lib/analytics.ts` fires five funnel events to `dataLayer` / `gtag`, with a safe
-no-op fallback:
-
-| Event | Fires when |
-|---|---|
-| `lead_email_submitted` | opt-in form submitted |
-| `lead_book_sent` | success screen shown, book delivered |
-| `payment_page_viewed` | Paystack popup opened (or `/apply` loaded) |
-| `redirect_to_payment` | fallback redirect when Paystack isn't set |
-| `purchase_completed` | Paystack payment succeeded |
-
-Add Google Tag Manager or GA4 in `app/layout.tsx` and these start reporting the
-full funnel automatically — `purchase_completed` now fires on its own from the
-Paystack success callback, so you no longer need to wire it manually.

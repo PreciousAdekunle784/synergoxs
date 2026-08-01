@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Reveal } from "./Primitives";
-import { SUBSCRIBE_FN, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/site";
+import { SUBSCRIBE_FN, SUPABASE_ANON_KEY, SUPABASE_IS_SET } from "@/lib/site";
 
 const bullets = [
   "The nine checks that locate a leak in under an hour",
@@ -27,9 +27,8 @@ export default function LeadCapture() {
       return;
     }
     setState("sending");
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      // Backend not wired yet — don't block the visitor in local/dev.
-      console.warn("Supabase not configured — lead not saved.");
+    if (!SUPABASE_IS_SET) {
+      console.warn("Supabase not set — lead not saved (paste keys in lib/site.ts).");
       setState("done");
       return;
     }
