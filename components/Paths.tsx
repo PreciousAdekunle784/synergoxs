@@ -25,7 +25,7 @@ const paths = [
     forYou: "You have demand, budget and no time. You'd rather own the outcome than the calendar.",
     notForYou: "You want to be in every decision, or you're pre-revenue and testing whether the thing sells at all.",
     cta: "Get the free growth playbook",
-    href: "/apply",
+    href: "/offer",
     external: false,
     book: true,
     meta: "Free · 74 pages · Then the next step",

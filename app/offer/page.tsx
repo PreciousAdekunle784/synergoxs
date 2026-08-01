@@ -164,6 +164,66 @@ export default function OfferPage() {
         </div>
       </section>
 
+      {/* ─────────────────────── WHO IT'S FOR ─────────────────────── */}
+      <section className="border-t border-hair py-20 md:py-28">
+        <div className="shell max-w-4xl">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow text-signal">Let&apos;s make sure this fits</p>
+            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
+              This isn&apos;t for everyone. On purpose.
+            </h2>
+            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
+              We&apos;d rather turn you away now than take money for something
+              that won&apos;t work for you. Here&apos;s the honest cut.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-4 md:grid-cols-2">
+            <div className="rounded-slab border border-signal/25 bg-signal/[0.04] p-8">
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-signal">
+                This is for you if
+              </p>
+              <ul className="mt-6 space-y-4">
+                {[
+                  "You already have a product or service that people buy — you just can't make the flow of customers predictable.",
+                  "You'd rather run your business than spend a year becoming a growth marketer.",
+                  "You can handle more customers if we send them — the constraint is acquisition, not delivery.",
+                  "You want to own the system, not rent an agency forever.",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-ink/90">
+                    <svg width="16" height="16" viewBox="0 0 15 15" fill="none" className="mt-1 shrink-0" aria-hidden>
+                      <path d="M3.5 8l3 3 5-7" stroke="#00C551" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-slab border border-hair bg-panel p-8">
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-boneDim">
+                This is not for you if
+              </p>
+              <ul className="mt-6 space-y-4">
+                {[
+                  "You're looking for a magic button that needs zero input from you — this is a build, and it needs your offer and your approvals.",
+                  "You don't yet have something people pay for. Fix the offer first; the book shows you how.",
+                  "You want the cheapest option on the market. That's a race we don't run.",
+                  "You need results next week. Real systems take a few weeks to build and tune.",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-inkMute">
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" className="mt-1 shrink-0 text-boneDim" aria-hidden>
+                      <path d="M4 4l7 7M11 4l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                    </svg>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─────────────────────── VALUE STACK + PRICE ─────────────────────── */}
       <section className="border-t border-hair py-20 md:py-28">
         <div className="shell max-w-2xl">
@@ -233,6 +293,10 @@ export default function OfferPage() {
                 <PayButton className="btn-signal w-full max-w-sm px-9 py-5 text-[1.05rem] shadow-press" />
                 <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-inkFaint">
                   Secure Paystack checkout · Card, transfer, USSD
+                </p>
+                <p className="mt-1 text-[0.82rem] text-inkMute">
+                  We take on a limited number of builds each month so every one
+                  gets our full attention.
                 </p>
               </div>
             </div>

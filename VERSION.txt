@@ -1,50 +1,50 @@
-SYNERGOX SITE — BUILD 9  (no-tab redirect + conversion payment page)
-====================================================================
+SYNERGOX SITE — BUILD 10  (routing fix + working Paystack)
+==========================================================
 
-WHAT CHANGED FROM BUILD 8
+THE FIX YOU ASKED FOR
 
-  1. NO MORE DISTRACTING NEW TAB
-     Submitting the opt-in no longer force-opens the book in a new tab
-     (that pulled people out of the funnel). Now:
-        submit -> success screen (~3s, with a countdown)
-               -> AUTO-REDIRECT to the payment page (/offer)
-     The book still gets delivered — by email — so nothing is lost.
-     A "Take me there now" button lets impatient people skip the wait.
+  The opt-in was landing people on the "book your call" page (/apply)
+  instead of the payment page. Cause: the Paystack button on the offer
+  page fell back to /apply whenever Paystack wasn't configured yet.
 
-  2. PRICE = N199,999
-     Set as the default in lib/site.ts
-     (NEXT_PUBLIC_OFFER_AMOUNT_KOBO = 19999900 kobo).
-     Change it in that one place / via env.
+  Fixed. Now:
+    - Every conversion CTA -> opt-in -> /offer (the payment page). Never /apply.
+    - The Paystack button on /offer opens inline checkout ON the page.
+      If Paystack isn't set up yet, it shows a short "checkout is being
+      set up" note and STAYS on /offer — it never bounces to /apply.
+    - ONLY the /learn page routes to "book a call" (/apply), exactly as
+      you wanted, plus one small "not ready? book a call" link at the
+      very bottom of /offer.
 
-  3. NEW CONVERSION PAYMENT PAGE — /offer  (app/offer/page.tsx)
-     A long-form, direct-response sales page for your PAID
-     done-for-you offer, written in a Hormozi / Suby / Brunson style:
-        pattern-interrupt hero
-        the real problem (knowing != doing)
-        what we build (6 concrete deliverables)
-        value stack + price anchoring (N199,999 vs N2.45M+ of value)
-        risk reversal (ship-it, own-it, no lock-in)
-        real proof (Kings Food Mart only — no invented quotes)
-        objection handling (the 3 real hesitations)
-        final close
-     The Paystack INLINE checkout button (components/PayButton.tsx)
-     appears three times down the page and prefills the email
-     captured at opt-in. Falls back to /apply if Paystack isn't set.
+PAYSTACK — NOW VERIFIED & CORRECT
+  - Integration matches Paystack's official inline v1 API (checked
+    against their docs): PaystackPop.setup({ key, email, amount,
+    currency, ref, metadata.custom_fields, callback, onClose }) +
+    handler.openIframe().
+  - metadata now uses custom_fields so the offer/source show on your
+    Paystack dashboard.
+  - amount is forced to an integer (kobo).
+  - Payment is VERIFIED SERVER-SIDE: on success the button calls your
+    verify-payment Edge Function, which re-checks the transaction with
+    your secret key before marking the buyer paid and sending them to
+    /guide. A "paid" state can't be faked from the browser.
+  - Set an EXPECTED_AMOUNT_KOBO secret (= 19999900) so an underpayment
+    is rejected.
 
-FLOW NOW
-  any CTA -> opt-in modal -> subscribe fn (save lead + email book)
-          -> success (3s countdown) -> /offer (sales page)
-          -> Paystack button -> purchase_completed -> /guide
+OFFER PAGE — MORE CONVERSION-FOCUSED
+  Added a "This is / is NOT for you" qualifier section (self-selection
+  lifts conversion by repelling the wrong buyer), plus a genuine
+  capacity line near the price ("limited builds each month"). Existing
+  structure kept: hero, the real problem, 6 deliverables, value stack
+  (N199,999 vs N2.45M+ anchor), risk reversal, real proof (Kings Food
+  Mart only), objections, final close. Paystack button appears 3x.
 
-THE BOOK IS FREE. /offer sells the paid done-for-you build. The book
-is delivered by email the moment someone opts in.
+TO GO LIVE (unchanged setup + one new secret)
+  Env (.env.local / Vercel): NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY (pk_live_),
+    NEXT_PUBLIC_OFFER_AMOUNT_KOBO=19999900, plus Supabase URL + anon key.
+  Supabase secrets: RESEND_API_KEY, BOOK_URL, FROM_EMAIL,
+    PAYSTACK_SECRET_KEY, and NEW: EXPECTED_AMOUNT_KOBO=19999900.
+  Deploy both Edge Functions. Full guide in README.
 
-EDIT THESE FOR YOUR BUSINESS
-  - Price: NEXT_PUBLIC_OFFER_AMOUNT_KOBO (env) — currently N199,999
-  - Value-stack line items in app/offer/page.tsx (illustrative anchors)
-  - Add real client results in components/OfferProof.tsx as you get them
-
-Backend setup (Supabase + Paystack + Resend) is unchanged from build 8 —
-full guide in README -> "The funnel backend (Supabase + Paystack)".
-
-Routes: 16 (adds /offer). Build verified clean.
+Build verified clean (16 routes). Live click-through needs your real
+Paystack key — test one payment after deploying to confirm end to end.

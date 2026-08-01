@@ -320,6 +320,21 @@ pattern-interrupt hero → the real problem (knowing ≠ doing) → what we buil
 page. Proof uses ONLY the real Kings Food Mart result (no invented quotes) —
 add more via `components/OfferProof.tsx` as you're cleared to share them.
 
+**Where each thing leads (important):**
+- Every conversion CTA → opt-in → **`/offer`** (the payment page). Never `/apply`.
+- The Paystack button on `/offer` opens **inline checkout on the page** — it does
+  NOT send anyone to `/apply`. If Paystack isn't configured yet it shows a short
+  "checkout is being set up" note and stays put.
+- Only the **`/learn`** page routes to `/apply` (book a call), plus one small
+  "not ready? book a call first" link at the very bottom of `/offer`.
+
+**Payment is verified server-side.** When Paystack's popup reports success, the
+button calls your `verify-payment` Edge Function, which re-checks the transaction
+against Paystack with your secret key before the buyer is marked paid and sent to
+`/guide`. Set an `EXPECTED_AMOUNT_KOBO` secret (= your price in kobo, `19999900`)
+so an underpayment can't be accepted. This means a "paid" state can't be faked
+from the browser.
+
 The price shows **₦199,999** by default. Change it in one place:
 `NEXT_PUBLIC_OFFER_AMOUNT_KOBO` (kobo — ₦199,999 = `19999900`). The value-stack
 line items inside the page are illustrative anchors — edit them in
@@ -385,6 +400,7 @@ supabase secrets set RESEND_API_KEY=re_xxxx
 supabase secrets set BOOK_URL=https://synergox.co/growth-playbook.pdf
 supabase secrets set FROM_EMAIL="Synergox <hello@synergox.co>"
 supabase secrets set PAYSTACK_SECRET_KEY=sk_live_xxxx
+supabase secrets set EXPECTED_AMOUNT_KOBO=19999900   # your price in kobo — blocks underpayment
 ```
 
 - **`subscribe`** — saves the lead and emails the book via Resend.

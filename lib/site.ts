@@ -22,6 +22,9 @@ export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
 /** The Edge Function that saves the lead and sends the book. */
 export const SUBSCRIBE_FN = `${SUPABASE_URL}/functions/v1/subscribe`;
 
+/** The Edge Function that verifies a Paystack payment server-side. */
+export const VERIFY_FN = `${SUPABASE_URL}/functions/v1/verify-payment`;
+
 /**
  * ── Paystack ────────────────────────────────────────────────────────────
  * After the book is sent, the success screen offers the paid next step via
@@ -47,12 +50,6 @@ export const OFFER_LABEL =
  * Paystack checkout button lives on that page (see app/offer/page.tsx).
  */
 export const PAYMENT_PAGE = "/offer";
-
-/**
- * Fallback for the payment page's checkout button if Paystack isn't set up yet:
- * where it sends people instead. Keeps the flow alive during setup.
- */
-export const PAYMENT_FALLBACK_URL = "/apply";
 
 /** Seconds on the success screen before auto-redirecting to the payment page. */
 export const REDIRECT_DELAY = 3;

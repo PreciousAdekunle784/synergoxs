@@ -22,7 +22,6 @@ type PaystackOptions = {
   amount: number;
   currency?: string;
   ref?: string;
-  label?: string;
   metadata?: Record<string, unknown>;
   callback: (res: { reference: string }) => void;
   onClose: () => void;
@@ -74,11 +73,24 @@ export function openPaystack(
   const handler = window.PaystackPop.setup({
     key: PAYSTACK_PUBLIC_KEY,
     email,
-    amount: OFFER_AMOUNT_KOBO,
+    amount: Math.round(OFFER_AMOUNT_KOBO), // must be an integer (kobo)
     currency: OFFER_CURRENCY,
-    label: OFFER_LABEL,
     ref: `syx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-    metadata: { source: "synergox.co/optin", offer: OFFER_LABEL },
+    // custom_fields is what makes the info visible on the Paystack dashboard.
+    metadata: {
+      custom_fields: [
+        {
+          display_name: "Offer",
+          variable_name: "offer",
+          value: OFFER_LABEL,
+        },
+        {
+          display_name: "Source",
+          variable_name: "source",
+          value: "synergox.co/offer",
+        },
+      ],
+    },
     callback: (res) => onResult({ status: "success", reference: res.reference }),
     onClose: () => onResult({ status: "closed" }),
   });
