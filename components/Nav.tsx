@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useOptIn } from "./OptInProvider";
 
 const links = [
   { href: "/#teardown", label: "Teardown" },
@@ -16,6 +17,7 @@ const links = [
 export default function Nav() {
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
+  const { openOptIn } = useOptIn();
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 24);
@@ -60,12 +62,12 @@ export default function Nav() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/apply"
+          <button
+            onClick={openOptIn}
             className="hidden rounded-full bg-signal px-5 py-2.5 text-[0.875rem] font-semibold text-void transition-colors hover:bg-[#12E062] sm:inline-flex"
           >
-            Book a strategy call
-          </Link>
+            Get the free playbook
+          </button>
           <button
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -109,13 +111,12 @@ export default function Nav() {
                   {l.label}
                 </Link>
               ))}
-              <Link
-                href="/apply"
-                onClick={() => setOpen(false)}
+              <button
+                onClick={() => { setOpen(false); openOptIn(); }}
                 className="btn-signal mt-5 w-full"
               >
-                Book a strategy call
-              </Link>
+                Get the free playbook
+              </button>
             </div>
           </motion.nav>
         )}

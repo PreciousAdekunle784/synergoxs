@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Reveal } from "./Primitives";
+import { useOptIn } from "./OptInProvider";
 
 const reminders = [
   "Ship it or it's free",
@@ -11,6 +12,8 @@ const reminders = [
 ];
 
 export default function FinalCTA() {
+  const { openOptIn } = useOptIn();
+
   return (
     <section id="book" className="relative overflow-hidden py-28 md:py-36">
       <div
@@ -47,11 +50,11 @@ export default function FinalCTA() {
           </Reveal>
           <Reveal delay={0.18}>
             <div className="mt-10 flex flex-col items-center gap-4">
-              <Link
-                href="/apply"
+              <button
+                onClick={openOptIn}
                 className="btn-signal shadow-press px-9 py-5 text-[1rem]"
               >
-                Book your strategy call
+                Get the free playbook
                 <svg width="16" height="16" viewBox="0 0 15 15" fill="none" aria-hidden>
                   <path
                     d="M3 7.5h9m0 0L8.5 4M12 7.5 8.5 11"
@@ -61,7 +64,7 @@ export default function FinalCTA() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </Link>
+              </button>
               <p className="font-mono text-[0.74rem] uppercase tracking-[0.16em] text-inkFaint">
                 We take on three builds a month · No pitch deck · No pressure
               </p>
@@ -121,12 +124,12 @@ export default function FinalCTA() {
                 Six weeks to first ship. You approve the direction; we do
                 everything else and report against cost per customer.
               </p>
-              <Link
-                href="/apply"
+              <button
+                onClick={openOptIn}
                 className="btn-signal mt-7 w-full shadow-press sm:w-auto"
               >
-                Let&apos;s scale your business
-              </Link>
+                Get the free playbook
+              </button>
             </div>
             <div className="bg-pitch p-9 md:p-11">
               <p className="eyebrow">Door two</p>
@@ -137,8 +140,8 @@ export default function FinalCTA() {
                 The same teardown methodology, frameworks and templates, taught
                 in the open — so the capability stays with you.
               </p>
-              <Link href="/learn" className="btn-ghost mt-7 w-full sm:w-auto">
-                Start learning
+              <Link href="/apply" className="btn-signal mt-7 w-full shadow-press sm:w-auto">
+                Book your call
               </Link>
             </div>
           </div>

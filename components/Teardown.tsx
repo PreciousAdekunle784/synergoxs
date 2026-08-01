@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { Reveal, SectionHead } from "./Primitives";
+import { useOptIn } from "./OptInProvider";
 
 /* Benchmarks are stated as targets, not promises. */
 const TARGET = { toLead: 0.15, toCall: 0.3, toClose: 0.25 };
@@ -57,6 +57,7 @@ function Slider({
 }
 
 export default function Teardown() {
+  const { openOptIn } = useOptIn();
   const [cur, setCur] = useState<Cur>("USD");
   const m = CUR[cur].mult;
 
@@ -357,9 +358,18 @@ export default function Teardown() {
               </div>
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <Link href="/apply" className="btn-signal shadow-press">
-                  Put your real numbers on this
-                </Link>
+                <button onClick={openOptIn} className="btn-signal shadow-press">
+                  Get the free playbook
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
+                    <path
+                      d="M3 7.5h9m0 0L8.5 4M12 7.5 8.5 11"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
                 <p className="text-[0.78rem] leading-relaxed text-inkFaint">
                   Targets are typical mid-range benchmarks, not a forecast. On
                   the call we throw them out and use your analytics instead.

@@ -93,8 +93,8 @@ export default function LearnPage() {
             keep it for the rest of your career. Both are honest answers.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link href="/#checklist" className="btn-signal shadow-press">
-              Start with the free checklist
+            <Link href="/apply" className="btn-signal shadow-press">
+              Book your call
             </Link>
             <Link href="/#paths" className="btn-ghost">
               Compare both paths
@@ -212,7 +212,7 @@ export default function LearnPage() {
             </p>
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
               <Link href="/apply" className="btn-signal shadow-press">
-                Book a strategy call
+                Book your call
               </Link>
               <Link href="/#teardown" className="btn-ghost">
                 Run the teardown now

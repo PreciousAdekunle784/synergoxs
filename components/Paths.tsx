@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Reveal } from "./Primitives";
+import { useOptIn } from "./OptInProvider";
 
 const paths = [
   {
@@ -23,9 +24,10 @@ const paths = [
     ],
     forYou: "You have demand, budget and no time. You'd rather own the outcome than the calendar.",
     notForYou: "You want to be in every decision, or you're pre-revenue and testing whether the thing sells at all.",
-    cta: "Let's scale your business",
-    href: "/apply",
+    cta: "Get the free playbook",
+    href: "#optin",
     external: false,
+    optin: true,
     meta: "Six weeks to first ship · Three builds a month",
   },
   {
@@ -46,9 +48,10 @@ const paths = [
     ],
     forYou: "You're an operator or marketer who wants the capability permanently, not rented by the month.",
     notForYou: "You need revenue moving in the next thirty days and don't have time to learn on the way.",
-    cta: "Start learning",
-    href: "/learn",
+    cta: "Book your call",
+    href: "/apply",
     external: false,
+    optin: false,
     meta: "Self-paced · Community included · Cancel anytime",
   },
 ];
@@ -78,6 +81,7 @@ function DIYIcon() {
 
 export default function Paths() {
   const reduce = useReducedMotion();
+  const { openOptIn } = useOptIn();
 
   return (
     <section id="paths" className="relative overflow-hidden py-32 md:py-44">
@@ -207,11 +211,9 @@ export default function Paths() {
               </div>
 
               <div className="mt-auto pt-9">
-                {p.external ? (
-                  <a
-                    href={p.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                {p.optin ? (
+                  <button
+                    onClick={openOptIn}
                     className="btn-signal w-full shadow-press"
                   >
                     {p.cta}
@@ -224,9 +226,9 @@ export default function Paths() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </a>
+                  </button>
                 ) : (
-                  <Link href={p.href} className="btn-ghost w-full">
+                  <Link href={p.href} className="btn-signal w-full shadow-press">
                     {p.cta}
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
                       <path

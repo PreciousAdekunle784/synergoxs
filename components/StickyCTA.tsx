@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { useOptIn } from "./OptInProvider";
 
 /**
  * Mobile-only sticky bar. Appears once the hero has been passed and hides
@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
  */
 export default function StickyCTA() {
   const [show, setShow] = useState(false);
+  const { openOptIn } = useOptIn();
 
   useEffect(() => {
     const onScroll = () => {
@@ -48,12 +49,12 @@ export default function StickyCTA() {
                 30 min · No pitch
               </p>
             </div>
-            <Link
-              href="/apply"
+            <button
+              onClick={openOptIn}
               className="shrink-0 rounded-full bg-signal px-5 py-3 text-[0.88rem] font-semibold text-void shadow-press"
             >
-              Book a call
-            </Link>
+              Get the playbook
+            </button>
           </div>
         </motion.div>
       )}

@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { EMAIL } from "@/lib/site";
+import { useOptIn } from "./OptInProvider";
 
 export default function Footer() {
+  const { openOptIn } = useOptIn();
+
   return (
     <footer className="border-t border-hair bg-pitch">
       <div className="shell py-16 md:py-20">
@@ -58,9 +63,9 @@ export default function Footer() {
 
           <div>
             <p className="eyebrow">Start</p>
-            <Link href="/apply" className="btn-signal mt-5 w-full sm:w-auto">
-              Book a strategy call
-            </Link>
+            <button onClick={openOptIn} className="btn-signal mt-5 w-full sm:w-auto">
+              Get the free playbook
+            </button>
             <ul className="mt-8 space-y-3 text-[0.92rem]">
               <li>
                 <Link

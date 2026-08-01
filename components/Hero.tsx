@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import SystemPanel from "./SystemPanel";
 import { useOptIn } from "./OptInProvider";
@@ -125,9 +124,9 @@ export default function Hero() {
             className="mt-5 max-w-md text-[0.85rem] leading-relaxed text-inkFaint"
           >
             74 pages, free — the exact system we install for clients. Or{" "}
-            <Link href="/apply" className="text-inkMute underline decoration-hair underline-offset-4 transition-colors hover:text-ink">
-              book a strategy call
-            </Link>{" "}
+            <button onClick={openOptIn} className="text-inkMute underline decoration-hair underline-offset-4 transition-colors hover:text-ink">
+              get the book
+            </button>{" "}
             if you already know you want the team.
           </motion.p>
         </div>
