@@ -1,44 +1,31 @@
-SYNERGOX SITE — BUILD 14
+SYNERGOX SITE — BUILD 15
 ========================
 
-** YOUR "supabaseUrl is required" ERROR — HOW TO FIX IT **  (see FIX_LEADS.txt)
-   That error means the deployed subscribe function got an EMPTY project URL,
-   so createClient crashed and the function shut down before saving — which is
-   why the leads table stayed empty.
-   CAUSE: Supabase reserves the SUPABASE_ prefix, so SUPABASE_URL /
-   SUPABASE_SERVICE_ROLE_KEY weren't reaching your function.
-   FIX (this build already reads non-reserved names):
-     1. Set two secrets:
-          supabase secrets set PROJECT_URL=https://YOURPROJECT.supabase.co
-          supabase secrets set SERVICE_ROLE_KEY=<your service_role key>
-        (service_role key = Supabase > Settings > API > service_role. NOT anon.)
-     2. Redeploy:  supabase functions deploy subscribe
-                   supabase functions deploy verify-payment
-     3. Make sure the table exists: run supabase/migrations/0001_leads.sql
-   The function now also returns a clear config/database error instead of
-   crashing, so if anything's still off you'll see the reason in the Network
-   tab and the function logs. Full walkthrough + curl test in FIX_LEADS.txt.
+FOOTER REDESIGN (this build)
+  The old footer was scattered: uneven 1.4fr/1fr/1fr columns, a big green
+  CTA button crammed into a text column, a long anchor-heavy link list with
+  no grouping, and the legal links buried under the button.
 
-NEW IN THIS BUILD: URGENCY / FOMO ON THE OFFER PAGE
-   The page was too flat — no reason to act now. Added, honestly (no fake
-   resetting timers):
-     - A live "X of 5 build slots left in <Month>" capacity indicator (in the
-       hero AND again lower down). Deterministic — decreases through the month,
-       resets when the month rolls over. Set your real capacity in
-       components/OfferUrgency.tsx (TOTAL_SLOTS).
-     - A "COST OF WAITING" section before the close: customers you lose don't
-       come back, the intro price only goes up, slots are capped monthly.
-     - A final CTA labelled "Lock in ₦199,999 before this month's slots close".
+  Rebuilt into a clean three-part structure:
+    1. CTA band  — brand + tagline on the left, ONE playbook button on the
+       right, as a proper row (button no longer stuffed mid-column).
+    2. Link grid — even 3 columns: Explore / Company / Get in touch, each
+       tidy and grouped; email + location live under "Get in touch".
+    3. Bottom bar — copyright on the left, Privacy + Terms on the right,
+       where legal links belong.
+  Mobile: collapses to 2 columns then stacks; no horizontal overflow.
 
-CARRIED FROM BUILD 13
-   - Paystack v2 in-page flow (starts+finishes on /offer, no redirect away).
-   - Post-payment goes to /thank-you (purchase confirmation + onboarding),
-     ZERO call/booking references.
-   - Offer page: 6 deliverables + comparison table (you vs freelancer vs
-     typical agency vs Synergox), framed as a growth agency (funnels, ads).
+EVERYTHING ELSE UNCHANGED FROM BUILD 14
+  - Leads fix: functions read non-reserved PROJECT_URL / SERVICE_ROLE_KEY
+    (fixes "supabaseUrl is required"). See FIX_LEADS.txt.
+  - Paystack v2 in-page flow; post-payment → /thank-you (no call refs).
+  - Offer page: deliverables + comparison table + urgency/FOMO (slots +
+    cost-of-waiting). Price ₦199,999.
 
-PRICE: ₦199,999 (19999900 kobo).  Routes: 17.  Build verified clean.
+Routes: 17. Build verified clean.
 
-REMEMBER the other secrets too (SETUP.txt): RESEND_API_KEY, BOOK_URL,
-FROM_EMAIL, PAYSTACK_SECRET_KEY, EXPECTED_AMOUNT_KOBO=19999900 — and paste
-SUPABASE_URL + SUPABASE_ANON_KEY + PAYSTACK_PUBLIC_KEY into lib/site.ts.
+Still to set before launch (SETUP.txt / FIX_LEADS.txt):
+  lib/site.ts — SUPABASE_URL, SUPABASE_ANON_KEY, PAYSTACK_PUBLIC_KEY
+  Supabase secrets — PROJECT_URL, SERVICE_ROLE_KEY, RESEND_API_KEY,
+    BOOK_URL, FROM_EMAIL, PAYSTACK_SECRET_KEY, EXPECTED_AMOUNT_KOBO=19999900
+  Run the migration + deploy both functions + verify a Resend domain.
