@@ -22,10 +22,10 @@ export const PLAYBOOK_TITLE = "The Compounding Business";
  */
 export const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ??
-  "PASTE_YOUR_https://xxxx.supabase.co_URL_HERE";
+  "https://kugpqkmvcwagjjyfifbm.supabase.co";
 export const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-  "PASTE_YOUR_ANON_PUBLIC_KEY_HERE";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1Z3Bxa212Y3dhZ2pqeWZpZmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1Nzk4NzQsImV4cCI6MjEwMTE1NTg3NH0.DN7Ll4b4_vGSXu8IWlNxkwer-UkrUVhxiDqIB75Y8BI";
 
 /** Edge Functions. These resolve automatically from SUPABASE_URL. */
 export const SUBSCRIBE_FN = `${SUPABASE_URL}/functions/v1/subscribe`;
@@ -51,7 +51,7 @@ export const SUPABASE_IS_SET =
  */
 export const PAYSTACK_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY ??
-  "PASTE_YOUR_pk_live_KEY_HERE";
+  "pk_live_86332c190507c82d135d897432ea4cb285cbdc79";
 
 /** Price of the paid offer, in the smallest currency unit (kobo for NGN). */
 export const OFFER_AMOUNT_KOBO = Number(
