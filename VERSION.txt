@@ -1,31 +1,31 @@
-SYNERGOX SITE — BUILD 15
+SYNERGOX SITE — BUILD 16
 ========================
 
-FOOTER REDESIGN (this build)
-  The old footer was scattered: uneven 1.4fr/1fr/1fr columns, a big green
-  CTA button crammed into a text column, a long anchor-heavy link list with
-  no grouping, and the legal links buried under the button.
+LEARN PAGE — FIXED CTA + CONVERSION-FOCUSED (this build)
+  The problem: the learn page's main hero button said "Start with the free
+  checklist" and pointed to /#checklist — you wanted it to lead to the
+  BOOK-A-CALL page. Fixed, and rebuilt the whole page to funnel toward the
+  call:
 
-  Rebuilt into a clean three-part structure:
-    1. CTA band  — brand + tagline on the left, ONE playbook button on the
-       right, as a proper row (button no longer stuffed mid-column).
-    2. Link grid — even 3 columns: Explore / Company / Get in touch, each
-       tidy and grouped; email + location live under "Get in touch".
-    3. Bottom bar — copyright on the left, Privacy + Terms on the right,
-       where legal links belong.
-  Mobile: collapses to 2 columns then stacks; no horizontal overflow.
+    - Hero CTA now: "Book your free teardown call" -> /apply
+      (reframed copy: learning the system vs knowing which part moves YOUR
+       numbers first — so book the free teardown).
+    - NEW mid-page conversion band (after the 4 tracks): "Not sure which
+      track you actually need? Book your teardown" -> /apply.
+    - Closing section CTA still -> /apply ("Book a strategy call").
+    - ZERO checklist references left. Every primary (green) button on the
+      page now leads to book-a-call. Secondary ghost buttons point to
+      "Compare both paths" and "Run the teardown now" (supporting, not
+      competing).
 
-EVERYTHING ELSE UNCHANGED FROM BUILD 14
-  - Leads fix: functions read non-reserved PROJECT_URL / SERVICE_ROLE_KEY
-    (fixes "supabaseUrl is required"). See FIX_LEADS.txt.
-  - Paystack v2 in-page flow; post-payment → /thank-you (no call refs).
-  - Offer page: deliverables + comparison table + urgency/FOMO (slots +
-    cost-of-waiting). Price ₦199,999.
+  So the /learn page is the do-it-yourself door, but its conversion goal —
+  getting the visitor onto a free teardown call — is now consistent top to
+  bottom.
+
+EVERYTHING ELSE UNCHANGED FROM BUILD 15
+  - Footer redesign (clean 3-part structure).
+  - Leads fix (PROJECT_URL / SERVICE_ROLE_KEY — see FIX_LEADS.txt).
+  - Paystack v2 in-page; post-payment -> /thank-you (no call refs).
+  - Offer page: deliverables + comparison table + urgency/FOMO. ₦199,999.
 
 Routes: 17. Build verified clean.
-
-Still to set before launch (SETUP.txt / FIX_LEADS.txt):
-  lib/site.ts — SUPABASE_URL, SUPABASE_ANON_KEY, PAYSTACK_PUBLIC_KEY
-  Supabase secrets — PROJECT_URL, SERVICE_ROLE_KEY, RESEND_API_KEY,
-    BOOK_URL, FROM_EMAIL, PAYSTACK_SECRET_KEY, EXPECTED_AMOUNT_KOBO=19999900
-  Run the migration + deploy both functions + verify a Resend domain.

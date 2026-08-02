@@ -89,21 +89,23 @@ export default function LearnPage() {
           <p className="body-lg mt-8 max-w-2xl">
             Everything we charge for on a build — the teardown methodology, the
             offer frameworks, the funnel templates, the campaign structures —
-            taught in the open. Buy the outcome from us, or buy the skill and
-            keep it for the rest of your career. Both are honest answers.
+            taught in the open. But learning the system and knowing which part of
+            it will move <em>your</em> numbers first are two different things.
+            Start with a free teardown of your business, and we&apos;ll tell you
+            exactly where to point your effort.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link href="/#checklist" className="btn-signal shadow-press">
-              Start with the free checklist
+            <Link href="/apply" className="btn-signal shadow-press">
+              Book your free teardown call
             </Link>
             <Link href="/#paths" className="btn-ghost">
               Compare both paths
             </Link>
           </div>
           <p className="mt-6 max-w-lg text-[0.85rem] leading-relaxed text-inkFaint">
-            Enrolment opens in cohorts so live sessions stay small enough to get
-            your build reviewed. Join the checklist list and you&apos;ll hear
-            first.
+            No pitch on the call — you leave with your biggest leak identified and
+            the exact track (or build) that closes it. Cohorts stay small so live
+            sessions can review your work.
           </p>
         </div>
       </section>
@@ -147,6 +149,22 @@ export default function LearnPage() {
                 </ul>
               </article>
             ))}
+          </div>
+
+          <div className="mt-14 flex flex-col items-center gap-5 rounded-slab border border-signal/25 bg-signal/[0.05] p-9 text-center md:flex-row md:justify-between md:p-11 md:text-left">
+            <div className="max-w-xl">
+              <h3 className="font-display text-[1.4rem] font-extrabold leading-tight tracking-tighter2 text-ink md:text-[1.7rem]">
+                Not sure which track you actually need?
+              </h3>
+              <p className="mt-3 text-[0.97rem] leading-relaxed text-inkMute">
+                That&apos;s the whole point of the free teardown. We look at your
+                business, find the one leak costing you the most, and tell you
+                which track closes it — before you spend a naira or an hour.
+              </p>
+            </div>
+            <Link href="/apply" className="btn-signal shrink-0 shadow-press">
+              Book your teardown
+            </Link>
           </div>
         </div>
       </section>
