@@ -1,72 +1,74 @@
-FIX: "LEADS TABLE NOT RECORDING ANY EMAIL"
-==========================================
+FIX: "supabaseUrl is required" / LEADS NOT RECORDING
+====================================================
 
-Why you saw nothing: the old function logged database errors but still
-returned success, so the site looked fine while nothing saved. This
-build now RETURNS the real error, so you can see exactly what's wrong.
-Work down this list — it's almost always #1 or #2.
+You saw this in the subscribe function logs:
+    Error: supabaseUrl is required
+    ... then "shutdown"
 
+CAUSE (this was a real bug, now fixed):
+The function needs your project URL + service-role key. Supabase
+RESERVES the "SUPABASE_" prefix for its own secrets — you can't reliably
+set SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY yourself, and in your
+deployment they weren't reaching the function, so the client got an
+empty URL and crashed before saving anything.
 
-1) DID YOU RUN THE MIGRATION? (most common cause)
-   The `leads` table has to exist. In Supabase:
-     - Left sidebar → SQL Editor → New query
-     - Paste the entire contents of:  supabase/migrations/0001_leads.sql
-     - Run it.
-   Then check: Table Editor → you should see a `leads` table.
+THE FIX: the function now reads NON-reserved secret names:
+    PROJECT_URL        = your project URL
+    SERVICE_ROLE_KEY   = your service_role key
 
-   If the table wasn't there, that was it. Test an opt-in again.
+DO THIS (3 steps)
+-----------------
 
+1) Set the two secrets (names WITHOUT the SUPABASE_ prefix):
 
-2) ARE THE EDGE FUNCTIONS DEPLOYED?
-   The site calls a function called `subscribe`. It must be live.
-     supabase login
-     supabase link --project-ref YOUR-PROJECT-REF
+   Using the CLI:
+     supabase secrets set PROJECT_URL=https://YOURPROJECT.supabase.co
+     supabase secrets set SERVICE_ROLE_KEY=eyJ....(your service_role key)
+
+   Or in the dashboard:
+     Project Settings → Edge Functions → Secrets → Add new secret
+        PROJECT_URL       = https://YOURPROJECT.supabase.co
+        SERVICE_ROLE_KEY  = (paste the service_role key)
+
+   Where to find these:
+     Project Settings → API
+       - Project URL          → PROJECT_URL
+       - service_role key      → SERVICE_ROLE_KEY   (NOT the anon key)
+       (the service_role key is secret — it only ever lives in Supabase,
+        never in the website code.)
+
+2) Make sure the `leads` table exists:
+     SQL Editor → paste & run supabase/migrations/0001_leads.sql
+
+3) Redeploy the functions so they pick up the new code + secrets:
      supabase functions deploy subscribe
      supabase functions deploy verify-payment
-   In Supabase → Edge Functions you should see both listed.
 
 
-3) ARE THE PUBLIC KEYS IN lib/site.ts? (or Vercel env + REDEPLOY)
-   Open lib/site.ts and confirm these are your REAL values, not the
-   "PASTE_YOUR_..." placeholders:
-     SUPABASE_URL       = "https://xxxx.supabase.co"
-     SUPABASE_ANON_KEY  = "eyJ...."
-   If they're still placeholders, the site skips the call entirely
-   (you'll see a console warning "Supabase not set"). Paste them and
-   redeploy.
-
-
-4) READ THE ACTUAL ERROR (this build now shows it)
-   Open your live site, press F12 → Network tab, submit the opt-in.
-   Click the "subscribe" request → Response. You'll see one of:
-     - {"stage":"database","error":"...relation \"leads\" does not
-        exist..."}  → run the migration (step 1).
-     - {"stage":"config","error":"...missing credentials..."}  →
-        redeploy the function (step 2).
-     - {"ok":true}  → it saved! Check Table Editor → leads.
-
-   Also check the function logs: Supabase → Edge Functions → subscribe
-   → Logs. Any red error there names the exact problem.
-
-
-5) STILL NOTHING? CHECK THE TABLE NAME + RLS
-   - The table must be named exactly  leads  (lowercase).
-   - RLS being ON is fine — the function uses the service-role key,
-     which bypasses RLS. Do NOT add public policies; you don't need
-     them, and the migration is already correct.
-
-
-QUICK TEST WITHOUT THE WEBSITE
-------------------------------
-You can hit the function directly to isolate the problem. In a terminal
-(replace the URL + anon key):
+CONFIRM IT WORKS
+----------------
+Quick direct test (replace URL + ANON key — anon, not service_role):
 
   curl -i -X POST \
-    "https://YOUR-PROJECT.supabase.co/functions/v1/subscribe" \
+    "https://YOURPROJECT.supabase.co/functions/v1/subscribe" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer YOUR_ANON_KEY" \
     -H "apikey: YOUR_ANON_KEY" \
     -d '{"name":"Test","email":"test@example.com"}'
 
-  - 200 {"ok":true}  → saving works; check Table Editor → leads.
-  - 500 {...error...} → the message tells you which step above to fix.
+  200 {"ok":true}                → saved. Check Table Editor → leads.
+  500 {"stage":"config"...}      → PROJECT_URL/SERVICE_ROLE_KEY not set (step 1)
+  500 {"stage":"database"...}    → table missing, run the migration (step 2)
+
+Then do a real opt-in on the site and confirm the row appears in
+Table Editor → leads.
+
+
+ALSO NEEDED FOR THE BOOK EMAIL (Resend) — unchanged:
+  supabase secrets set RESEND_API_KEY=re_xxxx
+  supabase secrets set BOOK_URL=https://synergox.co/growth-playbook.pdf
+  supabase secrets set FROM_EMAIL="Synergox <hello@synergox.co>"
+
+AND FOR PAYMENT VERIFICATION:
+  supabase secrets set PAYSTACK_SECRET_KEY=sk_live_xxxx
+  supabase secrets set EXPECTED_AMOUNT_KOBO=19999900

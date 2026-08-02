@@ -1,45 +1,44 @@
-SYNERGOX SITE — BUILD 13
+SYNERGOX SITE — BUILD 14
 ========================
 
-FOUR THINGS IN THIS BUILD
+** YOUR "supabaseUrl is required" ERROR — HOW TO FIX IT **  (see FIX_LEADS.txt)
+   That error means the deployed subscribe function got an EMPTY project URL,
+   so createClient crashed and the function shut down before saving — which is
+   why the leads table stayed empty.
+   CAUSE: Supabase reserves the SUPABASE_ prefix, so SUPABASE_URL /
+   SUPABASE_SERVICE_ROLE_KEY weren't reaching your function.
+   FIX (this build already reads non-reserved names):
+     1. Set two secrets:
+          supabase secrets set PROJECT_URL=https://YOURPROJECT.supabase.co
+          supabase secrets set SERVICE_ROLE_KEY=<your service_role key>
+        (service_role key = Supabase > Settings > API > service_role. NOT anon.)
+     2. Redeploy:  supabase functions deploy subscribe
+                   supabase functions deploy verify-payment
+     3. Make sure the table exists: run supabase/migrations/0001_leads.sql
+   The function now also returns a clear config/database error instead of
+   crashing, so if anything's still off you'll see the reason in the Network
+   tab and the function logs. Full walkthrough + curl test in FIX_LEADS.txt.
 
-1) LEADS NOT RECORDING — now diagnosable + likely fixed
-   The old subscribe function hid database errors (logged them but
-   still returned success), so nothing saved and you saw no error.
-   Now it RETURNS the real reason (500 with a clear message + hint),
-   visible in your browser Network tab and the function logs.
-   >>> The actual fix is almost always: RUN THE MIGRATION (the `leads`
-       table didn't exist) or DEPLOY THE FUNCTION.  Step-by-step with
-       a curl test is in  FIX_LEADS.txt — read it first.
-   Also added a guard: if the function is missing its service-role key
-   it now says so instead of silently failing.
+NEW IN THIS BUILD: URGENCY / FOMO ON THE OFFER PAGE
+   The page was too flat — no reason to act now. Added, honestly (no fake
+   resetting timers):
+     - A live "X of 5 build slots left in <Month>" capacity indicator (in the
+       hero AND again lower down). Deterministic — decreases through the month,
+       resets when the month rolls over. Set your real capacity in
+       components/OfferUrgency.tsx (TOTAL_SLOTS).
+     - A "COST OF WAITING" section before the close: customers you lose don't
+       come back, the intro price only goes up, slots are capped monthly.
+     - A final CTA labelled "Lock in ₦199,999 before this month's slots close".
 
-2) PAYSTACK NOW IN-PAGE (v2)
-   Upgraded from Paystack Inline v1 to v2 (js.paystack.co/v2/inline.js,
-   newTransaction). The whole payment flow starts AND finishes on the
-   offer page — no redirect away. (Paystack always shows its card form
-   in a secure iframe for PCI reasons; v2 is the closest to "in-page" —
-   the buyer never leaves synergox.co/offer.)
+CARRIED FROM BUILD 13
+   - Paystack v2 in-page flow (starts+finishes on /offer, no redirect away).
+   - Post-payment goes to /thank-you (purchase confirmation + onboarding),
+     ZERO call/booking references.
+   - Offer page: 6 deliverables + comparison table (you vs freelancer vs
+     typical agency vs Synergox), framed as a growth agency (funnels, ads).
 
-3) POST-PAYMENT PAGE IS NO LONGER CALL-RELATED
-   After paying, buyers now land on  /thank-you  (a proper purchase
-   confirmation: receipt on the way, onboarding form, "we map your
-   system, we build, you approve"). It says NOTHING about booking a
-   call — they bought a build, not a call. (Old flow wrongly sent them
-   to /guide, the post-booking call page.)
+PRICE: ₦199,999 (19999900 kobo).  Routes: 17.  Build verified clean.
 
-4) OFFER PAGE — WHAT YOU GET + COMPARISON TABLE
-   - Kept the 6 concrete deliverables ("what we actually build").
-   - Added a COMPARISON TABLE: Do it yourself vs A freelancer vs A
-     typical agency vs Synergox — across whole-system build, funnels,
-     paid ads (judged on cost per customer), asset ownership, time cost,
-     retainer, and the scope guarantee.
-   - Reframed copy around the agency (funnels, ads, growth), not the book.
-
-PRICE: ₦199,999 (19999900 kobo) in lib/site.ts.
-Routes: 17 (adds /thank-you). Build verified clean.
-
-SETUP REMINDER (SETUP.txt): paste SUPABASE_URL + SUPABASE_ANON_KEY +
-PAYSTACK_PUBLIC_KEY in lib/site.ts; set Supabase secrets (RESEND_API_KEY,
-BOOK_URL, FROM_EMAIL, PAYSTACK_SECRET_KEY, EXPECTED_AMOUNT_KOBO=19999900);
-run the migration; deploy both functions; verify a Resend domain.
+REMEMBER the other secrets too (SETUP.txt): RESEND_API_KEY, BOOK_URL,
+FROM_EMAIL, PAYSTACK_SECRET_KEY, EXPECTED_AMOUNT_KOBO=19999900 — and paste
+SUPABASE_URL + SUPABASE_ANON_KEY + PAYSTACK_PUBLIC_KEY into lib/site.ts.

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { OFFER_AMOUNT_KOBO, OFFER_CURRENCY } from "@/lib/site";
 import PayButton from "@/components/PayButton";
 import OfferProof from "@/components/OfferProof";
+import OfferUrgency from "@/components/OfferUrgency";
 
 export const metadata: Metadata = {
   title: "Your Growth System, Built For You — Synergox",
@@ -85,11 +86,14 @@ export default function OfferPage() {
             way. Or we can do it with you, starting this week.
           </p>
 
-          <div className="mt-10 flex flex-col items-center gap-4">
-            <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" />
-            <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-inkFaint">
-              One-time {P} · Secure checkout · Scope guarantee
-            </p>
+          <div className="mt-10 flex flex-col items-center gap-6">
+            <OfferUrgency />
+            <div className="flex flex-col items-center gap-4">
+              <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" />
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-inkFaint">
+                One-time {P} · Secure checkout · Scope guarantee
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -526,6 +530,115 @@ export default function OfferPage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────── COST OF WAITING (FOMO) ─────────────────────── */}
+      <section className="border-t border-hair bg-pitch py-20 md:py-28">
+        <div className="shell max-w-2xl">
+          <p className="eyebrow text-signal">The real cost isn&apos;t the price</p>
+          <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
+            Every month you wait is a month your competitors don&apos;t.
+          </h2>
+          <div className="mt-8 space-y-5 text-[1.02rem] leading-relaxed text-inkMute">
+            <p>
+              While the system sits unbuilt, the traffic you&apos;re already
+              paying for keeps leaking. The leads you could be capturing go to
+              the business down the street whose funnel converts better than
+              yours. That&apos;s not a one-time loss — it compounds, every single
+              month, whether or not you act.
+            </p>
+            <p>
+              Do the maths on your own numbers: if a working system would bring
+              even a handful of extra customers a month, waiting three months to
+              &ldquo;think about it&rdquo; doesn&apos;t cost you nothing — it
+              costs you every customer you would have won in those three months,
+              gone for good.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            {[
+              { t: "Waiting is a decision too", d: "Doing nothing isn't neutral — it's choosing to keep losing the customers your funnel currently drops." },
+              { t: "The price only goes up", d: "As we take on more clients and prove more results, this one-time build won't stay at this number." },
+              { t: "Slots are capped monthly", d: "When this month's builds are booked, the next opening is weeks away. Momentum lost is revenue lost." },
+            ].map((c) => (
+              <div key={c.t} className="rounded-card border border-hair bg-panel p-6">
+                <h3 className="font-display text-[1.05rem] font-extrabold tracking-tighter2 text-ink">
+                  {c.t}
+                </h3>
+                <p className="mt-2 text-[0.88rem] leading-relaxed text-inkMute">
+                  {c.d}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 flex flex-col items-center gap-4">
+            <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" />
+            <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-inkFaint">
+              Lock in {P} before this month&apos;s slots close
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────── COST OF WAITING (FOMO) ─────────────────────── */}
+      <section className="border-t border-hair bg-pitch py-20 md:py-28">
+        <div className="shell max-w-2xl">
+          <div className="text-center">
+            <p className="eyebrow text-signal">The cost of waiting</p>
+            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
+              Every month you wait is a month your competitors don&apos;t.
+            </h2>
+            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
+              This isn&apos;t pressure — it&apos;s arithmetic. The customers
+              searching for what you sell are being converted right now. The only
+              question is by whom.
+            </p>
+          </div>
+
+          <div className="mt-12 space-y-4">
+            {[
+              {
+                t: "The customers you're losing don't come back",
+                d: "Every week without a working funnel, the people who would have bought from you are buying from whoever converts them first. That's not delayed revenue — it's revenue that's gone to someone else for good.",
+              },
+              {
+                t: "The price only moves one way",
+                d: "This is an introductory build price while we're growing our case studies. As the results stack up, the number goes up with them. The cheapest this will ever be is today.",
+              },
+              {
+                t: "Slots are capped every month",
+                d: "We take a handful of builds a month so each gets our full attention. When this month's are gone, the next opening is weeks away — weeks your competitors spend converting the customers you both want.",
+              },
+            ].map((c) => (
+              <div
+                key={c.t}
+                className="flex items-start gap-4 rounded-slab border border-hair bg-panel p-7 shadow-lift"
+              >
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-signal/30 bg-signal/[0.08]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <circle cx="12" cy="12" r="8.5" stroke="#00C551" strokeWidth="1.5" />
+                    <path d="M12 7.5V12l3 2" stroke="#00C551" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <div>
+                  <h3 className="font-display text-[1.2rem] font-extrabold tracking-tighter2 text-ink">
+                    {c.t}
+                  </h3>
+                  <p className="mt-2 text-[0.96rem] leading-relaxed text-inkMute">
+                    {c.d}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 flex flex-col items-center gap-5">
+            <OfferUrgency />
+            <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" label={`Lock in ${P} before this month's slots close`} />
           </div>
         </div>
       </section>

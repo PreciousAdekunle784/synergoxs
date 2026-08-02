@@ -29,14 +29,22 @@ Price is already set: OFFER_AMOUNT_KOBO = 19999900  (= ₦199,999).
 ──────────────────────────────────────────────────────────────────────
 B) SET SUPABASE SECRETS   (the sensitive keys — CLI or dashboard)
 ──────────────────────────────────────────────────────────────────────
+  # REQUIRED for the leads table to save (the SUPABASE_ prefix is reserved,
+  # so we use these non-reserved names — the functions read them):
+  supabase secrets set PROJECT_URL=https://xxxx.supabase.co
+  supabase secrets set SERVICE_ROLE_KEY=your-service_role-key   (Settings > API)
+
+  # For the book email:
   supabase secrets set RESEND_API_KEY=re_xxxx
   supabase secrets set BOOK_URL=https://synergox.co/growth-playbook.pdf
   supabase secrets set FROM_EMAIL="Synergox <hello@synergox.co>"
+
+  # For payment verification:
   supabase secrets set PAYSTACK_SECRET_KEY=sk_live_xxxx
   supabase secrets set EXPECTED_AMOUNT_KOBO=19999900
 
-(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided automatically
- inside the Edge runtime — you don't set those.)
+(The service_role key is SECRET — it only lives in Supabase, never in the
+ website code. Don't confuse it with the anon key that goes in lib/site.ts.)
 
 
 ──────────────────────────────────────────────────────────────────────
