@@ -7,9 +7,32 @@ import OfferProof from "@/components/OfferProof";
 export const metadata: Metadata = {
   title: "Your Growth System, Built For You — Synergox",
   description:
-    "We install the exact system from The Compounding Business inside your business — offer, funnel, traffic, follow-up — built, launched, and optimised by people who do it every week.",
+    "Synergox is a growth agency. We build the funnels, run the ads, and install the follow-up that turns strangers into customers — done with you, for a one-time build.",
   robots: { index: false, follow: false },
 };
+
+function Check({ muted = false }: { muted?: boolean }) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 15 15"
+      fill="none"
+      className={muted ? "text-inkMute" : "text-signal"}
+      aria-label="yes"
+    >
+      <path d="M3.5 8l3 3 5-7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function XMark() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 15 15" fill="none" className="text-boneDim" aria-label="no">
+      <path d="M4 4l7 7M11 4l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function price() {
   const major = OFFER_AMOUNT_KOBO / 100;
@@ -164,7 +187,137 @@ export default function OfferPage() {
         </div>
       </section>
 
-      {/* ─────────────────────── WHO IT'S FOR ─────────────────────── */}
+      {/* ─────────────────────── COMPARISON TABLE ─────────────────────── */}
+      <section className="border-t border-hair py-20 md:py-28">
+        <div className="shell max-w-4xl">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow text-signal">How this compares</p>
+            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
+              Four ways to fix your customer acquisition.
+            </h2>
+            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
+              You have options. Here&apos;s the honest trade-off on each — against
+              what actually matters when you&apos;re trying to grow.
+            </p>
+          </div>
+
+          <div className="mt-14 overflow-x-auto">
+            <table className="w-full min-w-[680px] border-collapse text-left">
+              <thead>
+                <tr>
+                  <th className="w-[28%] p-4 align-bottom" />
+                  <th className="p-4 align-bottom">
+                    <span className="block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-inkMute">
+                      Do it yourself
+                    </span>
+                  </th>
+                  <th className="p-4 align-bottom">
+                    <span className="block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-inkMute">
+                      A freelancer
+                    </span>
+                  </th>
+                  <th className="p-4 align-bottom">
+                    <span className="block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-inkMute">
+                      A typical agency
+                    </span>
+                  </th>
+                  <th className="rounded-t-card bg-signal/[0.08] p-4 align-bottom">
+                    <span className="block font-mono text-[0.62rem] uppercase tracking-[0.16em] text-signal">
+                      Synergox
+                    </span>
+                    <span className="mt-1 block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-ink">
+                      Done with you
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="align-middle">
+                {[
+                  {
+                    label: "Whole system built (offer, funnel, ads, follow-up)",
+                    diy: "You, from scratch",
+                    free: "One piece only",
+                    agency: "Sometimes",
+                    syx: true,
+                  },
+                  {
+                    label: "Funnels designed to convert, not just look nice",
+                    diy: "no",
+                    free: "Maybe",
+                    agency: "Varies",
+                    syx: true,
+                  },
+                  {
+                    label: "Paid ads run against cost per customer",
+                    diy: "no",
+                    free: "Rarely",
+                    agency: "Often vanity metrics",
+                    syx: true,
+                  },
+                  {
+                    label: "You own every asset from day one",
+                    diy: "yes",
+                    free: "Usually",
+                    agency: "Often locked in",
+                    syx: true,
+                  },
+                  {
+                    label: "Time it costs you",
+                    diy: "Months of your life",
+                    free: "Heavy management",
+                    agency: "Endless meetings",
+                    syx: "Minimal — we drive",
+                  },
+                  {
+                    label: "Ongoing monthly retainer",
+                    diy: "—",
+                    free: "Per project",
+                    agency: "₦1.5M+/mo typical",
+                    syx: "No — one-time build",
+                  },
+                  {
+                    label: "Scope guarantee (don't ship it, don't bill it)",
+                    diy: "—",
+                    free: "no",
+                    agency: "no",
+                    syx: true,
+                  },
+                ].map((row, i) => (
+                  <tr key={row.label} className={i % 2 ? "" : "bg-panel/40"}>
+                    <td className="p-4 text-[0.9rem] font-medium leading-snug text-ink/90">
+                      {row.label}
+                    </td>
+                    {(["diy", "free", "agency"] as const).map((col) => (
+                      <td key={col} className="p-4 text-[0.86rem] text-inkMute">
+                        {row[col] === "no" ? (
+                          <XMark />
+                        ) : row[col] === "yes" ? (
+                          <Check muted />
+                        ) : (
+                          <span>{row[col]}</span>
+                        )}
+                      </td>
+                    ))}
+                    <td className="bg-signal/[0.06] p-4 text-[0.86rem] text-ink">
+                      {row.syx === true ? (
+                        <Check />
+                      ) : (
+                        <span className="font-medium text-ink">{row.syx}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-6 text-center text-[0.82rem] text-inkFaint">
+            Retainer and cost figures are typical market ranges, shown for
+            comparison — not quotes.
+          </p>
+        </div>
+      </section>
+
       <section className="border-t border-hair py-20 md:py-28">
         <div className="shell max-w-4xl">
           <div className="mx-auto max-w-2xl text-center">

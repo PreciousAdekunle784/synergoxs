@@ -91,8 +91,17 @@ export default function PayButton({
 
     setPaying(true);
     const opened = openPaystack(payerEmail, async (r) => {
+      if (r.status === "error") {
+        setPaying(false);
+        setNotice(
+          r.message
+            ? `Payment couldn't complete: ${r.message}. Please try again.`
+            : "Payment couldn't complete. Please try again."
+        );
+        return;
+      }
       if (r.status !== "success") {
-        // User closed the popup — leave them on THIS page to try again.
+        // User cancelled — leave them on THIS page to try again.
         setPaying(false);
         return;
       }
@@ -123,7 +132,8 @@ export default function PayButton({
 
       setPaying(false);
       track("purchase_completed", { reference: r.reference, verified });
-      window.location.href = "/guide";
+      // Post-purchase page — this is a BUILD purchase, NOT a call booking.
+      window.location.href = `/thank-you?ref=${encodeURIComponent(r.reference)}`;
     });
 
     if (!opened) {

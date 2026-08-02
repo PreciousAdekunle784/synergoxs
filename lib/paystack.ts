@@ -8,28 +8,42 @@ import {
   OFFER_LABEL,
 } from "@/lib/site";
 
-declare global {
-  interface Window {
-    PaystackPop?: {
-      setup: (opts: PaystackOptions) => { openIframe: () => void };
-    };
-  }
-}
+/**
+ * Paystack Popup v2 (@paystack/inline-js via js.paystack.co/v2/inline.js).
+ *
+ * The whole payment flow starts and finishes ON THIS PAGE — the checkout
+ * appears over the offer page and returns control to it on success, with no
+ * redirect away. (Paystack always renders its card form in a secure iframe
+ * overlay; that's required for PCI compliance — you never handle raw card data.
+ * v2 is the closest to "in-page": the user never leaves synergox.co/offer.)
+ */
 
-type PaystackOptions = {
+type NewTxnOptions = {
   key: string;
   email: string;
   amount: number;
   currency?: string;
-  ref?: string;
+  reference?: string;
   metadata?: Record<string, unknown>;
-  callback: (res: { reference: string }) => void;
-  onClose: () => void;
+  onSuccess?: (res: { reference: string }) => void;
+  onLoad?: (res: unknown) => void;
+  onCancel?: () => void;
+  onError?: (err: { message?: string }) => void;
 };
 
-const SRC = "https://js.paystack.co/v1/inline.js";
+type PaystackPopV2 = {
+  newTransaction: (opts: NewTxnOptions) => unknown;
+};
 
-/** Loads the Paystack inline script once and reports when it's ready. */
+declare global {
+  interface Window {
+    PaystackPop?: new () => PaystackPopV2;
+  }
+}
+
+const SRC = "https://js.paystack.co/v2/inline.js";
+
+/** Loads the Paystack v2 script once and reports when it's ready. */
 export function usePaystackScript() {
   const [ready, setReady] = useState(false);
 
@@ -48,6 +62,11 @@ export function usePaystackScript() {
     }
     const onLoad = () => setReady(true);
     script.addEventListener("load", onLoad);
+    // If the script was already in the DOM and loaded, mark ready.
+    if ((script as HTMLScriptElement & { dataset: DOMStringMap }).dataset.loaded) {
+      setReady(true);
+    }
+    script.addEventListener("load", () => (script!.dataset.loaded = "1"));
     return () => script?.removeEventListener("load", onLoad);
   }, []);
 
@@ -56,12 +75,13 @@ export function usePaystackScript() {
 
 export type PayResult =
   | { status: "success"; reference: string }
-  | { status: "closed" };
+  | { status: "closed" }
+  | { status: "error"; message?: string };
 
 /**
- * Opens the Paystack popup for the given email. Resolves when the popup
- * closes or a payment succeeds. Returns false immediately if Paystack isn't
- * configured, so the caller can fall back gracefully.
+ * Opens the Paystack v2 checkout for the given email. Calls onResult when the
+ * transaction succeeds, is cancelled, or errors. Returns false immediately if
+ * Paystack isn't configured, so the caller can handle that case.
  */
 export function openPaystack(
   email: string,
@@ -70,30 +90,22 @@ export function openPaystack(
   if (typeof window === "undefined" || !window.PaystackPop) return false;
   if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.startsWith("PASTE_")) return false;
 
-  const handler = window.PaystackPop.setup({
+  const popup = new window.PaystackPop();
+  popup.newTransaction({
     key: PAYSTACK_PUBLIC_KEY,
     email,
-    amount: Math.round(OFFER_AMOUNT_KOBO), // must be an integer (kobo)
+    amount: Math.round(OFFER_AMOUNT_KOBO), // integer, kobo
     currency: OFFER_CURRENCY,
-    ref: `syx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-    // custom_fields is what makes the info visible on the Paystack dashboard.
+    reference: `syx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     metadata: {
       custom_fields: [
-        {
-          display_name: "Offer",
-          variable_name: "offer",
-          value: OFFER_LABEL,
-        },
-        {
-          display_name: "Source",
-          variable_name: "source",
-          value: "synergox.co/offer",
-        },
+        { display_name: "Offer", variable_name: "offer", value: OFFER_LABEL },
+        { display_name: "Source", variable_name: "source", value: "synergox.co/offer" },
       ],
     },
-    callback: (res) => onResult({ status: "success", reference: res.reference }),
-    onClose: () => onResult({ status: "closed" }),
+    onSuccess: (res) => onResult({ status: "success", reference: res.reference }),
+    onCancel: () => onResult({ status: "closed" }),
+    onError: (err) => onResult({ status: "error", message: err?.message }),
   });
-  handler.openIframe();
   return true;
 }
