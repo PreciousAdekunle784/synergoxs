@@ -51,7 +51,7 @@ export const SUPABASE_IS_SET =
  */
 export const PAYSTACK_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY ??
-  "pk_test_ddc4b999eeb75c075045a6c1d6c9809e2d5210cf";
+  "pk_live_86332c190507c82d135d897432ea4cb285cbdc79";
 
 /** Price of the paid offer, in the smallest currency unit (kobo for NGN). */
 export const OFFER_AMOUNT_KOBO = Number(
