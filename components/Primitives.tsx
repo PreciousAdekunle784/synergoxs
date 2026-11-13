@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import Eyebrow from "./Eyebrow";
 
 /* ------------------------------------------------------------------ */
 /* Reveal — the single scroll-entrance used site-wide.                  */
@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 export function Reveal({
   children,
   delay = 0,
-  y = 22,
+  y = 18,
   className = "",
 }: {
   children: React.ReactNode;
@@ -24,8 +24,8 @@ export function Reveal({
       className={className}
       initial={reduce ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-12% 0px -8% 0px" }}
-      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>
@@ -33,95 +33,33 @@ export function Reveal({
 }
 
 /* ------------------------------------------------------------------ */
-/* Counter — numbers count only when they represent measured movement.  */
-/* ------------------------------------------------------------------ */
-export function Counter({
-  to,
-  suffix = "",
-  prefix = "",
-  decimals = 0,
-  duration = 1500,
-}: {
-  to: number;
-  suffix?: string;
-  prefix?: string;
-  decimals?: number;
-  duration?: number;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const reduce = useReducedMotion();
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    if (reduce) {
-      setValue(to);
-      return;
-    }
-    let frame = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setValue(to * eased);
-      if (p < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [inView, to, duration, reduce]);
-
-  return (
-    <span ref={ref} className="num">
-      {prefix}
-      {value.toLocaleString("en-US", {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })}
-      {suffix}
-    </span>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* SectionHead — eyebrow + hairline + display heading.                  */
-/* The eyebrow states the objection the section removes.                */
+/* SectionHead — eyebrow + heading + optional lede.                     */
 /* ------------------------------------------------------------------ */
 export function SectionHead({
   eyebrow,
   title,
   lede,
   align = "left",
+  as: Tag = "h2",
 }: {
   eyebrow: string;
   title: React.ReactNode;
   lede?: React.ReactNode;
   align?: "left" | "center";
+  as?: "h1" | "h2";
 }) {
+  const center = align === "center";
   return (
-    <div className={align === "center" ? "mx-auto max-w-3xl text-center" : ""}>
+    <div className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       <Reveal>
-        <div
-          className={`flex items-center gap-4 ${
-            align === "center" ? "justify-center" : ""
-          }`}
-        >
-          <span className="h-px w-8 bg-signal" />
-          <span className="eyebrow">{eyebrow}</span>
-        </div>
+        <Eyebrow center={center}>{eyebrow}</Eyebrow>
       </Reveal>
-      <Reveal delay={0.06}>
-        <h2 className="h-section mt-6 max-w-4xl text-ink">{title}</h2>
+      <Reveal delay={0.05}>
+        <Tag className="h-section mt-5">{title}</Tag>
       </Reveal>
       {lede && (
-        <Reveal delay={0.12}>
-          <p
-            className={`body-lg mt-6 max-w-2xl ${
-              align === "center" ? "mx-auto" : ""
-            }`}
-          >
-            {lede}
-          </p>
+        <Reveal delay={0.1}>
+          <p className={`lede mt-5 max-w-2xl ${center ? "mx-auto" : ""}`}>{lede}</p>
         </Reveal>
       )}
     </div>

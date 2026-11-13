@@ -62,10 +62,22 @@ export const OFFER_LABEL =
   process.env.NEXT_PUBLIC_OFFER_LABEL ?? "Growth System Build";
 
 /**
- * The conversion-focused payment page the success screen redirects to. The
- * Paystack checkout button lives on that page (see app/offer/page.tsx).
+ * ── The funnel ──────────────────────────────────────────────────────────
+ * ONE primary conversion: the free growth teardown call.
+ *
+ *   any page → BOOKING_PAGE (short form → calendar) → BOOKED_PAGE
+ *
+ * The free playbook is the fallback for visitors who aren't ready to talk; its
+ * success screen points back at BOOKING_PAGE. PAYMENT_PAGE is the checkout for
+ * the paid build — send it to prospects who are ready to start (it is not
+ * linked from the public navigation, and is noindex).
  */
+export const BOOKING_PAGE = "/apply";
+export const BOOKED_PAGE = "/booked";
 export const PAYMENT_PAGE = "/offer";
 
-/** Seconds on the success screen before auto-redirecting to the payment page. */
-export const REDIRECT_DELAY = 3;
+/** Facts repeated in copy. Change them here and every page follows. */
+export const CALL_MINUTES = 30;
+export const CALL_NAME = "growth teardown";
+export const PLAYBOOK_PAGES = 74;
+export const CASE_STUDY_URL = "https://kingsfoodstoreabuja.com.ng";

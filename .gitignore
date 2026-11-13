@@ -15,3 +15,6 @@
 .DS_Store
 *.pem
 npm-debug.log*
+
+# build artefacts
+*.tsbuildinfo
