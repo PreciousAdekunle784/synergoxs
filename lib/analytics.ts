@@ -11,6 +11,7 @@
  *   call_booked            → Calendly confirmed a booking  ← the primary conversion
  *   lead_email_submitted   → playbook opt-in form submitted
  *   lead_book_sent         → playbook delivery triggered
+ *   playbook_downloaded    → playbook saved from the "you're booked" page
  *   payment_page_viewed    → checkout button clicked on the paid offer
  *   purchase_completed     → Paystack payment succeeded
  */
@@ -21,6 +22,7 @@ type EventName =
   | "call_booked"
   | "lead_email_submitted"
   | "lead_book_sent"
+  | "playbook_downloaded"
   | "payment_page_viewed"
   | "purchase_completed";
 

@@ -3,11 +3,10 @@ import Link from "next/link";
 import {
   BOOKING_PAGE,
   CALL_MINUTES,
-  PLAYBOOK_PAGES,
   PLAYBOOK_TITLE,
-  PLAYBOOK_URL,
 } from "@/lib/site";
 import { Check, Tick } from "@/components/Icons";
+import PlaybookDownload from "@/components/PlaybookDownload";
 import { getContent } from "@/lib/content/get";
 
 export const metadata: Metadata = {
@@ -101,9 +100,7 @@ export default async function BookedPage() {
                 </li>
               ))}
             </ul>
-            <a href={PLAYBOOK_URL} target="_blank" rel="noopener noreferrer" className="btn-primary mt-8 w-full sm:w-auto">
-              Open the playbook (PDF, {PLAYBOOK_PAGES} pages)
-            </a>
+            <PlaybookDownload />
           </div>
 
           <p className="mt-8 text-center text-[0.92rem] leading-relaxed text-mute">

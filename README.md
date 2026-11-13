@@ -26,8 +26,9 @@ Deploy to Vercel: push to GitHub, import the repo, accept the defaults.
 
 ```
 PRIMARY     any green button → /apply (5 questions) → calendar → /booked
+            → "Download the playbook" (saves in place) → /offer
 FALLBACK    "free playbook" link → opt-in (name + email) → success screen → /apply
-CHECKOUT    /offer → Paystack → /thank-you          (unlisted; send the link)
+CHECKOUT    /offer → Paystack → /thank-you
 ```
 
 **One primary action.** Every green button is `components/CTA.tsx` and goes to
@@ -67,11 +68,19 @@ const underServed = a.revenueIndex === 0 && a.spendIndex === 0;
 Currencies and bands are at the top of the same file. `rate` is only used to
 print readable ranges; it never touches billing.
 
+### After booking — `/booked`
+
+Confirms the call and what happens next, then offers the playbook. The button
+(`components/PlaybookDownload.tsx`) saves the PDF to the visitor's device
+without leaving the site, and about two seconds later moves them to the sales
+page. A "Continue" link does the same if they'd rather not wait.
+
 ### The paid offer — `/offer`
 
 The checkout page for the Growth System Build (₦199,999, set by
-`NEXT_PUBLIC_OFFER_AMOUNT_KOBO`). It is `noindex` and not linked from the menu:
-send it to prospects who are ready to start, typically after their call.
+`NEXT_PUBLIC_OFFER_AMOUNT_KOBO`). It is `noindex` and not in the menu. Visitors
+reach it straight after booking a call (once they download the playbook), and
+you can also send the link to anyone who is ready to start.
 Paystack opens inline; the payment is verified server-side, then `/thank-you`.
 
 ---
