@@ -1,7 +1,7 @@
 "use client";
 
 import BookCall, { CallFacts } from "./CTA";
-import { Reveal, SectionHead } from "./Primitives";
+import { Reveal, SectionHead, Stagger, StaggerItem, type HeadCopy } from "./Primitives";
 import { CALL_MINUTES } from "@/lib/site";
 
 const steps = [
@@ -27,42 +27,34 @@ const steps = [
   },
 ];
 
-export default function Process() {
+export default function Process({ copy }: { copy: HeadCopy }) {
   return (
     <section id="how" className="section">
       <div className="shell">
-        <SectionHead
-          eyebrow="How it works"
-          title={
-            <>
-              From first call to live system{" "}
-              <span className="hl">in about six weeks.</span>
-            </>
-          }
-        />
+        <SectionHead eyebrow="How it works" title={copy.title} accent={copy.accent} accentStyle="mark" />
 
-        <ol className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        <Stagger as="ol" className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
-            <li key={s.t}>
-              <Reveal delay={i * 0.06}>
-                {/* Rail: numbered node + connecting line */}
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green font-display text-[1rem] font-extrabold text-ink">
-                    {i + 1}
-                  </span>
-                  <span aria-hidden className="h-px flex-1 bg-line" />
-                </div>
-                <p className="mt-5 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-greenDeep">
-                  {s.when}
-                </p>
-                <h3 className="mt-2 font-display text-[1.35rem] font-extrabold leading-tight tracking-tighter2 text-ink">
-                  {s.t}
-                </h3>
-                <p className="mt-3 text-[0.96rem] leading-relaxed text-body">{s.d}</p>
-              </Reveal>
-            </li>
+            <StaggerItem as="li" key={s.t} className="group">
+              {/* Rail: numbered node, and a line that fills on hover */}
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green font-display text-[1rem] font-extrabold text-ink transition-transform duration-300 ease-out group-hover:scale-110">
+                  {i + 1}
+                </span>
+                <span aria-hidden className="relative h-px flex-1 bg-line">
+                  <span className="absolute inset-0 origin-left scale-x-0 bg-green transition-transform duration-500 ease-out group-hover:scale-x-100" />
+                </span>
+              </div>
+              <p className="mt-5 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-greenDeep">
+                {s.when}
+              </p>
+              <h3 className="mt-2 font-display text-[1.35rem] font-extrabold leading-tight tracking-tighter2 text-ink">
+                {s.t}
+              </h3>
+              <p className="mt-3 text-[0.96rem] leading-relaxed text-body">{s.d}</p>
+            </StaggerItem>
           ))}
-        </ol>
+        </Stagger>
 
         <Reveal delay={0.1}>
           <div className="mt-14 grid gap-8 rounded-slab border border-line p-7 md:p-10 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">

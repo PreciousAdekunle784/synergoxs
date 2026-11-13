@@ -68,6 +68,28 @@ const config: Config = {
           from: { transform: "scaleX(0)" },
           to: { transform: "scaleX(1)" },
         },
+        // A word rising out from behind a mask (hero headline)
+        word: {
+          from: { transform: "translateY(110%)" },
+          to: { transform: "translateY(0)" },
+        },
+        page: {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        // Slow, small movements for background shapes and the hero panel
+        drift: {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "50%": { transform: "translate3d(3%, -4%, 0) scale(1.06)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        fade: {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
       },
       animation: {
         // CSS-only entrances for above-the-fold content: they run before
@@ -75,6 +97,14 @@ const config: Config = {
         rise: "rise 0.8s cubic-bezier(0.16,1,0.3,1) both",
         mark: "mark 0.7s cubic-bezier(0.16,1,0.3,1) 0.55s both",
         grow: "grow 1s cubic-bezier(0.16,1,0.3,1) both",
+        word: "word 0.9s cubic-bezier(0.16,1,0.3,1) both",
+        // No fill mode on purpose. A finished animation that keeps holding
+        // `transform` makes the browser treat the element as transformed, which
+        // traps position:fixed children (the mobile sticky bar) inside the page.
+        page: "page 0.45s cubic-bezier(0.16,1,0.3,1)",
+        drift: "drift 18s ease-in-out infinite",
+        float: "float 7s ease-in-out infinite",
+        fade: "fade 1.2s ease-out both",
       },
     },
   },

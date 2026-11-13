@@ -1,0 +1,133 @@
+SYNERGOX — ADMIN DASHBOARD SETUP
+================================
+
+The dashboard lives at  https://YOUR-SITE/admin
+It needs three things done ONCE in Supabase. About five minutes.
+Nothing here needs a code change or a secret key in the website.
+
+Until you do step 1, the public website keeps working exactly as before
+(it shows its built-in text), and /admin simply refuses sign-ins.
+
+
+STEP 1 — RUN THE DATABASE SCRIPT
+--------------------------------
+  Supabase → SQL Editor → New query
+  Paste the whole of:   supabase/migrations/0002_admin_dashboard.sql
+  Click Run.
+
+  It is safe to run more than once. It adds to your leads table (a status
+  column); it does not change or delete any existing lead.
+
+
+STEP 2 — CREATE YOUR ADMIN LOGIN
+--------------------------------
+  Supabase → Authentication → Users → Add user → "Create new user"
+    Email:     your email
+    Password:  a strong one (you can change it later in the dashboard)
+    Tick "Auto Confirm User"
+
+  Then, back in the SQL Editor, run this with YOUR email:
+
+      insert into public.admins (user_id)
+      select id from auth.users where email = 'you@example.com';
+
+  That second step is what makes the account an admin. An account that
+  isn't in the admins table can sign in to Supabase but gets nothing from
+  the dashboard: every screen and every action is checked in the database.
+
+  To add another admin later: repeat step 2 with their email.
+  To remove one:
+      delete from public.admins
+      where user_id = (select id from auth.users where email = 'them@example.com');
+
+
+STEP 3 — CLOSE PUBLIC SIGN-UPS  (recommended)
+---------------------------------------------
+  Supabase → Authentication → Sign In / Providers
+  Turn OFF "Allow new users to sign up".
+
+  Signing up never grants dashboard access, but there's no reason to
+  leave the door open.
+
+
+THEN: SIGN IN
+-------------
+  Go to  https://YOUR-SITE/admin  and sign in with the email and password
+  from step 2. You stay signed in on that device for seven days after your
+  last visit.
+
+
+OPTIONAL — FILL IN CALL TIMES AUTOMATICALLY
+-------------------------------------------
+  The site records every booking the moment Calendly confirms it. But
+  Calendly only shares the chosen TIME through its API, so by default you
+  type the call time into Consultations yourself.
+
+  To automate it:
+    1. Calendly → Integrations & apps → API and webhooks →
+       "Personal access tokens" → create a token.
+    2. Vercel → your project → Settings → Environment Variables →
+       add  CALENDLY_API_TOKEN  = that token   (Production)
+    3. Redeploy.
+  Settings → Data sources in the dashboard will show "Connected".
+  (This was built to Calendly's documented API but could not be tested
+   against a live Calendly account. Make one test booking after setting it
+   and check the time appears under Consultations → Upcoming calls.)
+
+
+WHAT THE DASHBOARD DOES
+-----------------------
+  Overview        Visitors, leads, bookings, new inquiries, conversion rate,
+                  charts per day, pipeline, sources, latest submissions,
+                  recent activity. Real data only: anything not yet being
+                  collected is shown as "—" with the reason.
+  Leads           Search, filter, sort. Open a lead to see everything they
+                  submitted, change its status, add notes, or delete it.
+  Consultations   Every booking-form submission and whether it became a
+                  booked call. Set status, call time and notes.
+  Website content Headlines and copy, services, case studies, testimonials,
+                  contact details and links. Saves go live immediately.
+  Settings        Change password, see who can sign in, see what is and
+                  isn't connected.
+
+  Visitor numbers start from the first visit AFTER this version goes live.
+  The site counts its own visits: a page path, the referring site and a
+  random id that lasts one browser session. No cookies, no IP addresses.
+  Visitors whose browser sends "Do Not Track" are not counted.
+
+  Consultation records start from this version too. Earlier call
+  applications are still in Leads (source: Teardown application).
+
+
+HOW IT IS SECURED  (for whoever reviews this)
+---------------------------------------------
+  • Sign-in is Supabase Auth. Passwords are never stored by the website.
+  • The session is two httpOnly, Secure, SameSite=Lax cookies scoped to
+    /admin. Page scripts cannot read them.
+  • middleware.ts turns away any request to /admin without a session
+    before dashboard code runs, and renews an expiring session.
+  • Every page and every action then asks the database "is this token a
+    current admin?" (lib/admin/session.ts → admin_whoami()).
+  • Every table has row level security ON with NO policies. Nothing can be
+    read or written through the REST API directly. All access goes through
+    database functions; each admin_* function checks admin membership
+    itself and raises "not authorised" otherwise. So even a bug in the
+    website cannot hand data to a non-admin.
+  • The website only ever holds the public (anon) key. No service-role key
+    is used by this code.
+  • /admin is noindex, no-store, cannot be framed, and is disallowed in
+    robots.txt.
+
+
+IF SOMETHING ISN'T WORKING
+--------------------------
+  "That email and password don't match an admin account."
+      → Wrong password, or step 2's insert wasn't run for that email.
+  "Signed in, but the dashboard isn't set up in the database yet."
+      → Step 1 hasn't been run on this Supabase project.
+  A dashboard page says it couldn't load its data
+      → Re-run step 1 (safe), then reload.
+  Content edits don't show on the site
+      → Settings → Data sources → "Website content" should say Connected.
+        If it says the site is showing built-in text, the public site
+        can't reach the database functions: re-run step 1.

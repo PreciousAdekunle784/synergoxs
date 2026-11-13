@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // Funnel steps that only make sense mid-journey.
-      disallow: ["/booked", "/thank-you", "/offer", "/guide", "/payment"],
+      disallow: ["/admin", "/api", "/booked", "/thank-you", "/offer", "/guide", "/payment"],
     },
     sitemap: "https://synergox.co/sitemap.xml",
   };

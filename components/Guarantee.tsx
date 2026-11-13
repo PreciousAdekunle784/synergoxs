@@ -1,7 +1,7 @@
 "use client";
 
 import BookCall, { CallFacts } from "./CTA";
-import { Reveal } from "./Primitives";
+import { Mark, Reveal, Stagger, StaggerItem, type HeadCopy } from "./Primitives";
 import Eyebrow from "./Eyebrow";
 import { Cross } from "./Icons";
 
@@ -45,7 +45,7 @@ const exclusions = [
   },
 ];
 
-export default function Guarantee() {
+export default function Guarantee({ copy }: { copy: HeadCopy }) {
   return (
     <section id="guarantee" className="section">
       <div className="shell">
@@ -56,16 +56,11 @@ export default function Guarantee() {
             </Reveal>
             <Reveal delay={0.05}>
               <h2 className="h-section mt-5">
-                If we don&apos;t ship it,{" "}
-                <span className="hl">you don&apos;t pay for it.</span>
+                {copy.title} <Mark>{copy.accent}</Mark>
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <p className="lede mt-5 max-w-md">
-                Most agency guarantees are a line on a website that never makes
-                it into the contract. These four are clauses. You&apos;ll read
-                them in the agreement before you sign anything.
-              </p>
+              <p className="lede mt-5 max-w-md">{copy.lede}</p>
             </Reveal>
             <Reveal delay={0.15}>
               <p className="mt-6 max-w-md border-l-[3px] border-green pl-5 text-[1rem] font-medium leading-relaxed text-ink">
@@ -82,23 +77,21 @@ export default function Guarantee() {
           </div>
 
           <div>
-            <ol className="grid gap-4 sm:grid-cols-2">
+            <Stagger as="ol" className="grid gap-4 sm:grid-cols-2">
               {clauses.map((c, i) => (
-                <li key={c.t}>
-                  <Reveal delay={Math.min(i * 0.05, 0.2)} className="h-full">
-                    <div className="card card-hover h-full p-7">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green font-display text-[0.9rem] font-extrabold text-ink">
-                        {i + 1}
-                      </span>
-                      <h3 className="mt-5 font-display text-[1.3rem] font-extrabold leading-tight tracking-tighter2 text-ink">
-                        {c.t}
-                      </h3>
-                      <p className="mt-3 text-[0.95rem] leading-relaxed text-body">{c.d}</p>
-                    </div>
-                  </Reveal>
-                </li>
+                <StaggerItem as="li" key={c.t}>
+                  <div className="card card-hover card-accent h-full p-7">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green font-display text-[0.9rem] font-extrabold text-ink">
+                      {i + 1}
+                    </span>
+                    <h3 className="mt-5 font-display text-[1.3rem] font-extrabold leading-tight tracking-tighter2 text-ink">
+                      {c.t}
+                    </h3>
+                    <p className="mt-3 text-[0.95rem] leading-relaxed text-body">{c.d}</p>
+                  </div>
+                </StaggerItem>
               ))}
-            </ol>
+            </Stagger>
 
             <Reveal delay={0.1}>
               <div className="mt-4 rounded-card bg-mist p-7">

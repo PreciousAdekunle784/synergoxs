@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import "./globals.css";
-import OptInProvider from "@/components/OptInProvider";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
 
 /* Self-hosted at build time: no render-blocking request to Google, no layout shift. */
 const display = Bricolage_Grotesque({
@@ -48,50 +45,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: "Synergox",
-  url: "https://synergox.co",
-  logo: "https://synergox.co/logo.png",
-  description:
-    "Growth marketing agency building customer acquisition systems — offer, funnel, paid ads and follow-up — for service and e-commerce businesses.",
-  address: { "@type": "PostalAddress", addressLocality: "Lagos", addressCountry: "NG" },
-  areaServed: "Worldwide",
-  serviceType: [
-    "Conversion Rate Optimisation",
-    "Sales Funnel Development",
-    "Performance Marketing",
-    "Lifecycle Email Marketing",
-  ],
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+/**
+ * The root layout is only the document shell and fonts. The public website
+ * (navigation, footer) lives in app/(site); the dashboard lives in app/admin.
+ */
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      </head>
-      <body className="bg-paper font-sans text-ink antialiased">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-white"
-        >
-          Skip to content
-        </a>
-        <OptInProvider>
-          <Nav />
-          <main id="main">{children}</main>
-          <Footer />
-        </OptInProvider>
-      </body>
+      <body className="bg-paper font-sans text-ink antialiased">{children}</body>
     </html>
   );
 }

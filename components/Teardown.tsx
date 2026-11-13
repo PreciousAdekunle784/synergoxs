@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import BookCall from "./CTA";
-import { Reveal, SectionHead } from "./Primitives";
+import { Reveal, SectionHead, type HeadCopy } from "./Primitives";
 
 /* Benchmarks are stated as targets, not promises. */
 const TARGET = { toLead: 0.15, toCall: 0.3, toClose: 0.25 };
@@ -58,7 +58,7 @@ function Slider({
   );
 }
 
-export default function Teardown() {
+export default function Teardown({ copy }: { copy: HeadCopy }) {
   const [cur, setCur] = useState<Cur>("USD");
   const m = CUR[cur].mult;
 
@@ -132,18 +132,9 @@ export default function Teardown() {
   return (
     <section id="teardown" className="section">
       <div className="shell">
-        <SectionHead
-          eyebrow="Put a number on it"
-          title={
-            <>
-              What is your biggest leak{" "}
-              <span className="hl">costing you every month?</span>
-            </>
-          }
-          lede="Move the sliders until they roughly match your business. The model finds your weakest stage and shows what fixing that one stage would be worth, on the traffic and budget you already have."
-        />
+        <SectionHead eyebrow="Put a number on it" title={copy.title} accent={copy.accent} accentStyle="mark" lede={copy.lede} />
 
-        <Reveal delay={0.1}>
+        <Reveal delay={0.1} scale={0.98}>
           <div className="mt-12 grid overflow-hidden rounded-slab border border-line shadow-card lg:grid-cols-[0.82fr_1.18fr]">
             {/* Inputs — white */}
             <div className="flex flex-col bg-paper p-6 sm:p-9">

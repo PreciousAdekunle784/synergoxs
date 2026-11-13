@@ -5,14 +5,15 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { BOOKING_PAGE, EMAIL } from "@/lib/site";
+import { BOOKING_PAGE } from "@/lib/site";
+import { useContact } from "./ContactProvider";
 import { Arrow } from "./Icons";
 
 /**
  * Four links, each answering a question a buyer asks before booking.
  * Anything that isn't on that path lives in the footer.
  */
-const links = [
+const allLinks = [
   { href: "/#how", label: "How it works" },
   { href: "/#results", label: "Results" },
   { href: "/#guarantee", label: "Guarantee" },
@@ -22,8 +23,10 @@ const links = [
 /** Conversion pages: no navigation at all, so the only way forward is the task. */
 export const FOCUS_PATHS = ["/apply", "/booked", "/offer", "/thank-you"];
 
-export default function Nav() {
+export default function Nav({ hasResults = true }: { hasResults?: boolean }) {
   const pathname = usePathname();
+  const EMAIL = useContact().email;
+  const links = allLinks.filter((l) => hasResults || l.href !== "/#results");
   const focus = FOCUS_PATHS.includes(pathname);
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
@@ -48,11 +51,15 @@ export default function Nav() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300 ${
         solid || open
-          ? "border-b border-line bg-paper/95 backdrop-blur-md"
+          ? "border-b border-line bg-paper/95 shadow-[0_8px_24px_-20px_rgba(10,12,10,0.35)] backdrop-blur-md"
           : "border-b border-transparent bg-paper/0"
       }`}
     >
-      <div className="shell flex h-[68px] items-center justify-between gap-6">
+      <div
+        className={`shell flex items-center justify-between gap-6 transition-[height] duration-300 ease-out ${
+          solid ? "h-[60px]" : "h-[68px]"
+        }`}
+      >
         <Link href="/" className="flex items-center gap-2.5" aria-label="Synergox home">
           <Image
             src="/logo.png"
@@ -138,15 +145,22 @@ export default function Nav() {
             aria-label="Mobile"
           >
             <div className="shell flex flex-col pb-6 pt-2">
-              {links.map((l) => (
-                <Link
+              {links.map((l, i) => (
+                <motion.div
                   key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="border-b border-line py-4 font-display text-[1.25rem] font-semibold tracking-tighter2 text-ink"
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.35, delay: 0.06 + i * 0.05, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {l.label}
-                </Link>
+                  <Link
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-between border-b border-line py-4 font-display text-[1.25rem] font-semibold tracking-tighter2 text-ink transition-colors active:text-greenDeep"
+                  >
+                    {l.label}
+                    <Arrow className="text-mute" />
+                  </Link>
+                </motion.div>
               ))}
               <Link
                 href={BOOKING_PAGE}

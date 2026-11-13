@@ -12,6 +12,7 @@ import {
 } from "@/lib/site";
 import { track } from "@/lib/analytics";
 import { Arrow } from "./Icons";
+import { useContact } from "./ContactProvider";
 
 const KEY_IS_SET =
   !!PAYSTACK_PUBLIC_KEY && !PAYSTACK_PUBLIC_KEY.startsWith("PASTE_");
@@ -40,6 +41,7 @@ export default function PayButton({
 }) {
   const ready = usePaystackScript();
   const id = useId();
+  const supportEmail = useContact().email;
   const [email, setEmail] = useState("");
   const [askEmail, setAskEmail] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -75,8 +77,7 @@ export default function PayButton({
       }
       setNotice(
         "Payment isn't switched on yet. If you're the site owner: set " +
-          "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY and redeploy. Otherwise email " +
-          "hello@synergox.co and we'll send a secure link."
+          `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY and redeploy. Otherwise email ${supportEmail} and we'll send a secure link.`
       );
       return;
     }
@@ -154,7 +155,7 @@ export default function PayButton({
     if (!opened) {
       setPaying(false);
       setNotice(
-        "Secure checkout couldn't open just now — please try again, or email hello@synergox.co for a payment link."
+        `Secure checkout couldn't open just now. Please try again, or email ${supportEmail} for a payment link.`
       );
     }
   }

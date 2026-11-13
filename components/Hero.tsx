@@ -2,6 +2,7 @@ import BookCall, { CallFacts } from "./CTA";
 import PlaybookLink from "./PlaybookLink";
 import { Check } from "./Icons";
 import { PLAYBOOK_PAGES } from "@/lib/site";
+import type { Copy } from "@/lib/content/defaults";
 
 /* Same numbers the calculator opens with, so the page tells one story. */
 const stages = [
@@ -28,7 +29,7 @@ function TeardownPreview() {
           </p>
         </div>
         <span className="rounded-full border border-lineDark px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-ash">
-          Illustrative
+          Example
         </span>
       </div>
 
@@ -54,7 +55,7 @@ function TeardownPreview() {
                 className={`h-full origin-left animate-grow rounded-full ${
                   s.leak ? "bg-white" : "bg-green"
                 }`}
-                style={{ width: `${s.w}%`, animationDelay: `${0.5 + i * 0.12}s` }}
+                style={{ width: `${s.w}%`, animationDelay: `${0.7 + i * 0.12}s` }}
               />
             </div>
           </div>
@@ -86,59 +87,109 @@ function TeardownPreview() {
   );
 }
 
-export default function Hero() {
+/** Each word rises from behind a mask, one after another. Pure CSS. */
+function Words({ text, from, mark = false }: { text: string; from: number; mark?: boolean }) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const out = words.map((w, i) => (
+    <span key={i} className="inline-block overflow-hidden pb-[0.12em] align-bottom [margin-bottom:-0.12em]">
+      <span className="inline-block animate-word" style={{ animationDelay: `${80 + (from + i) * 55}ms` }}>
+        {w}
+        {i < words.length - 1 ? " " : ""}
+      </span>
+    </span>
+  ));
+  return mark ? (
+    <span className="hl animate-mark" style={{ animationDelay: `${420 + (from + words.length) * 55}ms` }}>
+      {out}
+    </span>
+  ) : (
+    <>{out}</>
+  );
+}
+
+export default function Hero({ copy }: { copy: Copy }) {
+  const [eyebrowLead, ...eyebrowRest] = copy["hero.eyebrow"].split(" · ");
+  const headWords = copy["hero.headline"].split(/\s+/).filter(Boolean).length;
+  const delay = (ms: number) => ({ animationDelay: `${ms}ms` });
+
   return (
     <section className="relative overflow-hidden pb-16 pt-[112px] md:pb-24 md:pt-[148px]">
+      {/* Background: two soft green fields drifting very slowly behind a faint grid.
+          Decorative, low contrast, and still for anyone who prefers reduced motion. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 animate-fade">
+        <div
+          className="absolute -right-[10%] -top-[18%] h-[560px] w-[560px] animate-drift rounded-full opacity-70 blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(0,197,81,0.16), transparent)" }}
+        />
+        <div
+          className="absolute -left-[12%] top-[38%] h-[420px] w-[420px] animate-drift rounded-full opacity-60 blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(0,197,81,0.09), transparent)", animationDelay: "-9s" }}
+        />
+        <div
+          className="absolute inset-0 opacity-[0.5]"
+          style={{
+            backgroundImage: "radial-gradient(rgba(10,12,10,0.09) 1px, transparent 1px)",
+            backgroundSize: "26px 26px",
+            maskImage: "radial-gradient(70% 60% at 60% 30%, black, transparent)",
+            WebkitMaskImage: "radial-gradient(70% 60% at 60% 30%, black, transparent)",
+          }}
+        />
+      </div>
+
       <div className="shell grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
         <div>
-          <p className="eyebrow animate-rise flex items-center gap-3">
-            <span aria-hidden className="h-[3px] w-6 rounded-full bg-green" />
+          <p className="eyebrow flex animate-rise items-center gap-3">
+            <span aria-hidden className="h-[3px] w-6 shrink-0 origin-left animate-grow rounded-full bg-green" />
             <span>
-              Growth marketing agency
-              <span className="hidden sm:inline"> · Funnels, ads &amp; follow-up</span>
+              {eyebrowLead}
+              {eyebrowRest.length > 0 && (
+                <span className="hidden sm:inline"> · {eyebrowRest.join(" · ")}</span>
+              )}
             </span>
           </p>
 
           <h1
-            className="h-display mt-6 animate-rise text-[2.55rem] sm:text-[3.5rem] lg:text-[4.1rem]"
-            style={{ animationDelay: "80ms" }}
+            className="h-display mt-6 text-[2.55rem] sm:text-[3.5rem] lg:text-[4.1rem]"
+            aria-label={`${copy["hero.headline"]} ${copy["hero.highlight"]}`}
           >
-            Get more customers from the traffic you&apos;re{" "}
-            <span className="hl animate-mark">already paying for.</span>
+            <span aria-hidden>
+              <Words text={copy["hero.headline"]} from={0} />{" "}
+              <Words text={copy["hero.highlight"]} from={headWords} mark />
+            </span>
           </h1>
 
-          <p className="lede mt-6 max-w-xl animate-rise" style={{ animationDelay: "160ms" }}>
-            You probably don&apos;t have a traffic problem. You have a leak: one
-            stage of your funnel where buyers quietly drop out. We find it,
-            rebuild it, and hand you a system with a cost per customer you can
-            plan around.
+          <p className="lede mt-6 max-w-xl animate-rise" style={delay(520)}>
+            {copy["hero.sub"]}
           </p>
 
-          <div className="mt-8 animate-rise" style={{ animationDelay: "240ms" }}>
+          <div className="mt-8 animate-rise" style={delay(640)}>
             <BookCall size="lg" className="w-full sm:w-auto" />
             <CallFacts className="mt-3" />
           </div>
 
-          <ul
-            className="mt-8 flex animate-rise flex-col gap-2.5 border-t border-line pt-6 sm:flex-row sm:flex-wrap sm:gap-x-6"
-            style={{ animationDelay: "320ms" }}
-          >
-            {promises.map((p) => (
-              <li key={p} className="flex items-center gap-2 text-[0.9rem] font-medium text-ink">
+          <ul className="mt-8 flex flex-col gap-2.5 border-t border-line pt-6 sm:flex-row sm:flex-wrap sm:gap-x-6">
+            {promises.map((p, i) => (
+              <li
+                key={p}
+                className="flex animate-rise items-center gap-2 text-[0.9rem] font-medium text-ink"
+                style={delay(760 + i * 80)}
+              >
                 <Check className="text-greenDeep" />
                 {p}
               </li>
             ))}
           </ul>
 
-          <p className="mt-6 animate-rise text-[0.92rem] text-body" style={{ animationDelay: "400ms" }}>
+          <p className="mt-6 animate-rise text-[0.92rem] text-body" style={delay(1040)}>
             Not ready to talk?{" "}
             <PlaybookLink>Get the free {PLAYBOOK_PAGES}-page playbook</PlaybookLink>
           </p>
         </div>
 
-        <div className="animate-rise" style={{ animationDelay: "300ms" }}>
-          <TeardownPreview />
+        <div className="animate-rise" style={delay(420)}>
+          <div className="lg:animate-float">
+            <TeardownPreview />
+          </div>
         </div>
       </div>
 
@@ -148,7 +199,10 @@ export default function Hero() {
           <span className="eyebrow shrink-0">Platforms we build on</span>
           <ul className="flex flex-wrap items-center gap-x-8 gap-y-2.5">
             {["Meta Ads", "Google Ads", "Shopify", "Klaviyo", "GA4", "HubSpot", "Next.js"].map((p) => (
-              <li key={p} className="font-display text-[1rem] font-semibold tracking-tighter2 text-ink/70">
+              <li
+                key={p}
+                className="font-display text-[1rem] font-semibold tracking-tighter2 text-ink/70 transition-colors duration-300 hover:text-ink"
+              >
                 {p}
               </li>
             ))}

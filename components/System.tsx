@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Reveal, SectionHead } from "./Primitives";
+import { Reveal, SectionHead, Stagger, StaggerItem, type HeadCopy } from "./Primitives";
 import { Arrow } from "./Icons";
 
 /* Outcome first, deliverables second. Each card is a stage of one system. */
@@ -32,51 +32,40 @@ const parts = [
   },
 ];
 
-export default function System() {
+export default function System({ copy }: { copy: HeadCopy }) {
   return (
     <section id="system" className="section bg-mist">
       <div className="shell">
-        <SectionHead
-          eyebrow="What we build for you"
-          title={
-            <>
-              One connected system.{" "}
-              <span className="text-mute">Not five disconnected services.</span>
-            </>
-          }
-          lede="Most agencies sell you a channel. We build the whole path a stranger walks, from first click to paid invoice, starting with the stage that's costing you the most."
-        />
+        <SectionHead eyebrow="What we build for you" title={copy.title} accent={copy.accent} lede={copy.lede} />
 
-        <ol className="mt-12 grid gap-4 md:grid-cols-2">
+        <Stagger as="ol" className="mt-12 grid gap-4 md:grid-cols-2">
           {parts.map((p, i) => (
-            <li key={p.stage}>
-              <Reveal delay={i * 0.05} className="h-full">
-                <div className="card card-hover flex h-full flex-col p-7 md:p-9">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-[0.9rem] font-extrabold text-white">
-                      {i + 1}
-                    </span>
-                    <span className="eyebrow">{p.stage}</span>
-                  </div>
-                  <h3 className="mt-5 font-display text-[1.45rem] font-extrabold leading-tight tracking-tighter2 text-ink">
-                    {p.t}
-                  </h3>
-                  <p className="mt-3 text-[0.98rem] leading-relaxed text-body">{p.d}</p>
-                  <ul className="mt-auto flex flex-wrap gap-2 pt-6">
-                    {p.items.map((it) => (
-                      <li
-                        key={it}
-                        className="rounded-full bg-greenTint px-3.5 py-1.5 text-[0.82rem] font-medium text-greenDeep"
-                      >
-                        {it}
-                      </li>
-                    ))}
-                  </ul>
+            <StaggerItem as="li" key={p.stage}>
+              <div className="group card card-hover card-accent flex h-full flex-col p-7 md:p-9">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-[0.9rem] font-extrabold text-white transition-colors duration-300 group-hover:bg-green group-hover:text-ink">
+                    {i + 1}
+                  </span>
+                  <span className="eyebrow">{p.stage}</span>
                 </div>
-              </Reveal>
-            </li>
+                <h3 className="mt-5 font-display text-[1.45rem] font-extrabold leading-tight tracking-tighter2 text-ink">
+                  {p.t}
+                </h3>
+                <p className="mt-3 text-[0.98rem] leading-relaxed text-body">{p.d}</p>
+                <ul className="mt-auto flex flex-wrap gap-2 pt-6">
+                  {p.items.map((it) => (
+                    <li
+                      key={it}
+                      className="rounded-full bg-greenTint px-3.5 py-1.5 text-[0.82rem] font-medium text-greenDeep"
+                    >
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </StaggerItem>
           ))}
-        </ol>
+        </Stagger>
 
         <Reveal delay={0.1}>
           <p className="mt-8 max-w-2xl text-[0.98rem] leading-relaxed text-body">

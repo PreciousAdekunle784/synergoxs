@@ -86,12 +86,34 @@ body {
     padding-bottom: 0.04em;
   }
 
+  /* The marker draws itself the first time it scrolls into view (see <Mark>) */
+  .hl-draw {
+    background-size: 0% 0.2em;
+    transition: background-size 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+  }
+  .hl-draw.is-in {
+    background-size: 100% 0.2em;
+  }
+
   /* Buttons — green is the ONE primary action. Everything else is quieter. */
   .btn {
     @apply inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-center text-[0.98rem] font-semibold leading-tight transition-all duration-300 ease-out active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-green text-ink shadow-cta hover:-translate-y-0.5 hover:bg-greenBright;
+    @apply btn relative overflow-hidden bg-green text-ink shadow-cta hover:-translate-y-0.5 hover:bg-greenBright hover:shadow-[0_16px_30px_-12px_rgba(0,197,81,0.75)];
+  }
+  /* A soft band of light crosses the button once on hover */
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%);
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+  .btn-primary:hover::after {
+    transform: translateX(120%);
+    transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-dark {
     @apply btn bg-ink text-white hover:-translate-y-0.5 hover:bg-[#1c211c];
@@ -125,6 +147,27 @@ body {
   }
   .card-hover {
     @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:border-ink/20 hover:shadow-lift;
+  }
+
+  /* A green line grows across the top edge of a card on hover */
+  .card-accent {
+    @apply relative overflow-hidden;
+  }
+  .card-accent::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3px;
+    background: #00c551;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card-accent:hover::before,
+  .card-accent:focus-within::before {
+    transform: scaleX(1);
   }
 
   .field {
@@ -191,5 +234,45 @@ input[type="range"]:active::-webkit-slider-thumb {
     animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* ───────────────────────── Dashboard ───────────────────────── */
+@layer components {
+  .a-card {
+    @apply min-w-0 rounded-card border border-line bg-paper p-5 sm:p-6;
+  }
+  .a-h1 {
+    @apply font-display text-[1.75rem] font-extrabold leading-tight tracking-tighter2 text-ink sm:text-[2rem];
+  }
+  .a-h2 {
+    @apply font-display text-[1.15rem] font-extrabold tracking-tighter2 text-ink;
+  }
+  .a-label {
+    @apply mb-1.5 block text-[0.84rem] font-semibold text-ink;
+  }
+  .a-input {
+    @apply w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[0.95rem] text-ink transition-colors placeholder:text-mute/70 hover:border-ink/30 focus:border-greenDeep focus:outline-none focus:ring-4 focus:ring-green/20;
+  }
+  .a-btn {
+    @apply inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full px-5 py-2 text-[0.9rem] font-semibold leading-tight transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .a-btn-primary {
+    @apply a-btn bg-green text-ink hover:bg-greenBright;
+  }
+  .a-btn-dark {
+    @apply a-btn bg-ink text-white hover:bg-[#1c211c];
+  }
+  .a-btn-quiet {
+    @apply a-btn border border-line bg-paper text-ink hover:border-ink;
+  }
+  .a-btn-danger {
+    @apply a-btn border border-[#F1C9C4] bg-paper text-[#B42318] hover:border-[#B42318];
+  }
+  .a-th {
+    @apply whitespace-nowrap px-4 py-3 text-left text-[0.74rem] font-semibold uppercase tracking-[0.08em] text-mute;
+  }
+  .a-td {
+    @apply px-4 py-3.5 align-top text-[0.92rem] text-ink;
   }
 }

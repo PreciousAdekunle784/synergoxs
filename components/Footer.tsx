@@ -3,12 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { EMAIL } from "@/lib/site";
 import PlaybookLink from "./PlaybookLink";
+import { useContact } from "./ContactProvider";
 import { FOCUS_PATHS } from "./Nav";
 
-export default function Footer() {
+export default function Footer({ hasResults = true }: { hasResults?: boolean }) {
   const pathname = usePathname();
+  const contact = useContact();
+  const EMAIL = contact.email;
+  const wa = contact.whatsapp.replace(/[^0-9]/g, "");
+  const social = [
+    { label: "WhatsApp", href: wa ? `https://wa.me/${wa}` : "" },
+    { label: "LinkedIn", href: contact.linkedin },
+    { label: "Instagram", href: contact.instagram },
+    { label: "X", href: contact.x },
+  ].filter((s) => s.href);
   const year = new Date().getFullYear();
 
   /* Conversion pages get a legal line only — nothing to click away to. */
@@ -16,7 +25,7 @@ export default function Footer() {
     return (
       <footer className="border-t border-line bg-paper">
         <div className="shell flex flex-col gap-3 py-8 text-[0.84rem] text-mute sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Synergox · Lagos, Nigeria</p>
+          <p>© {year} Synergox · {contact.location}</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition-colors hover:text-ink">
               Privacy
@@ -54,7 +63,7 @@ export default function Footer() {
               <p className="eyebrow">Explore</p>
               <ul className="mt-5 space-y-3 text-[0.93rem]">
                 <li><Link href="/#how" className={linkCls}>How it works</Link></li>
-                <li><Link href="/#results" className={linkCls}>Results</Link></li>
+                {hasResults && <li><Link href="/#results" className={linkCls}>Results</Link></li>}
                 <li><Link href="/#guarantee" className={linkCls}>Guarantee</Link></li>
                 <li><Link href="/#faq" className={linkCls}>FAQ</Link></li>
               </ul>
@@ -82,10 +91,22 @@ export default function Footer() {
                 {EMAIL}
               </a>
               <p className="mt-4 text-[0.88rem] leading-relaxed text-ash">
-                Lagos, Nigeria
+                {contact.location}
                 <br />
                 Working with clients worldwide
               </p>
+              {social.length > 0 && (
+                <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[0.9rem]">
+                  {social.map((s) => (
+                    <li key={s.label}>
+                      <a href={s.href} target="_blank" rel="noopener noreferrer" className={linkCls}>
+                        {s.label}
+                        <span className="sr-only"> (opens in a new tab)</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>

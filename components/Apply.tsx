@@ -5,15 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  BOOKING_URL,
   BOOKED_PAGE,
   CALL_MINUTES,
-  CASE_STUDY_URL,
-  EMAIL,
   SUBSCRIBE_FN,
   SUPABASE_ANON_KEY,
   SUPABASE_IS_SET,
+  SUPABASE_URL,
 } from "@/lib/site";
+import type { Testimonial } from "@/lib/content/defaults";
+import { useContact } from "./ContactProvider";
 import { track } from "@/lib/analytics";
 import { Arrow, Check, Tick } from "./Icons";
 import Eyebrow from "./Eyebrow";
@@ -126,6 +126,8 @@ type Answers = {
   bottleneck: string;
   name: string;
   email: string;
+  company: string;
+  phone: string;
   website: string;
 };
 
@@ -139,6 +141,8 @@ const EMPTY: Answers = {
   bottleneck: "",
   name: "",
   email: "",
+  company: "",
+  phone: "",
   website: "",
 };
 
@@ -208,9 +212,12 @@ const reassure = [
   },
 ];
 
-export default function Apply() {
+export default function Apply({ testimonial }: { testimonial?: Testimonial }) {
   const reduce = useReducedMotion();
   const router = useRouter();
+  const { email: EMAIL, bookingUrl: BOOKING_URL } = useContact();
+  /** Private handle for this visitor's consultation record (see the migration). */
+  const consultToken = useRef<string | null>(null);
   const [step, setStep] = useState(0);
   const [a, setA] = useState<Answers>(EMPTY);
   const [sending, setSending] = useState(false);
@@ -255,6 +262,20 @@ export default function Apply() {
       if (e.origin !== "https://calendly.com") return;
       if (e.data?.event === "calendly.event_scheduled") {
         track("call_booked", { source: "apply" });
+        // Tell the dashboard this request is now a booked call. Never blocks
+        // the visitor: if it fails they still reach the confirmation page.
+        if (consultToken.current) {
+          fetch("/api/booking/confirm", {
+            method: "POST",
+            keepalive: true,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              token: consultToken.current,
+              eventUri: e.data?.payload?.event?.uri ?? null,
+              inviteeUri: e.data?.payload?.invitee?.uri ?? null,
+            }),
+          }).catch(() => {});
+        }
         router.push(BOOKED_PAGE);
       }
     };
@@ -465,6 +486,38 @@ export default function Apply() {
                 </p>
               )}
             </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="f-company" className="field-label">
+                  Business name
+                </label>
+                <input
+                  id="f-company"
+                  type="text"
+                  autoComplete="organization"
+                  value={a.company}
+                  onChange={(e) => set("company", e.target.value)}
+                  maxLength={200}
+                  className="field"
+                />
+              </div>
+              <div>
+                <label htmlFor="f-phone" className="field-label">
+                  Phone or WhatsApp <span className="font-normal text-mute">(optional)</span>
+                </label>
+                <input
+                  id="f-phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={a.phone}
+                  onChange={(e) => set("phone", e.target.value)}
+                  maxLength={40}
+                  placeholder="+234…"
+                  className="field"
+                />
+              </div>
+            </div>
             <div>
               <label htmlFor="f-website" className="field-label">
                 Website <span className="font-normal text-mute">(optional)</span>
@@ -541,6 +594,8 @@ export default function Apply() {
               monthlyRevenue: a.revenue,
               monthlyAdSpend: a.spend,
               biggestBottleneck: a.bottleneck,
+              company: a.company.trim(),
+              phone: a.phone.trim(),
               website: a.website.trim(),
               recommendation: underServed ? "Learn track" : "Done for you",
             },
@@ -549,6 +604,41 @@ export default function Apply() {
         if (!res.ok) setFailed(true);
       } catch {
         setFailed(true);
+      }
+
+      // A consultation record for the dashboard, for everyone who is shown the
+      // calendar. Best-effort: the lead above is already saved either way.
+      if (!underServed) {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/request_consultation`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              apikey: SUPABASE_ANON_KEY,
+            },
+            body: JSON.stringify({
+              p_name: name,
+              p_email: email,
+              p_phone: a.phone.trim() || null,
+              p_company: a.company.trim() || null,
+              p_website: a.website.trim() || null,
+              p_answers: {
+                currency: a.currency,
+                businessModel: a.model,
+                monthlyRevenue: a.revenue,
+                monthlyAdSpend: a.spend,
+                biggestBottleneck: a.bottleneck,
+              },
+            }),
+          });
+          if (res.ok) {
+            const token = await res.json();
+            if (typeof token === "string") consultToken.current = token;
+          }
+        } catch {
+          /* ignore */
+        }
       }
     } else {
       console.warn("Supabase not set — application not saved (paste keys in lib/site.ts).");
@@ -566,7 +656,7 @@ export default function Apply() {
       a1: `${a.model} · ${a.revenue} · spend ${a.spend} · ${a.bottleneck}`,
     });
     return `${BOOKING_URL}?${p.toString()}`;
-  }, [a]);
+  }, [a, BOOKING_URL]);
 
   const firstName = a.name.trim().split(/\s+/)[0] ?? "";
 
@@ -802,22 +892,17 @@ export default function Apply() {
             ))}
           </dl>
 
-          <figure className="on-dark mt-9 rounded-card bg-ink p-7 text-white">
-            <span className="inline-flex items-center gap-2 rounded-full bg-green px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-ink">
-              Verified client
-            </span>
-            <blockquote className="mt-4 font-display text-[1.25rem] font-semibold leading-snug tracking-tighter2">
-              &ldquo;It blew her mind — the brand finally looked like what
-              she&apos;d built.&rdquo;
-            </blockquote>
-            <figcaption className="mt-4 text-[0.88rem] text-ash">
-              Owner, Kings Food Mart ·{" "}
-              <a href={CASE_STUDY_URL} target="_blank" rel="noopener noreferrer" className="link">
-                see the live build
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            </figcaption>
-          </figure>
+          {testimonial && (
+            <figure className="on-dark mt-9 rounded-card bg-ink p-7 text-white">
+              <blockquote className="font-display text-[1.25rem] font-semibold leading-snug tracking-tighter2">
+                &ldquo;{testimonial.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-4 text-[0.88rem] text-ash">
+                {testimonial.name}
+                {testimonial.role ? ` · ${testimonial.role}` : ""}
+              </figcaption>
+            </figure>
+          )}
         </div>
       </div>
     </section>

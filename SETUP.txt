@@ -61,6 +61,14 @@ C) DATABASE + FUNCTIONS  (one-time, in Supabase)
 
 
 ──────────────────────────────────────────────────────────────────────
+D) THE ADMIN DASHBOARD  (one-time, about five minutes)
+──────────────────────────────────────────────────────────────────────
+  See ADMIN_SETUP.txt. In short: run one more SQL file
+  (supabase/migrations/0002_admin_dashboard.sql), create your admin user
+  in Supabase, then sign in at  yoursite.com/admin
+
+
+──────────────────────────────────────────────────────────────────────
 EMAIL — Resend (free)
 ──────────────────────────────────────────────────────────────────────
   1. Create a free account at resend.com

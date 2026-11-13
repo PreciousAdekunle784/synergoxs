@@ -1,6 +1,6 @@
 "use client";
 
-import { Reveal, SectionHead } from "./Primitives";
+import { Reveal, SectionHead, type HeadCopy } from "./Primitives";
 import { Check, Cross } from "./Icons";
 
 const rows = [
@@ -41,20 +41,11 @@ const rows = [
   },
 ];
 
-export default function Difference() {
+export default function Difference({ copy }: { copy: HeadCopy }) {
   return (
     <section id="why" className="section">
       <div className="shell">
-        <SectionHead
-          eyebrow="Why Synergox"
-          title={
-            <>
-              Same category.{" "}
-              <span className="hl">A very different deal for you.</span>
-            </>
-          }
-          lede="If you've hired an agency before, you already know how the usual deal goes. Here's what changes."
-        />
+        <SectionHead eyebrow="Why Synergox" title={copy.title} accent={copy.accent} accentStyle="mark" lede={copy.lede} />
 
         <Reveal delay={0.1}>
           <div className="mt-12 overflow-hidden rounded-slab border border-line shadow-card">
@@ -77,7 +68,7 @@ export default function Difference() {
             {rows.map((r) => (
               <div
                 key={r.axis}
-                className="md:grid md:grid-cols-[0.8fr_1fr_1.1fr]"
+                className="transition-colors duration-300 hover:bg-mist/70 md:grid md:grid-cols-[0.8fr_1fr_1.1fr]"
               >
                 <div className="px-6 pt-6 md:px-8 md:py-6">
                   <span className="text-[0.82rem] font-semibold uppercase tracking-[0.1em] text-ink md:text-[0.92rem] md:normal-case md:tracking-normal">

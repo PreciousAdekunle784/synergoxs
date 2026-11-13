@@ -1,15 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import { BOOKING_PAGE, CALL_MINUTES } from "@/lib/site";
+import { useCtaLabel } from "./ContactProvider";
 import { Arrow } from "./Icons";
 
 /**
  * THE primary call to action. Every green button on the site is this, so the
  * wording and the destination stay identical everywhere: the booking page.
+ * The default wording is editable in the dashboard (Website content → Hero).
  *
- * Server-safe. For the secondary "free playbook" action, see PlaybookLink.
+ * For the secondary "free playbook" action, see PlaybookLink.
  */
 export default function BookCall({
-  label = "Book my free growth teardown",
+  label,
   size = "md",
   full = false,
   className = "",
@@ -19,6 +23,7 @@ export default function BookCall({
   full?: boolean;
   className?: string;
 }) {
+  const fallback = useCtaLabel();
   return (
     <Link
       href={BOOKING_PAGE}
@@ -26,7 +31,7 @@ export default function BookCall({
         full ? "w-full" : ""
       } ${className}`}
     >
-      {label}
+      {label ?? fallback}
       <Arrow />
     </Link>
   );

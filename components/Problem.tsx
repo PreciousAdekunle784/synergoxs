@@ -1,6 +1,6 @@
 "use client";
 
-import { Reveal, SectionHead } from "./Primitives";
+import { Reveal, SectionHead, Stagger, StaggerItem, type HeadCopy } from "./Primitives";
 
 const symptoms = [
   {
@@ -21,38 +21,27 @@ const symptoms = [
   },
 ];
 
-export default function Problem() {
+export default function Problem({ copy }: { copy: HeadCopy }) {
   return (
     <section id="problem" className="section bg-mist">
       <div className="shell">
-        <SectionHead
-          eyebrow="Sound familiar?"
-          title={
-            <>
-              You&apos;ve already paid for customers{" "}
-              <span className="text-mute">you never got.</span>
-            </>
-          }
-          lede="The clicks arrived. The enquiries came in. Then, somewhere between the first visit and the paid invoice, most of them slipped away. It usually shows up as one of these."
-        />
+        <SectionHead eyebrow="Sound familiar?" title={copy.title} accent={copy.accent} lede={copy.lede} />
 
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2">
+        <Stagger as="ul" className="mt-12 grid gap-4 sm:grid-cols-2">
           {symptoms.map((s, i) => (
-            <li key={s.t}>
-              <Reveal delay={i * 0.05} className="h-full">
-                <div className="card card-hover h-full p-7 md:p-8">
-                  <span className="num text-[0.8rem] font-semibold text-greenDeep">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="mt-3 font-display text-[1.3rem] font-extrabold leading-snug tracking-tighter2 text-ink">
-                    {s.t}
-                  </h3>
-                  <p className="mt-3 text-[0.97rem] leading-relaxed text-body">{s.d}</p>
-                </div>
-              </Reveal>
-            </li>
+            <StaggerItem as="li" key={s.t}>
+              <div className="card card-hover card-accent h-full p-7 md:p-8">
+                <span className="num text-[0.8rem] font-semibold text-greenDeep">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-3 font-display text-[1.3rem] font-extrabold leading-snug tracking-tighter2 text-ink">
+                  {s.t}
+                </h3>
+                <p className="mt-3 text-[0.97rem] leading-relaxed text-body">{s.d}</p>
+              </div>
+            </StaggerItem>
           ))}
-        </ul>
+        </Stagger>
 
         <Reveal delay={0.1}>
           <p className="mt-10 max-w-2xl border-l-[3px] border-green pl-5 font-display text-[1.3rem] font-semibold leading-snug tracking-tighter2 text-ink">

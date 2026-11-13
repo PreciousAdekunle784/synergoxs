@@ -80,4 +80,3 @@ export const PAYMENT_PAGE = "/offer";
 export const CALL_MINUTES = 30;
 export const CALL_NAME = "growth teardown";
 export const PLAYBOOK_PAGES = 74;
-export const CASE_STUDY_URL = "https://kingsfoodstoreabuja.com.ng";

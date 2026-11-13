@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Reveal, SectionHead } from "./Primitives";
-import { CALL_MINUTES, EMAIL } from "@/lib/site";
+import { Reveal, SectionHead, type HeadCopy } from "./Primitives";
+import { useContact } from "./ContactProvider";
+import { CALL_MINUTES } from "@/lib/site";
 
 /* Ordered the way the doubts actually arrive: the call, the risk, the money,
    the time, the alternatives. */
@@ -106,22 +107,15 @@ function Item({
   );
 }
 
-export default function Questions() {
+export default function Questions({ copy }: { copy: HeadCopy }) {
   const [open, setOpen] = useState<number | null>(0);
+  const EMAIL = useContact().email;
 
   return (
     <section id="faq" className="section bg-mist">
       <div className="shell grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <SectionHead
-            eyebrow="Questions"
-            title={
-              <>
-                What people ask{" "}
-                <span className="text-mute">right before they book.</span>
-              </>
-            }
-          />
+          <SectionHead eyebrow="Questions" title={copy.title} accent={copy.accent} />
           <Reveal delay={0.1}>
             <p className="mt-6 text-[0.98rem] leading-relaxed text-body">
               Something we haven&apos;t covered? Email{" "}
