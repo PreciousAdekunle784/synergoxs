@@ -74,16 +74,28 @@ automatically. No monthly fee.
 
 
 ──────────────────────────────────────────────────────────────────────
-HOW THE MONEY FLOW WORKS
+HOW THE FUNNEL FLOWS
 ──────────────────────────────────────────────────────────────────────
-  opt-in (name+email) -> subscribe fn saves lead + emails FREE book
-    -> success screen (3s) -> /offer sales page
-    -> Paystack button (pk_live_) opens inline checkout
-    -> on success, verify-payment re-checks it with your SECRET key
-       (and rejects underpayment) -> buyer marked paid -> /guide
+  PRIMARY — the free growth teardown call:
+    any green button -> /apply (5 quick questions)
+      -> subscribe fn saves the lead + answers (no book email)
+      -> Calendly calendar appears on the same page
+      -> on booking -> /booked (what happens next + the playbook)
 
-The BOOK IS FREE. Paystack charges for the PAID done-for-you offer
-(₦199,999) on /offer — the upsell after the free book.
+  FALLBACK — the free playbook, for visitors not ready to talk:
+    "free playbook" link -> opt-in (first name + email)
+      -> subscribe fn saves lead + emails the FREE book
+      -> success screen offers the teardown call (-> /apply)
+
+  CHECKOUT — the paid build, for prospects who are ready to start:
+    /offer -> Paystack button (pk_live_) opens inline checkout
+      -> on success, verify-payment re-checks it with your SECRET key
+         (and rejects underpayment) -> buyer marked paid -> /thank-you
+    /offer is not linked from the menu. Send the link to people after
+    their call (or in follow-up emails).
+
+  TIP: In Calendly, you don't need to set a redirect. The site listens
+  for Calendly's "booked" signal and moves the visitor to /booked itself.
 
 
 ──────────────────────────────────────────────────────────────────────

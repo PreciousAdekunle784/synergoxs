@@ -5,18 +5,22 @@
  * is installed yet, it no-ops safely and logs in dev — so the funnel works
  * today and starts reporting the moment you add GTM or GA4, with no code change.
  *
- * The five events the funnel needs:
- *   lead_email_submitted   → opt-in form submitted
- *   lead_book_sent         → book delivery triggered
- *   redirect_to_payment    → visitor sent to the payment step
- *   payment_page_viewed    → payment/apply page loaded
- *   purchase_completed     → call this from your checkout success page
+ * The events the funnel fires, in the order a visitor meets them:
+ *   booking_page_viewed    → the booking page loaded
+ *   application_submitted  → the short form before the calendar was sent
+ *   call_booked            → Calendly confirmed a booking  ← the primary conversion
+ *   lead_email_submitted   → playbook opt-in form submitted
+ *   lead_book_sent         → playbook delivery triggered
+ *   payment_page_viewed    → checkout button clicked on the paid offer
+ *   purchase_completed     → Paystack payment succeeded
  */
 
 type EventName =
+  | "booking_page_viewed"
+  | "application_submitted"
+  | "call_booked"
   | "lead_email_submitted"
   | "lead_book_sent"
-  | "redirect_to_payment"
   | "payment_page_viewed"
   | "purchase_completed";
 

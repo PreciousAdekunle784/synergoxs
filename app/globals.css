@@ -3,144 +3,193 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  /* Anchor targets clear the fixed header */
+  scroll-padding-top: 88px;
 }
 
 body {
-  background-color: #050605;
-  color: #f2f4f1;
+  background-color: #ffffff;
+  color: #0a0c0a;
   overflow-x: hidden;
-}
-
-/* Lenis */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-stopped {
-  overflow: hidden;
 }
 
 ::selection {
   background: #00c551;
-  color: #050605;
+  color: #0a0c0a;
 }
 
 *:focus-visible {
-  outline: 2px solid #00c551;
+  outline: 2px solid #007a35;
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: 4px;
+}
+.on-dark *:focus-visible {
+  outline-color: #00c551;
 }
 
 @layer components {
   .shell {
-    @apply mx-auto w-full max-w-shell px-6 md:px-10;
+    @apply mx-auto w-full max-w-shell px-5 sm:px-8 lg:px-10;
   }
 
-  /* Eyebrow: mono, uppercase, always paired with a hairline */
+  /* Section rhythm — one vertical scale for the whole site */
+  .section {
+    @apply py-20 md:py-28;
+  }
+
+  /* Black emphasis slab: inset and rounded so white still frames the page.
+     Pair with `on-dark` so nested type, links and focus rings invert. */
+  .slab-dark {
+    @apply mx-3 rounded-slab bg-ink text-white sm:mx-5 lg:mx-8;
+  }
+
   .eyebrow {
-    @apply font-mono text-[11px] uppercase tracking-[0.22em] text-inkFaint;
+    @apply text-[0.74rem] font-semibold uppercase tracking-[0.16em] text-mute;
+  }
+  .on-dark .eyebrow {
+    @apply text-ash;
   }
 
-  .hair-rule {
-    @apply h-px w-full bg-hair;
-  }
-
-  /* Display type — Bricolage set very tight at large sizes */
   .h-display {
-    @apply font-display font-extrabold leading-[0.92] tracking-tightest;
+    @apply font-display font-extrabold leading-[0.98] tracking-tightest text-ink;
   }
-
   .h-section {
-    @apply font-display text-[2.4rem] font-extrabold leading-[0.98] tracking-tightest sm:text-[3.2rem] lg:text-[3.9rem];
+    @apply font-display text-[2.1rem] font-extrabold leading-[1.03] tracking-tightest text-ink sm:text-[2.7rem] lg:text-[3.2rem];
+  }
+  .on-dark .h-display,
+  .on-dark .h-section {
+    @apply text-white;
   }
 
-  .body-lg {
-    @apply text-[1.0625rem] leading-[1.65] text-inkMute md:text-[1.15rem];
+  .lede {
+    @apply text-[1.05rem] leading-[1.65] text-body md:text-[1.125rem];
+  }
+  .on-dark .lede {
+    @apply text-ash;
   }
 
-  .glass {
-    background: linear-gradient(
-      165deg,
-      rgba(255, 255, 255, 0.055),
-      rgba(255, 255, 255, 0.012)
-    );
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+  /* Green marker under a key phrase. Text stays black, so contrast never drops. */
+  .hl {
+    background-image: linear-gradient(#00c551, #00c551);
+    background-repeat: no-repeat;
+    background-position: 0 92%;
+    background-size: 100% 0.2em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    padding-bottom: 0.04em;
   }
 
-  .btn-signal {
-    @apply relative inline-flex items-center justify-center gap-2 rounded-full bg-signal px-7 py-4 font-sans text-[0.95rem] font-semibold text-void transition-all duration-300 hover:bg-[#12E062] hover:shadow-[0_0_44px_-8px_rgba(0,197,81,0.65)];
+  /* Buttons — green is the ONE primary action. Everything else is quieter. */
+  .btn {
+    @apply inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-center text-[0.98rem] font-semibold leading-tight transition-all duration-300 ease-out active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-green text-ink shadow-cta hover:-translate-y-0.5 hover:bg-greenBright;
+  }
+  .btn-dark {
+    @apply btn bg-ink text-white hover:-translate-y-0.5 hover:bg-[#1c211c];
+  }
+  .btn-outline {
+    @apply btn border border-line bg-paper text-ink hover:border-ink;
+  }
+  .on-dark .btn-outline {
+    @apply border-lineDark bg-transparent text-white hover:border-white;
+  }
+  .btn-lg {
+    @apply min-h-[60px] px-6 text-[1rem] sm:px-9 sm:text-[1.05rem];
+  }
+  /* The arrow inside a button nudges forward on hover */
+  .btn .arrow {
+    @apply transition-transform duration-300 ease-out;
+  }
+  .btn:hover .arrow {
+    @apply translate-x-1;
   }
 
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-hair px-7 py-4 font-sans text-[0.95rem] font-medium text-ink transition-colors duration-300 hover:border-inkFaint hover:bg-white/[0.03];
+  .link {
+    @apply font-medium text-ink underline decoration-green decoration-2 underline-offset-4 transition-colors hover:text-greenDeep;
+  }
+  .on-dark .link {
+    @apply text-white hover:text-green;
+  }
+
+  .card {
+    @apply rounded-card border border-line bg-paper;
+  }
+  .card-hover {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:border-ink/20 hover:shadow-lift;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-line bg-paper px-5 py-4 text-[1rem] text-ink transition-colors placeholder:text-mute/70 hover:border-ink/30 focus:border-greenDeep focus:outline-none focus:ring-4 focus:ring-green/20;
+  }
+  .field-label {
+    @apply mb-2 block text-[0.9rem] font-semibold text-ink;
   }
 
   .num {
-    @apply font-mono tabular-nums;
+    @apply tabular-nums;
   }
 }
 
-/* Grain — one shared texture layer, not per-section decoration */
-.grain::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
+/* Range inputs (teardown calculator) */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
   cursor: pointer;
+  height: 28px;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 2px;
-  background: #232722;
+  height: 4px;
+  border-radius: 4px;
+  background: #e3e6e1;
 }
 input[type="range"]::-moz-range-track {
-  height: 2px;
-  background: #232722;
+  height: 4px;
+  border-radius: 4px;
+  background: #e3e6e1;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 16px;
-  width: 16px;
-  margin-top: -7px;
+  height: 22px;
+  width: 22px;
+  margin-top: -9px;
   border-radius: 50%;
-  background: #00c551;
-  box-shadow: 0 0 0 5px rgba(0, 197, 81, 0.14);
+  background: #0a0c0a;
+  border: 3px solid #00c551;
+  box-shadow: 0 2px 8px rgba(10, 12, 10, 0.25);
+  transition: transform 0.2s ease;
 }
 input[type="range"]::-moz-range-thumb {
   height: 16px;
   width: 16px;
-  border: none;
   border-radius: 50%;
-  background: #00c551;
-  box-shadow: 0 0 0 5px rgba(0, 197, 81, 0.14);
+  background: #0a0c0a;
+  border: 3px solid #00c551;
+  box-shadow: 0 2px 8px rgba(10, 12, 10, 0.25);
+}
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.12);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
   }
 }

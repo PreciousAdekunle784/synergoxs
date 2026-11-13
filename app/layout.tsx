@@ -1,28 +1,51 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import "./globals.css";
-import SmoothScroll from "@/components/SmoothScroll";
 import OptInProvider from "@/components/OptInProvider";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
+/* Self-hosted at build time: no render-blocking request to Google, no layout shift. */
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["600", "800"],
+  variable: "--font-display",
+  display: "swap",
+});
+const body = Instrument_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const TITLE = "Synergox — More customers from the traffic you already pay for";
+const DESCRIPTION =
+  "Synergox is a growth marketing agency. We find the stage of your funnel losing the most customers and rebuild it — offer, pages, ads and follow-up — into a system with a cost per customer you can forecast. Start with a free 30-minute growth teardown.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://synergox.co"),
   title: {
-    default: "Synergox — Revenue Growth Partner",
+    default: TITLE,
     template: "%s · Synergox",
   },
-  description:
-    "Synergox builds predictable customer acquisition systems: offer, funnel, traffic and follow-up assembled into one machine you can forecast from.",
+  description: DESCRIPTION,
   openGraph: {
-    title: "Synergox — Revenue Growth Partner",
+    title: TITLE,
     description:
-      "We don't sell marketing. We build predictable customer acquisition systems.",
+      "Funnels, ads and follow-up, done for you. Start with a free 30-minute growth teardown of your own numbers.",
     url: "https://synergox.co",
     siteName: "Synergox",
     type: "website",
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
 };
 
 const schema = {
@@ -32,7 +55,8 @@ const schema = {
   url: "https://synergox.co",
   logo: "https://synergox.co/logo.png",
   description:
-    "Revenue growth partner building predictable customer acquisition systems for service and e-commerce businesses.",
+    "Growth marketing agency building customer acquisition systems — offer, funnel, paid ads and follow-up — for service and e-commerce businesses.",
+  address: { "@type": "PostalAddress", addressLocality: "Lagos", addressCountry: "NG" },
   areaServed: "Worldwide",
   serviceType: [
     "Conversion Rate Optimisation",
@@ -48,36 +72,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${display.variable} ${body.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `:root{--font-display:'Bricolage Grotesque';--font-body:'Instrument Sans';--font-mono:'JetBrains Mono';}`,
-          }}
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       </head>
-      <body className="grain bg-void font-sans antialiased">
+      <body className="bg-paper font-sans text-ink antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-signal focus:px-5 focus:py-3 focus:text-void"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-white"
         >
           Skip to content
         </a>
-        <SmoothScroll />
         <OptInProvider>
           <Nav />
           <main id="main">{children}</main>

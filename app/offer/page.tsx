@@ -1,39 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { OFFER_AMOUNT_KOBO, OFFER_CURRENCY } from "@/lib/site";
+import { BOOKING_PAGE, OFFER_AMOUNT_KOBO, OFFER_CURRENCY, OFFER_LABEL } from "@/lib/site";
 import PayButton from "@/components/PayButton";
 import OfferProof from "@/components/OfferProof";
-import OfferUrgency from "@/components/OfferUrgency";
+import { Check, Cross, Tick } from "@/components/Icons";
 
 export const metadata: Metadata = {
-  title: "Your Growth System, Built For You — Synergox",
+  title: "Your growth system, built for you",
   description:
-    "Synergox is a growth agency. We build the funnels, run the ads, and install the follow-up that turns strangers into customers — done with you, for a one-time build.",
+    "The Growth System Build: we build the offer, the funnel, the ads and the follow-up that turn strangers into customers. One-time fee, no retainer, and you own all of it.",
   robots: { index: false, follow: false },
 };
-
-function Check({ muted = false }: { muted?: boolean }) {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 15 15"
-      fill="none"
-      className={muted ? "text-inkMute" : "text-signal"}
-      aria-label="yes"
-    >
-      <path d="M3.5 8l3 3 5-7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function XMark() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 15 15" fill="none" className="text-boneDim" aria-label="no">
-      <path d="M4 4l7 7M11 4l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 function price() {
   const major = OFFER_AMOUNT_KOBO / 100;
@@ -48,78 +25,187 @@ function price() {
   }
 }
 
+const deliverables = [
+  {
+    t: "An offer they can't compare on price",
+    d: "We rebuild your core offer into a stacked, risk-reversed proposition priced against the transformation, so you stop competing with whoever's cheapest.",
+  },
+  {
+    t: "A page built to convert, not just to exist",
+    d: "One visitor, one action, with the trust, proof and objection-handling that turns attention into commitment.",
+  },
+  {
+    t: "One traffic channel, proven first",
+    d: "We find a source with a cost per customer that works and prove it, instead of spraying budget across six channels badly.",
+  },
+  {
+    t: "Follow-up for everyone who doesn't buy today",
+    d: "The email and nurture sequences most businesses never send. This is where a lot of the revenue is hiding.",
+  },
+  {
+    t: "Tracking you'll actually look at",
+    d: "A simple dashboard of the four numbers that matter, so growth becomes something you forecast instead of something you hope for.",
+  },
+  {
+    t: "Every asset in your name from day one",
+    d: "Ad accounts, code, list, funnel. All yours from the first week. Leaving us never means rebuilding anything.",
+  },
+];
+
+const compare = [
+  {
+    label: "Whole system built (offer, funnel, ads, follow-up)",
+    diy: "You, from scratch",
+    free: "One piece only",
+    agency: "Sometimes",
+    syx: true,
+  },
+  {
+    label: "Funnel designed to convert, not just look good",
+    diy: "no",
+    free: "Maybe",
+    agency: "Varies",
+    syx: true,
+  },
+  {
+    label: "Ads judged on cost per customer",
+    diy: "no",
+    free: "Rarely",
+    agency: "Often vanity metrics",
+    syx: true,
+  },
+  {
+    label: "You own every asset from day one",
+    diy: "yes",
+    free: "Usually",
+    agency: "Often locked in",
+    syx: true,
+  },
+  {
+    label: "Time it costs you",
+    diy: "Months of your life",
+    free: "Heavy management",
+    agency: "Lots of meetings",
+    syx: "Minimal. We drive",
+  },
+  {
+    label: "Ongoing monthly retainer",
+    diy: "—",
+    free: "Per project",
+    agency: "Usually",
+    syx: "No. One-time build",
+  },
+  {
+    label: "Scope guarantee (don't ship it, don't bill it)",
+    diy: "—",
+    free: "no",
+    agency: "no",
+    syx: true,
+  },
+] as const;
+
+const included = [
+  "The full offer rebuild",
+  "The conversion page and funnel",
+  "Traffic channel setup and first campaigns",
+  "Follow-up and nurture automation",
+  "Tracking dashboard and weekly reporting",
+  "The Compounding Business (the playbook)",
+];
+
+const forYou = [
+  "You already have a product or service people buy. You just can't make the flow of customers predictable.",
+  "You'd rather run your business than spend a year becoming a growth marketer.",
+  "You can handle more customers if we send them. The constraint is acquisition, not delivery.",
+  "You want to own the system, not rent an agency forever.",
+];
+
+const notForYou = [
+  "You want a magic button that needs nothing from you. This is a build, and it needs your offer and your approvals.",
+  "You don't yet have something people pay for. Fix the offer first; the playbook shows you how.",
+  "You want the cheapest option on the market. That's a race we don't run.",
+  "You need results next week. Real systems take a few weeks to build and tune.",
+];
+
+const reversals = [
+  {
+    t: "Ship it, or it's free.",
+    d: "Every stage of the build is scoped and priced separately. A stage we don't deliver is a stage you don't pay for. It's a clause in your agreement, not a promise on a page.",
+  },
+  {
+    t: "You own everything from day one.",
+    d: "Accounts, code, list, creative. All in your name from week one. If we ever part ways, you keep a working system, not a pile of things to rebuild.",
+  },
+  {
+    t: "No twelve-month lock-in.",
+    d: "The build is a one-time engagement. No retainer trap, no cancellation penalty, no clawback on work already delivered.",
+  },
+];
+
+const objections = [
+  {
+    q: "“Can't I just do this myself with the playbook?”",
+    a: "You can, and some people should. But the playbook is the map, not the miles. If your time is better spent running the business you already have than spending a year becoming a growth marketer, that's what this is for.",
+  },
+  {
+    q: "“What if it doesn't work for my business?”",
+    a: "That's why the build is scoped in stages and why you own everything as we go. If a stage doesn't ship, you don't pay for it. And because we start by finding your single biggest leak, we build against the constraint that's actually costing you money.",
+  },
+  {
+    q: "“Why a one-time price and not a retainer?”",
+    a: "Because you should own your growth system, not rent it from us forever. We build it and hand you the keys. If you want ongoing optimisation later, that's your choice, not a condition of getting started.",
+  },
+];
+
 export default function OfferPage() {
   const P = price();
 
   return (
-    <div className="bg-void">
+    <>
       {/* ─────────────────────────── HERO ─────────────────────────── */}
-      <section className="relative overflow-hidden pt-36 pb-20 md:pt-44 md:pb-28">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10"
-          style={{
-            background:
-              "radial-gradient(900px 500px at 50% -5%, rgba(0,197,81,0.12), transparent 65%)",
-          }}
-        />
+      <section className="pb-16 pt-[112px] md:pb-24 md:pt-[152px]">
         <div className="shell max-w-3xl text-center">
-          <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-signal/25 bg-signal/[0.06] px-4 py-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-signal" />
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-signal">
-              You&apos;ve read the book · Now skip the years
-            </span>
-          </div>
-
-          <h1 className="font-display text-[2.6rem] font-extrabold leading-[1.02] tracking-tightest text-ink sm:text-[3.4rem] md:text-[4rem]">
-            You now know the system.
-            <br />
-            <span className="text-signal">We&apos;ll build it for you</span> in
-            weeks, not years.
+          <p className="eyebrow">The {OFFER_LABEL} · One-time {P}</p>
+          <h1 className="h-display mt-5 text-[2.5rem] sm:text-[3.4rem] md:text-[3.9rem]">
+            Your growth system, built for you.{" "}
+            <span className="hl">In weeks, not years.</span>
           </h1>
-
-          <p className="mx-auto mt-8 max-w-xl text-[1.05rem] leading-relaxed text-inkMute md:text-[1.15rem]">
-            The Compounding Business showed you the seven levers. Here&apos;s the
-            uncomfortable truth: knowing them and having the time, the team, and
-            the scars to install them correctly are two very different things.
-            You could spend the next eighteen months learning that the expensive
-            way. Or we can do it with you, starting this week.
+          <p className="lede mx-auto mt-6 max-w-xl">
+            Knowing what a working funnel needs and having the time, the team
+            and the scars to install it correctly are two very different
+            things. You can learn it the slow way, or we can build it with you,
+            starting this week.
           </p>
-
-          <div className="mt-10 flex flex-col items-center gap-6">
-            <OfferUrgency />
-            <div className="flex flex-col items-center gap-4">
-              <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" />
-              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-inkFaint">
-                One-time {P} · Secure checkout · Scope guarantee
-              </p>
-            </div>
+          <div className="mt-9 flex flex-col items-center gap-3">
+            <PayButton className="btn-primary btn-lg w-full sm:w-auto" />
+            <p className="text-[0.86rem] text-mute">
+              One-time payment · Secure Paystack checkout · Ship-It Guarantee
+            </p>
           </div>
         </div>
       </section>
 
       {/* ─────────────────────── THE REAL PROBLEM ─────────────────────── */}
-      <section className="border-t border-hair py-20 md:py-28">
-        <div className="shell max-w-2xl">
-          <p className="eyebrow text-signal">Let&apos;s be honest about what happens next</p>
-          <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
-            Most people who read a guide like that do nothing with it.
+      <section className="section bg-mist">
+        <div className="shell max-w-3xl">
+          <p className="eyebrow">What usually happens next</p>
+          <h2 className="h-section mt-5">
+            Most people who read a guide do nothing with it.
           </h2>
-          <div className="mt-8 space-y-5 text-[1.02rem] leading-relaxed text-inkMute">
+          <div className="mt-6 space-y-5 text-[1.05rem] leading-relaxed text-body">
             <p>
-              Not because they&apos;re lazy. Because they&apos;re already running
-              a business. The offer rewrite, the funnel build, the traffic
-              testing, the follow-up sequences, the tracking — each one is a
-              project, and you have a company to run while you attempt all of
-              them at once, for the first time, with no one to tell you which
-              order to do them in.
+              Not because they&apos;re lazy. Because they&apos;re already
+              running a business. The offer rewrite, the funnel build, the
+              traffic testing, the follow-up, the tracking: each one is a
+              project, and you&apos;d be attempting all of them at once, for
+              the first time, with nobody to tell you which order to do them in.
             </p>
             <p>
-              So the book becomes another PDF in a folder. Six months later
+              So the playbook becomes another PDF in a folder. Six months later
               nothing has changed, except now you also feel guilty about it.
             </p>
-            <p className="border-l-2 border-signal pl-6 font-display text-[1.25rem] font-semibold leading-snug tracking-tighter2 text-ink">
-              The bottleneck was never information. It was implementation — and
+            <p className="border-l-[3px] border-green pl-5 font-display text-[1.3rem] font-semibold leading-snug tracking-tighter2 text-ink">
+              The bottleneck was never information. It was implementation, and
               implementation is exactly the thing you can hand to someone else.
             </p>
           </div>
@@ -127,186 +213,95 @@ export default function OfferPage() {
       </section>
 
       {/* ─────────────────────── WHAT YOU GET ─────────────────────── */}
-      <section className="border-t border-hair bg-pitch py-20 md:py-28">
-        <div className="shell max-w-4xl">
+      <section className="section">
+        <div className="shell max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="eyebrow text-signal">What we actually build</p>
-            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
+            <p className="eyebrow">What we build</p>
+            <h2 className="h-section mt-5">
               We install the whole system. You approve it and watch it run.
             </h2>
-            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
-              This isn&apos;t advice, a course, or a call where we tell you what
-              to do. We build the machine — the same seven levers from the book —
-              inside your business, launch it, and tune it until the numbers move.
+            <p className="lede mt-5">
+              This isn&apos;t advice, a course, or a call where we tell you
+              what to do. We build it inside your business, launch it, and tune
+              it against cost per customer.
             </p>
           </div>
 
-          <div className="mt-14 grid gap-4 sm:grid-cols-2">
-            {[
-              {
-                n: "01",
-                t: "An offer they can't compare on price",
-                d: "We rebuild your core offer into a stacked, risk-reversed proposition, priced against the transformation — so you stop competing with whoever's cheapest.",
-              },
-              {
-                n: "02",
-                t: "A conversion machine, not a website",
-                d: "A page built to move one visitor to one action, with the trust, proof and objection-handling that turns attention into commitment.",
-              },
-              {
-                n: "03",
-                t: "One traffic channel, proven and scaled",
-                d: "We find a source with a cost per customer that works, prove it, then scale it — instead of spraying budget across six channels badly.",
-              },
-              {
-                n: "04",
-                t: "Follow-up that closes the 80% who don't buy today",
-                d: "The email and nurture sequences most businesses never send — the ones where the majority of the revenue actually lives.",
-              },
-              {
-                n: "05",
-                t: "Tracking you'll actually look at",
-                d: "A simple dashboard of the four numbers that matter, so growth becomes something you forecast instead of something you hope for.",
-              },
-              {
-                n: "06",
-                t: "Every asset in your name from day one",
-                d: "Ad accounts, code, list, funnel — all yours from the first week. There's no version of leaving us that means rebuilding anything.",
-              },
-            ].map((f) => (
-              <div
-                key={f.n}
-                className="rounded-slab border border-hair bg-panel p-7 shadow-lift"
-              >
-                <span className="font-mono text-[0.72rem] text-signal">{f.n}</span>
-                <h3 className="mt-3 font-display text-[1.25rem] font-extrabold tracking-tighter2 text-ink">
+          <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {deliverables.map((f, i) => (
+              <li key={f.t} className="card p-7">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-[0.9rem] font-extrabold text-white">
+                  {i + 1}
+                </span>
+                <h3 className="mt-5 font-display text-[1.2rem] font-extrabold leading-tight tracking-tighter2 text-ink">
                   {f.t}
                 </h3>
-                <p className="mt-2.5 text-[0.95rem] leading-relaxed text-inkMute">
-                  {f.d}
-                </p>
-              </div>
+                <p className="mt-2.5 text-[0.95rem] leading-relaxed text-body">{f.d}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* ─────────────────────── COMPARISON TABLE ─────────────────────── */}
-      <section className="border-t border-hair py-20 md:py-28">
-        <div className="shell max-w-4xl">
+      {/* ─────────────────────── COMPARISON ─────────────────────── */}
+      <section className="section bg-mist">
+        <div className="shell max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="eyebrow text-signal">How this compares</p>
-            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
+            <p className="eyebrow">How this compares</p>
+            <h2 className="h-section mt-5">
               Four ways to fix your customer acquisition.
             </h2>
-            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
-              You have options. Here&apos;s the honest trade-off on each — against
-              what actually matters when you&apos;re trying to grow.
+            <p className="lede mt-5">
+              You have options. Here&apos;s the honest trade-off on each.
             </p>
           </div>
 
-          <div className="mt-14 overflow-x-auto">
-            <table className="w-full min-w-[680px] border-collapse text-left">
+          <div className="relative mt-12 overflow-x-auto rounded-slab border border-line bg-paper" tabIndex={0} role="region" aria-label="Comparison table">
+            <table className="w-full min-w-[720px] border-collapse text-left">
               <thead>
                 <tr>
-                  <th className="w-[28%] p-4 align-bottom" />
-                  <th className="p-4 align-bottom">
-                    <span className="block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-inkMute">
-                      Do it yourself
-                    </span>
-                  </th>
-                  <th className="p-4 align-bottom">
-                    <span className="block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-inkMute">
-                      A freelancer
-                    </span>
-                  </th>
-                  <th className="p-4 align-bottom">
-                    <span className="block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-inkMute">
-                      A typical agency
-                    </span>
-                  </th>
-                  <th className="rounded-t-card bg-signal/[0.08] p-4 align-bottom">
-                    <span className="block font-mono text-[0.62rem] uppercase tracking-[0.16em] text-signal">
-                      Synergox
-                    </span>
-                    <span className="mt-1 block font-display text-[1.05rem] font-extrabold tracking-tighter2 text-ink">
-                      Done with you
-                    </span>
+                  <th className="w-[28%] p-5" />
+                  {["Do it yourself", "A freelancer", "A typical agency"].map((h) => (
+                    <th key={h} scope="col" className="p-5 font-display text-[1rem] font-extrabold tracking-tighter2 text-mute">
+                      {h}
+                    </th>
+                  ))}
+                  <th scope="col" className="bg-ink p-5 font-display text-[1rem] font-extrabold tracking-tighter2 text-white">
+                    Synergox
                   </th>
                 </tr>
               </thead>
-              <tbody className="align-middle">
-                {[
-                  {
-                    label: "Whole system built (offer, funnel, ads, follow-up)",
-                    diy: "You, from scratch",
-                    free: "One piece only",
-                    agency: "Sometimes",
-                    syx: true,
-                  },
-                  {
-                    label: "Funnels designed to convert, not just look nice",
-                    diy: "no",
-                    free: "Maybe",
-                    agency: "Varies",
-                    syx: true,
-                  },
-                  {
-                    label: "Paid ads run against cost per customer",
-                    diy: "no",
-                    free: "Rarely",
-                    agency: "Often vanity metrics",
-                    syx: true,
-                  },
-                  {
-                    label: "You own every asset from day one",
-                    diy: "yes",
-                    free: "Usually",
-                    agency: "Often locked in",
-                    syx: true,
-                  },
-                  {
-                    label: "Time it costs you",
-                    diy: "Months of your life",
-                    free: "Heavy management",
-                    agency: "Endless meetings",
-                    syx: "Minimal — we drive",
-                  },
-                  {
-                    label: "Ongoing monthly retainer",
-                    diy: "—",
-                    free: "Per project",
-                    agency: "₦1.5M+/mo typical",
-                    syx: "No — one-time build",
-                  },
-                  {
-                    label: "Scope guarantee (don't ship it, don't bill it)",
-                    diy: "—",
-                    free: "no",
-                    agency: "no",
-                    syx: true,
-                  },
-                ].map((row, i) => (
-                  <tr key={row.label} className={i % 2 ? "" : "bg-panel/40"}>
-                    <td className="p-4 text-[0.9rem] font-medium leading-snug text-ink/90">
+              <tbody>
+                {compare.map((row) => (
+                  <tr key={row.label} className="border-t border-line">
+                    <th scope="row" className="p-5 text-[0.92rem] font-semibold leading-snug text-ink">
                       {row.label}
-                    </td>
+                    </th>
                     {(["diy", "free", "agency"] as const).map((col) => (
-                      <td key={col} className="p-4 text-[0.86rem] text-inkMute">
+                      <td key={col} className="p-5 text-[0.9rem] text-body">
                         {row[col] === "no" ? (
-                          <XMark />
+                          <>
+                            <Cross className="text-mute" />
+                            <span className="sr-only">No</span>
+                          </>
                         ) : row[col] === "yes" ? (
-                          <Check muted />
+                          <>
+                            <Check className="text-ink" />
+                            <span className="sr-only">Yes</span>
+                          </>
                         ) : (
-                          <span>{row[col]}</span>
+                          row[col]
                         )}
                       </td>
                     ))}
-                    <td className="bg-signal/[0.06] p-4 text-[0.86rem] text-ink">
+                    <td className="bg-ink p-5 text-[0.9rem] font-medium text-white">
                       {row.syx === true ? (
-                        <Check />
+                        <>
+                          <Check className="text-green" />
+                          <span className="sr-only">Yes</span>
+                        </>
                       ) : (
-                        <span className="font-medium text-ink">{row.syx}</span>
+                        row.syx
                       )}
                     </td>
                   </tr>
@@ -314,64 +309,43 @@ export default function OfferPage() {
               </tbody>
             </table>
           </div>
-
-          <p className="mt-6 text-center text-[0.82rem] text-inkFaint">
-            Retainer and cost figures are typical market ranges, shown for
-            comparison — not quotes.
+          <p className="mt-4 text-center text-[0.84rem] text-mute">
+            A general comparison of typical arrangements, not a claim about any
+            specific provider.
           </p>
         </div>
       </section>
 
-      <section className="border-t border-hair py-20 md:py-28">
-        <div className="shell max-w-4xl">
+      {/* ─────────────────────── FIT ─────────────────────── */}
+      <section className="section">
+        <div className="shell max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="eyebrow text-signal">Let&apos;s make sure this fits</p>
-            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
-              This isn&apos;t for everyone. On purpose.
-            </h2>
-            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
+            <p className="eyebrow">Let&apos;s make sure this fits</p>
+            <h2 className="h-section mt-5">This isn&apos;t for everyone. On purpose.</h2>
+            <p className="lede mt-5">
               We&apos;d rather turn you away now than take money for something
-              that won&apos;t work for you. Here&apos;s the honest cut.
+              that won&apos;t work for you.
             </p>
           </div>
 
           <div className="mt-12 grid gap-4 md:grid-cols-2">
-            <div className="rounded-slab border border-signal/25 bg-signal/[0.04] p-8">
-              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-signal">
-                This is for you if
-              </p>
+            <div className="rounded-slab border-2 border-ink p-8">
+              <p className="eyebrow !text-greenDeep">This is for you if</p>
               <ul className="mt-6 space-y-4">
-                {[
-                  "You already have a product or service that people buy — you just can't make the flow of customers predictable.",
-                  "You'd rather run your business than spend a year becoming a growth marketer.",
-                  "You can handle more customers if we send them — the constraint is acquisition, not delivery.",
-                  "You want to own the system, not rent an agency forever.",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-ink/90">
-                    <svg width="16" height="16" viewBox="0 0 15 15" fill="none" className="mt-1 shrink-0" aria-hidden>
-                      <path d="M3.5 8l3 3 5-7" stroke="#00C551" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                {forYou.map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-[0.98rem] leading-relaxed text-ink">
+                    <Tick className="mt-1" />
                     {t}
                   </li>
                 ))}
               </ul>
             </div>
-
-            <div className="rounded-slab border border-hair bg-panel p-8">
-              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-boneDim">
-                This is not for you if
-              </p>
+            <div className="rounded-slab border border-line bg-mist p-8">
+              <p className="eyebrow">This is not for you if</p>
               <ul className="mt-6 space-y-4">
-                {[
-                  "You're looking for a magic button that needs zero input from you — this is a build, and it needs your offer and your approvals.",
-                  "You don't yet have something people pay for. Fix the offer first; the book shows you how.",
-                  "You want the cheapest option on the market. That's a race we don't run.",
-                  "You need results next week. Real systems take a few weeks to build and tune.",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-inkMute">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" className="mt-1 shrink-0 text-boneDim" aria-hidden>
-                      <path d="M4 4l7 7M11 4l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                    </svg>
+                {notForYou.map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-[0.98rem] leading-relaxed text-body">
+                    <Cross className="mt-1.5 text-mute" />
                     {t}
                   </li>
                 ))}
@@ -381,79 +355,50 @@ export default function OfferPage() {
         </div>
       </section>
 
-      {/* ─────────────────────── VALUE STACK + PRICE ─────────────────────── */}
-      <section className="border-t border-hair py-20 md:py-28">
-        <div className="shell max-w-2xl">
-          <div className="text-center">
-            <p className="eyebrow text-signal">What this is worth</p>
-            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
-              Priced against what it replaces.
-            </h2>
-            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
-              A full-time growth marketer in Lagos runs ₦4–8M a year before they
-              produce a thing. A senior agency retainer starts around ₦1.5M a
-              month. Learning it yourself costs something worse than money — the
-              time you don&apos;t get back and the customers you lose while you
-              figure it out.
-            </p>
-          </div>
+      {/* ─────────────────────── PRICE ─────────────────────── */}
+      <section className="pb-20 md:pb-28">
+        <div className="slab-dark on-dark px-6 py-16 sm:px-10 md:py-24">
+          <div className="mx-auto grid max-w-5xl gap-12 lg:grid-cols-2 lg:items-center">
+            <div>
+              <p className="eyebrow">What it replaces</p>
+              <h2 className="h-section mt-5">Priced against the alternatives.</h2>
+              <p className="lede mt-5">
+                A full-time growth marketer in Lagos typically runs ₦4–8M a
+                year before they produce a thing. A senior agency retainer
+                often starts around ₦1.5M a month. Learning it yourself costs
+                something worse than money: the time you don&apos;t get back.
+              </p>
+              <p className="mt-4 text-[0.84rem] leading-relaxed text-ash">
+                Salary and retainer figures are typical market ranges, shown
+                for comparison. They are not quotes.
+              </p>
+            </div>
 
-          <div className="mt-12 overflow-hidden rounded-slab border border-hair bg-panel shadow-lift">
-            <div className="border-b border-hair bg-pitch px-7 py-4">
-              <span className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-inkMute">
+            <div className="rounded-slab bg-paper p-7 text-ink sm:p-9">
+              <p className="text-[0.74rem] font-semibold uppercase tracking-[0.16em] text-mute">
                 Everything included
-              </span>
-            </div>
-            {[
-              ["The full offer rebuild", "₦450,000"],
-              ["The conversion machine (page + funnel)", "₦650,000"],
-              ["Traffic channel setup & first campaigns", "₦400,000"],
-              ["Follow-up + nurture automation", "₦350,000"],
-              ["Tracking dashboard & weekly reporting", "₦250,000"],
-              ["The Compounding Business (the book)", "Free"],
-            ].map(([item, val]) => (
-              <div
-                key={item}
-                className="flex items-center justify-between gap-4 border-b border-hair/60 px-7 py-4"
-              >
-                <span className="flex items-center gap-3 text-[0.97rem] text-ink/90">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
-                    <path d="M3.5 8l3 3 5-7" stroke="#00C551" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  {item}
-                </span>
-                <span className="font-mono text-[0.85rem] text-inkFaint line-through">
-                  {val}
-                </span>
-              </div>
-            ))}
-            <div className="flex items-center justify-between gap-4 px-7 py-5">
-              <span className="font-display text-[1.05rem] font-bold text-inkMute">
-                Total value
-              </span>
-              <span className="font-mono text-[0.95rem] text-inkMute line-through">
-                ₦2,450,000+
-              </span>
-            </div>
-
-            <div className="bg-signal/[0.06] px-7 py-8 text-center">
-              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-signal">
-                Your price today
               </p>
-              <p className="mt-2 font-display text-[3rem] font-extrabold leading-none tracking-tightest text-ink md:text-[3.6rem]">
-                {P}
-              </p>
-              <p className="mt-3 text-[0.9rem] text-inkMute">
-                One-time. Not a monthly retainer.
-              </p>
-              <div className="mt-7 flex flex-col items-center gap-3">
-                <PayButton className="btn-signal w-full max-w-sm px-9 py-5 text-[1.05rem] shadow-press" />
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-inkFaint">
-                  Secure Paystack checkout · Card, transfer, USSD
+              <ul className="mt-5 space-y-3.5">
+                {included.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-[0.98rem] text-ink">
+                    <Tick className="mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-7 border-t border-line pt-7 text-center">
+                <p className="text-[0.74rem] font-semibold uppercase tracking-[0.16em] text-mute">
+                  One-time price
                 </p>
-                <p className="mt-1 text-[0.82rem] text-inkMute">
-                  We take on a limited number of builds each month so every one
-                  gets our full attention.
+                <p className="num mt-2 font-display text-[3rem] font-extrabold leading-none tracking-tightest text-ink md:text-[3.5rem]">
+                  {P}
+                </p>
+                <p className="mt-3 text-[0.92rem] text-body">Not a monthly retainer.</p>
+                <div className="mt-6">
+                  <PayButton className="btn-primary btn-lg w-full" />
+                </div>
+                <p className="mt-3 text-[0.82rem] text-mute">
+                  Secure Paystack checkout · Card, transfer or USSD
                 </p>
               </div>
             </div>
@@ -462,34 +407,20 @@ export default function OfferPage() {
       </section>
 
       {/* ─────────────────────── RISK REVERSAL ─────────────────────── */}
-      <section className="border-t border-hair bg-pitch py-20 md:py-28">
-        <div className="shell max-w-2xl">
-          <p className="eyebrow text-signal">The risk is on us</p>
-          <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
-            You don&apos;t take the leap. We do.
-          </h2>
-          <div className="mt-10 space-y-5">
-            {[
-              {
-                t: "Ship it, or it's free.",
-                d: "Every stage of the build is scoped and priced separately. A stage we don't deliver is a stage you don't pay for. It's a clause in your agreement, not a promise on a page.",
-              },
-              {
-                t: "You own everything from day one.",
-                d: "Accounts, code, list, creative — all in your name from week one. If we ever part ways, you keep a working system, not a pile of things to rebuild.",
-              },
-              {
-                t: "No twelve-month lock-in.",
-                d: "The build is a one-time engagement. No retainer trap, no cancellation penalty, no clawback on work already delivered.",
-              },
-            ].map((c) => (
-              <div key={c.t} className="rounded-card border border-hair bg-panel p-6">
-                <h3 className="font-display text-[1.2rem] font-extrabold tracking-tighter2 text-ink">
+      <section className="section bg-mist">
+        <div className="shell max-w-5xl">
+          <div className="max-w-2xl">
+            <p className="eyebrow">The risk is on us</p>
+            <h2 className="h-section mt-5">You don&apos;t take the leap. We do.</h2>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {reversals.map((c) => (
+              <div key={c.t} className="card p-7">
+                <Tick />
+                <h3 className="mt-4 font-display text-[1.2rem] font-extrabold tracking-tighter2 text-ink">
                   {c.t}
                 </h3>
-                <p className="mt-2 text-[0.95rem] leading-relaxed text-inkMute">
-                  {c.d}
-                </p>
+                <p className="mt-2 text-[0.95rem] leading-relaxed text-body">{c.d}</p>
               </div>
             ))}
           </div>
@@ -500,184 +431,52 @@ export default function OfferPage() {
       <OfferProof />
 
       {/* ─────────────────────── OBJECTIONS ─────────────────────── */}
-      <section className="border-t border-hair bg-pitch py-20 md:py-28">
-        <div className="shell max-w-2xl">
-          <p className="eyebrow text-signal">Before you decide</p>
-          <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
-            The three things you&apos;re thinking right now.
-          </h2>
-          <div className="mt-10 space-y-8">
-            {[
-              {
-                q: "\u201cCan't I just do this myself with the book?\u201d",
-                a: "You can — and some people should. But the book is the map, not the miles. If your time is better spent running the business you already have than spending a year becoming a growth marketer, that's exactly what this is for. You've already got the knowledge; this is the execution.",
-              },
-              {
-                q: "\u201cWhat if it doesn't work for my business?\u201d",
-                a: "That's why the build is scoped in stages and why you own everything as we go. If a stage doesn't ship, you don't pay for it. And because we start by finding your single biggest leak, we're not guessing — we build against the constraint that's actually costing you money.",
-              },
-              {
-                q: "\u201cWhy is it a one-time price and not a retainer?\u201d",
-                a: "Because you should own your growth system, not rent it from us forever. We build the machine, hand you the keys, and if you want ongoing optimisation later, that's your choice — not a condition of getting started.",
-              },
-            ].map((o) => (
-              <div key={o.q}>
-                <h3 className="font-display text-[1.2rem] font-bold tracking-tighter2 text-ink">
+      <section className="section bg-mist">
+        <div className="shell max-w-3xl">
+          <p className="eyebrow">Before you decide</p>
+          <h2 className="h-section mt-5">The three things you&apos;re thinking right now.</h2>
+          <div className="mt-10 space-y-4">
+            {objections.map((o) => (
+              <div key={o.q} className="card p-7">
+                <h3 className="font-display text-[1.2rem] font-extrabold tracking-tighter2 text-ink">
                   {o.q}
                 </h3>
-                <p className="mt-3 text-[0.98rem] leading-relaxed text-inkMute">
-                  {o.a}
-                </p>
+                <p className="mt-3 text-[0.98rem] leading-relaxed text-body">{o.a}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────── COST OF WAITING (FOMO) ─────────────────────── */}
-      <section className="border-t border-hair bg-pitch py-20 md:py-28">
-        <div className="shell max-w-2xl">
-          <p className="eyebrow text-signal">The real cost isn&apos;t the price</p>
-          <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
-            Every month you wait is a month your competitors don&apos;t.
-          </h2>
-          <div className="mt-8 space-y-5 text-[1.02rem] leading-relaxed text-inkMute">
-            <p>
-              While the system sits unbuilt, the traffic you&apos;re already
-              paying for keeps leaking. The leads you could be capturing go to
-              the business down the street whose funnel converts better than
-              yours. That&apos;s not a one-time loss — it compounds, every single
-              month, whether or not you act.
-            </p>
-            <p>
-              Do the maths on your own numbers: if a working system would bring
-              even a handful of extra customers a month, waiting three months to
-              &ldquo;think about it&rdquo; doesn&apos;t cost you nothing — it
-              costs you every customer you would have won in those three months,
-              gone for good.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {[
-              { t: "Waiting is a decision too", d: "Doing nothing isn't neutral — it's choosing to keep losing the customers your funnel currently drops." },
-              { t: "The price only goes up", d: "As we take on more clients and prove more results, this one-time build won't stay at this number." },
-              { t: "Slots are capped monthly", d: "When this month's builds are booked, the next opening is weeks away. Momentum lost is revenue lost." },
-            ].map((c) => (
-              <div key={c.t} className="rounded-card border border-hair bg-panel p-6">
-                <h3 className="font-display text-[1.05rem] font-extrabold tracking-tighter2 text-ink">
-                  {c.t}
-                </h3>
-                <p className="mt-2 text-[0.88rem] leading-relaxed text-inkMute">
-                  {c.d}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 flex flex-col items-center gap-4">
-            <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" />
-            <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-inkFaint">
-              Lock in {P} before this month&apos;s slots close
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────── COST OF WAITING (FOMO) ─────────────────────── */}
-      <section className="border-t border-hair bg-pitch py-20 md:py-28">
-        <div className="shell max-w-2xl">
-          <div className="text-center">
-            <p className="eyebrow text-signal">The cost of waiting</p>
-            <h2 className="mt-6 font-display text-[2rem] font-extrabold leading-[1.08] tracking-tighter2 text-ink md:text-[2.6rem]">
-              Every month you wait is a month your competitors don&apos;t.
-            </h2>
-            <p className="mt-6 text-[1.02rem] leading-relaxed text-inkMute">
-              This isn&apos;t pressure — it&apos;s arithmetic. The customers
-              searching for what you sell are being converted right now. The only
-              question is by whom.
-            </p>
-          </div>
-
-          <div className="mt-12 space-y-4">
-            {[
-              {
-                t: "The customers you're losing don't come back",
-                d: "Every week without a working funnel, the people who would have bought from you are buying from whoever converts them first. That's not delayed revenue — it's revenue that's gone to someone else for good.",
-              },
-              {
-                t: "The price only moves one way",
-                d: "This is an introductory build price while we're growing our case studies. As the results stack up, the number goes up with them. The cheapest this will ever be is today.",
-              },
-              {
-                t: "Slots are capped every month",
-                d: "We take a handful of builds a month so each gets our full attention. When this month's are gone, the next opening is weeks away — weeks your competitors spend converting the customers you both want.",
-              },
-            ].map((c) => (
-              <div
-                key={c.t}
-                className="flex items-start gap-4 rounded-slab border border-hair bg-panel p-7 shadow-lift"
-              >
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-signal/30 bg-signal/[0.08]">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <circle cx="12" cy="12" r="8.5" stroke="#00C551" strokeWidth="1.5" />
-                    <path d="M12 7.5V12l3 2" stroke="#00C551" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                <div>
-                  <h3 className="font-display text-[1.2rem] font-extrabold tracking-tighter2 text-ink">
-                    {c.t}
-                  </h3>
-                  <p className="mt-2 text-[0.96rem] leading-relaxed text-inkMute">
-                    {c.d}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 flex flex-col items-center gap-5">
-            <OfferUrgency />
-            <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" label={`Lock in ${P} before this month's slots close`} />
           </div>
         </div>
       </section>
 
       {/* ─────────────────────── FINAL CLOSE ─────────────────────── */}
-      <section className="relative overflow-hidden border-t border-hair py-24 md:py-32">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10"
-          style={{
-            background:
-              "radial-gradient(700px 400px at 50% 110%, rgba(0,197,81,0.14), transparent 65%)",
-          }}
-        />
-        <div className="shell max-w-2xl text-center">
-          <h2 className="font-display text-[2.2rem] font-extrabold leading-[1.05] tracking-tightest text-ink md:text-[3rem]">
+      <section className="section">
+        <div className="shell max-w-3xl text-center">
+          <h2 className="h-display text-[2.2rem] md:text-[3rem]">
             A year from now, the system will either be built or it won&apos;t.
           </h2>
-          <p className="mx-auto mt-7 max-w-xl text-[1.05rem] leading-relaxed text-inkMute">
+          <p className="lede mx-auto mt-6 max-w-xl">
             The only question is whether you spent that year building it alone,
-            or whether it was already running while you ran your business. The
-            customers are out there right now, choosing whoever converts them
-            best. Let&apos;s make that you.
+            or whether it was already running while you ran your business.
           </p>
-          <div className="mt-10 flex flex-col items-center gap-4">
-            <PayButton className="btn-signal px-9 py-5 text-[1.05rem] shadow-press" />
-            <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-inkFaint">
-              One-time {P} · Ship-it guarantee · You own it all
+          <div className="mt-9 flex flex-col items-center gap-3">
+            <PayButton className="btn-primary btn-lg w-full sm:w-auto" />
+            <p className="text-[0.86rem] text-mute">
+              One-time {P} · Ship-It Guarantee · You own it all
+            </p>
+            <p className="mt-1 max-w-md text-[0.86rem] text-mute">
+              We take on a limited number of builds each month, so every one
+              gets our full attention.
             </p>
           </div>
-          <p className="mt-10 text-[0.9rem] text-inkFaint">
+          <p className="mt-10 text-[0.95rem] text-body">
             Not ready to commit?{" "}
-            <Link href="/apply" className="text-inkMute underline decoration-hair underline-offset-4 hover:text-ink">
-              Book a call first
+            <Link href={BOOKING_PAGE} className="link">
+              Book a free teardown call first
             </Link>{" "}
             and we&apos;ll map your leak before you decide.
           </p>
         </div>
       </section>
-    </div>
+    </>
   );
 }

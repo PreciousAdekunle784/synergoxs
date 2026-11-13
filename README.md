@@ -1,371 +1,206 @@
-# Synergox — Revenue Growth Partner
+# Synergox — growth marketing agency funnel
 
-A conversion funnel built as a Next.js site. Dark-luxury, minimal, motion-led,
-with an interactive CAC teardown as the credibility centrepiece.
+A Next.js site built around one conversion: **booking the free 30-minute
+growth teardown call.** White, black and green. Static, fast, no backend of its
+own.
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
 ```
 
-## Ship it
+```bash
+npm run dev
+```
 
 ```bash
 npm run build
 ```
 
 Deploy to Vercel: push to GitHub, import the repo, accept the defaults.
-There is no backend and no environment variables, so nothing can 40x on you.
 
 ---
 
-## The three things to fill in before launch
+## The funnel
 
-### 1. The funnel backend — Supabase + Paystack
+```
+PRIMARY     any green button → /apply (5 questions) → calendar → /booked
+FALLBACK    "free playbook" link → opt-in (name + email) → success screen → /apply
+CHECKOUT    /offer → Paystack → /thank-you          (unlisted; send the link)
+```
 
-See **SETUP.txt** for the full walkthrough. In short: paste your Supabase URL +
-anon key and your Paystack public key into `lib/site.ts` (captures
-leads + emails the book) and your Paystack public key (the checkout). Full
-step-by-step is in **SETUP.txt** and in the backend section below.
+**One primary action.** Every green button is `components/CTA.tsx` and goes to
+`/apply`. Change the wording or the destination there and it changes
+everywhere.
 
-Also in `lib/site.ts`:
-- `BOOKING_URL` — your Calendly link (already set)
-- `EMAIL` — currently `hello@synergox.co`, change if different
+**One fallback.** `components/PlaybookLink.tsx` opens the playbook opt-in
+(`components/OptIn.tsx`). It is always a text link or an outline button, never
+green, so it can't compete with the call. Its success screen offers the call.
 
-### 2. Case study metrics — `components/Proof.tsx`
+**Conversion pages have no navigation.** `/apply`, `/booked`, `/offer` and
+`/thank-you` show a logo and an email address, nothing else (see `FOCUS_PATHS`
+in `components/Nav.tsx`).
 
-Look for the `EDIT ME` block at the top. Replace the three metrics with numbers
-you can show a screenshot for. Placeholder metrics are deliberately build-level
-facts (mobile-first, one vendor, nine funnel steps) rather than invented revenue
-figures — swap them for real performance data as soon as you have it.
+### The booking page — `/apply`
 
-### 3. Testimonials — `components/Trust.tsx`
+Five questions, about a minute: what you sell, monthly revenue (with a currency
+picker), ad spend, biggest bottleneck, then name / email / website. The first
+four are single taps that move on by themselves.
 
-Only the first testimonial is real (the Kings Food Mart owner). The other two
-are marked `real: false` and are **filtered out of the render** — the grid
-shows one, two or three depending on how many are marked real. So the page is
-safe to ship today.
+On submit the answers are saved to Supabase (`meta` JSON on the lead) and the
+Calendly calendar appears on the same page with name and email prefilled. When
+Calendly confirms a booking the visitor is taken to `/booked`. If the save
+fails, the calendar still appears with a note — a booking is never blocked on a
+form.
 
-Replace the placeholders with real quotes as you collect them and flip
-`real: true`. Do not launch with invented quotes: a prospect who checks one and
-finds nothing behind it will not book, and a fabricated endorsement is an
-advertising-standards problem in both Nigeria and the EU.
+**The honest "no".** Lowest revenue band *and* no ad spend → the visitor gets a
+straight explanation that a build would cost more than it returns, and a route
+to `/learn`, with "book the call anyway" still available. Tune or delete the
+rule in `components/Apply.tsx`:
+
+```ts
+const underServed = a.revenueIndex === 0 && a.spendIndex === 0;
+```
+
+Currencies and bands are at the top of the same file. `rate` is only used to
+print readable ranges; it never touches billing.
+
+### The paid offer — `/offer`
+
+The checkout page for the Growth System Build (₦199,999, set by
+`NEXT_PUBLIC_OFFER_AMOUNT_KOBO`). It is `noindex` and not linked from the menu:
+send it to prospects who are ready to start, typically after their call.
+Paystack opens inline; the payment is verified server-side, then `/thank-you`.
 
 ---
+
+## Things to fill in
+
+### 1. Testimonials — `components/Testimonials.tsx`
+
+One quote is real (`kind: "verified"`). Six are **illustrative examples with
+fictional profiles** (`kind: "sample"`); each card says so, and so does the
+section. As real quotes come in, replace a sample's fields and flip `kind` to
+`"verified"`. Don't remove the labels while a sample is on the page: an
+invented quote presented as real is an advertising-standards problem.
+
+### 2. Case study — `components/Proof.tsx`
+
+Kings Food Mart. Everything there is checkable. Add a number only if you can
+show a screenshot for it.
+
+### 3. Backend keys — `lib/site.ts`
+
+Supabase URL + anon key, Paystack public key, Calendly link, contact email.
+Full walkthrough in **SETUP.txt**; lead-saving troubleshooting in
+**FIX_LEADS.txt**.
+
+### 4. Facts used in copy — `lib/site.ts`
+
+`CALL_MINUTES`, `PLAYBOOK_PAGES`, `CASE_STUDY_URL`. Change once, updates
+everywhere.
+
+---
+
+## Home page order, and why
+
+Each section answers the question the one before it raises.
+
+| # | Section | The question it answers |
+|---|---|---|
+| 1 | Hero | What is this, and what do I do next? |
+| 2 | Problem | Is this about me? |
+| 3 | Calculator | What is it costing me? |
+| 4 | What we build | What would you actually do? |
+| 5 | How it works | How long, and how much of my time? |
+| 6 | Case study | Has it worked for anyone? |
+| 7 | Testimonials | What's it like to work with you? |
+| 8 | Why Synergox | Why you and not another agency? |
+| 9 | Guarantee | What if it doesn't work? |
+| 10 | FAQ | Everything else. |
+| 11 | Final CTA | The ask, with what they get. |
+
+The calculator's benchmarks are `TARGET` at the top of
+`components/Teardown.tsx`. They're typical mid-range figures, stated as
+targets, not promises.
+
+**The guarantee.** Four clauses, each one something you can be held to in a
+contract, plus three stated exclusions. Keep the exclusions: a guarantee with
+limits reads as a contract; one without reads as marketing.
+
+---
+
+## Design system
+
+Tokens are in `tailwind.config.ts`; component classes in `app/globals.css`.
+
+| Token | Hex | Use |
+|---|---|---|
+| `paper` | #FFFFFF | The page. Dominant. |
+| `mist` | #F5F6F4 | Alternate section background, quiet panels |
+| `line` | #E3E6E1 | Borders |
+| `ink` | #0A0C0A | Headlines, black blocks, footer |
+| `body` / `mute` | #454C45 / #5E665E | Paragraph text / captions |
+| `green` | #00C551 | Fills: primary buttons, bars, ticks. Always with black text |
+| `greenDeep` | #007A35 | Green *text* on white (plain `green` fails contrast) |
+
+Rules that keep it consistent:
+
+- **White first.** Black is for type, the footer and the occasional emphasis
+  block (`slab-dark on-dark`). Don't add a black section without removing one.
+- **Green means "do this" or "this is the point".** One green button style,
+  one destination.
+- `.hl` puts a green marker under a key phrase; the text stays black.
+- Classes: `.btn-primary`, `.btn-dark`, `.btn-outline`, `.card`, `.field`,
+  `.eyebrow`, `.h-section`, `.lede`, `.section`, `.shell`.
+
+Type: Bricolage Grotesque (headlines) and Instrument Sans (body), self-hosted
+through `next/font` — no request to Google at runtime.
 
 ## Structure
 
 ```
 app/
-  page.tsx          Home — the funnel, twelve sections in order
-  services/         Services detail page (the "done for you" path)
-  learn/            Courses, workshops, community (the "learn it" path)
-  apply/            Ten-question qualification gate before the calendar
-  guide/            Post-booking lead magnet page (noindex)
-  privacy/          Privacy policy (template — have a lawyer review)
-  terms/            Terms of service (template — have a lawyer review)
-  layout.tsx        Fonts, metadata, Schema.org, nav + footer
-  icon.png          Favicon (512px) — Next serves this automatically
-  apple-icon.png    Home-screen icon (180px)
-  favicon.ico       Legacy fallback (16/32/48/64)
-  globals.css       Type scale, component classes, reduced-motion
+  page.tsx            Home
+  apply/              Booking page (form → calendar)
+  booked/             Call confirmed
+  offer/              Paid build + checkout          (noindex)
+  thank-you/          Payment confirmed              (noindex)
+  services/           All eight capabilities
+  learn/              The do-it-yourself track
+  privacy/ terms/     Legal templates — have a lawyer review
+  opengraph-image.tsx Social share card
 components/
-  Hero.tsx          Headline + live pipeline panel
-  SystemPanel.tsx   The hero instrument
-  Problem.tsx       Six symptoms
-  Method.tsx        Acquire / Convert / Scale / Automate / Optimize
-  Teardown.tsx      The interactive CAC model  ← signature element one
-  Paths.tsx         "How do you want to grow?"  ← signature element two
-  Services.tsx      Eight expandable capabilities
-  Journey.tsx       Nine-step scroll-linked funnel spine
-  Proof.tsx         Kings Food Mart case study
-  Difference.tsx    Comparison table + seven-stage process
-  Trust.tsx         Trust indicators + testimonials
-  Questions.tsx     Objection handling + FAQ
-  LeadCapture.tsx   Checklist opt-in, before the booking close
-  Guarantee.tsx     The Ship-It Guarantee — clauses and exclusions
-  FinalCTA.tsx      Risk reversals + the two doors restated
-  StickyCTA.tsx     Mobile-only sticky bar
-  Apply.tsx         The qualification flow + currency config
+  CTA.tsx             The primary button (→ /apply)
+  PlaybookLink.tsx    The fallback action (opens the opt-in)
+  OptIn.tsx           Playbook opt-in modal
+  Apply.tsx           Booking flow
+  PayButton.tsx       Paystack checkout
+  Hero / Problem / Teardown / System / Process / Proof /
+  Testimonials / Difference / Guarantee / Questions / FinalCTA
+  Nav / Footer / StickyCTA / Primitives / Icons / Eyebrow / LegalPage
 lib/
-  site.ts           Booking URL, email, form endpoint
-  services.ts       Service data (shared by home + /services)
+  site.ts             Keys, links, funnel routes, copy facts
+  services.ts         Service data (used by /services)
+  analytics.ts        Event dispatch (GTM / GA4 if installed)
+  paystack.ts         Paystack loader
 ```
 
-## Design system
+## Analytics
 
-Colour is a rule, not a palette. Green (`signal`, #00C551) only marks things
-that represent measurable movement — numbers, progress, arrows, gains.
-Bone (#E9E5DA) marks the old way and losses. Everything else is graphite.
-If you add a section, keep that rule or the page loses its logic.
-
-| Token | Hex | Use |
-|---|---|---|
-| `void` | #050605 | Page background |
-| `pitch` | #0A0C0A | Alternate section background |
-| `panel` | #101310 | Cards, instrument surfaces |
-| `hair` | #232722 | All borders and dividers |
-| `signal` | #00C551 | Measurable movement only |
-| `bone` | #E9E5DA | Loss, the old way |
-
-Type: Bricolage Grotesque (display), Instrument Sans (body),
-JetBrains Mono (data, eyebrows, labels).
+`lib/analytics.ts` pushes to `dataLayer` / `gtag` when either is installed and
+no-ops otherwise. Events, in funnel order: `booking_page_viewed`,
+`application_submitted`, `call_booked` (the primary conversion),
+`lead_email_submitted`, `lead_book_sent`, `payment_page_viewed`,
+`purchase_completed`. Neither GTM nor GA4 is installed yet — add one to start
+measuring.
 
 ## Accessibility & performance
 
-- All interactive elements keyboard reachable with a visible green focus ring
-- `prefers-reduced-motion` disables Lenis and all entrance animation
-- Skip-to-content link, ARIA on tabs, accordions and the toggle
-- Every route prerenders as static HTML
-- Home is ~158 kB first-load JS; other routes ~87–94 kB
-- Mobile sticky CTA appears after the hero and hides over the final close, so
-  it never covers the real call to action
-
-## Notes
-
-- Google Fonts load via `<link>` in `app/layout.tsx`. To self-host, swap for
-  `next/font/local` and drop the woff2 files in `app/fonts/`.
-- `/guide` is set to `noindex` and excluded in `robots.ts` — it's the
-  post-booking page, not a public one. Add your PDF at `public/guide.pdf`.
-- The teardown's benchmarks live at the top of `Teardown.tsx` as `TARGET`.
-  They're typical mid-range figures. Adjust if your niche runs differently.
-
-
-## Page order, and why
-
-The home page is a sales letter, so the sequence carries the argument:
-
-1. **Hero** — reframes the assumption (not spend, conversion)
-2. **Problem** — six symptoms, agitation
-3. **Method** — the mechanism, so the claim has machinery behind it
-4. **Teardown** — they find their own leak; this creates the want
-5. **Paths** — the fork, placed the moment the problem becomes personal
-6. **Services** → **Journey** → **Proof** — support for the done-for-you path
-7. **Difference** → **Trust** → **Questions** — objections, in the order they occur
-8. **Lead capture** — catches everyone not ready to book
-9. **Final CTA** — risk reversal, then both doors restated
-
-If you reorder anything, keep Teardown immediately before Paths. The fork only
-works once the visitor has seen their own number.
-
-## Headline
-
-The hero headline was chosen from a shortlist against five criteria: curiosity,
-biggest pain point, measurable transformation, differentiation, impossible to
-ignore. Alternates worth A/B testing against the live one:
-
-- "You don't have a traffic problem. You have a leak you can't see."
-- "The 4% who convert aren't the problem. The 96% who leave are."
-- "Every month you wait, your customers get more expensive."
-- "Your best month wasn't luck. It just wasn't repeatable — yet."
-
-Swap in `components/Hero.tsx` — the `lines` array at the top, where `g: true`
-marks the words that render in green.
-
-
-## The qualification gate
-
-Every "book a call" button on the site points at `/apply`, not straight at
-Calendly. Ten questions, roughly ninety seconds, then the calendar appears with
-name and email prefilled and the answers attached.
-
-**Currency is question one, deliberately.** Every money question after it is
-rendered in the currency chosen, so a Lagos founder sees naira bands and a
-London founder sees sterling. Nobody has to convert anything in their head, and
-you get a revenue figure you can trust instead of one someone guessed at.
-
-### Editing the currencies — `components/Apply.tsx`
-
-```ts
-const CURRENCIES = {
-  NGN: { symbol: "₦", label: "Nigerian Naira", rate: 1550, locale: "en-NG" },
-  ...
-}
-```
-
-`rate` is units per 1 USD and is used *only* to generate readable answer bands.
-It never touches billing and is never shown to the visitor as an exchange rate.
-Bands round to two significant figures, so a stale rate makes a band slightly
-wide — it can never make the form wrong. Worth refreshing once or twice a year,
-NGN especially. Add or remove currencies freely; the form adapts.
-
-To change the bands themselves, edit `REVENUE_BANDS` and `SPEND_BANDS`. They're
-expressed in USD and converted per currency, so you only maintain one list.
-
-### The disqualification branch
-
-If someone reports the lowest revenue band **and** no current ad spend, they
-don't reach the calendar. They get an honest explanation that a retainer would
-eat the margin it's meant to create, and a route to the learn track — with a
-"book the call anyway" link still available, because occasionally the model is
-wrong about someone.
-
-Tune the rule in `Apply.tsx`:
-
-```ts
-const underServed = a.revenueIndex === 0 && (a.spendIndex === 0 || a.spendIndex === -1);
-```
-
-This protects your calendar and your reputation at the same time. Delete it if
-you'd rather speak to everyone.
-
-### Where the answers go
-
-The whole set is saved to your Supabase `leads` table (answers in a `meta` JSON blob: currency, market,
-model, revenue, spend, bottleneck, what they've tried, timeline, decision
-authority, plus a `recommendation` field reading "Done for you" or "Learn
-track"). If the POST fails, the visitor still reaches the calendar and sees a
-note asking them to email instead. Never block a booking on a form.
-
-### Reverting a CTA to direct booking
-
-Any button can skip the gate — swap `href="/apply"` for
-`href={BOOKING_URL}` with `target="_blank"`. If you A/B test one, make it the
-hero button: gating the very first click costs some volume in exchange for
-lead quality, and that trade is worth measuring rather than assuming.
-
-
-## Favicon
-
-Generated from your logo, cropped square to the mark itself with the flat black
-surround trimmed, then padded and centred on `#050605` so it matches the site
-background rather than sitting on pure black.
-
-Next.js App Router picks these up automatically from `app/` — there are no
-`<link>` tags to maintain:
-
-| File | Size | Used for |
-|---|---|---|
-| `app/icon.png` | 512×512 | Browser tabs, bookmarks, PWA |
-| `app/apple-icon.png` | 180×180 | iOS home screen |
-| `app/favicon.ico` | 16/32/48/64 | Older browsers |
-
-To regenerate after a logo change, drop the new file in and re-export at those
-three sizes. Keep the mark centred with roughly 16% padding — at 16px a tightly
-cropped mark turns to mush.
-
-`public/logo.png` was re-exported from the same square crop, so the nav and
-footer marks are sharper than the original screenshot.
-
-## The Ship-It Guarantee
-
-`components/Guarantee.tsx`, placed immediately before the final CTA — a
-guarantee works hardest directly before the ask.
-
-Four clauses, each one something you confirmed you can honour: ship it or it's
-free, fee tied to the number, you own everything from day one, thirty days'
-notice. All four are written as contract clauses rather than website promises,
-because that's the claim being made.
-
-**Don't delete the exclusions block.** The section states three things the
-guarantee explicitly does not cover — a revenue figure, a timeline the client
-delays, and money spent on ad platforms. A guarantee with no limits reads as
-marketing; a guarantee with stated limits reads as a contract, and converts
-better for exactly that reason. It also means nothing in the promise can be
-quietly walked back later, which is what makes it safe for you to publish.
-
-If you add a fifth clause, the test is: could a client hold you to it in a
-document? If not, it belongs somewhere else in the copy.
-
-To keep the page from repeating itself, two Trust indicators and the three
-risk-reversal cards in the final CTA were replaced when this section landed —
-the close now carries a four-item strip that links back up to the full terms.
-
-## The lead-magnet funnel (the free book)
-
-Every conversion CTA on the site does the **same thing**: opens the book opt-in.
-The opt-in saves the lead to your database, emails the book, and then offers the
-paid next step through a Paystack checkout popup. One message, one destination,
-everywhere.
-
-The single exception, by design, is the **`/learn` page**, which keeps a direct
-**"Book a strategy call" → `/apply`** CTA — that page is for people who chose the
-do-it-yourself path.
-
-### One button, used everywhere
-
-`components/BookCTA.tsx` is the single site-wide conversion button (Nav, Hero,
-Teardown, Paths done-for-you card, Guarantee, final CTA, services, footer). It
-opens the opt-in modal via `useOptIn()`. Change it once, it changes everywhere.
-
-### The flow, end to end
-
-1. A CTA opens the opt-in modal (`components/OptIn.tsx`).
-2. Visitor enters first name + email and submits.
-3. The modal **calls the Supabase `subscribe` function**, which saves the lead
-   to your `leads` table and emails the book via Resend (with
-   autoresponse on) **emails the person the book link** automatically.
-4. The success screen appears and the book also opens in a new tab as a backstop.
-5. The success screen shows briefly (~3s) and **auto-redirects to `/offer`** —
-   the conversion-focused payment page. It does NOT open the book in a new tab
-   (that pulled people out of the funnel); the book arrives by email.
-6. On `/offer`, the visitor reads the sales page and clicks the Paystack button
-   (`components/PayButton.tsx`) — **inline checkout, on your own site**. The
-   email captured at opt-in is prefilled.
-7. On successful payment, `purchase_completed` fires and they're sent to `/guide`.
-
-Every step degrades gracefully: if Supabase isn't set, the success screen still
-shows and the redirect still happens; if Paystack isn't set, the `/offer` button
-shows a short notice and stays put (it never bounces anyone to `/apply`).
-
-### The payment page — `/offer`
-
-`app/offer/page.tsx` is a long-form, conversion-focused sales page for your
-**paid done-for-you offer** (written in a direct-response style). Structure:
-pattern-interrupt hero → the real problem (knowing ≠ doing) → what we build
-(6 deliverables) → value stack with price anchoring → risk reversal → real proof
-→ objections → final close. The Paystack button appears three times down the
-page. Proof uses ONLY the real Kings Food Mart result (no invented quotes) —
-add more via `components/OfferProof.tsx` as you're cleared to share them.
-
-**Where each thing leads (important):**
-- Every conversion CTA → opt-in → **`/offer`** (the payment page). Never `/apply`.
-- The Paystack button on `/offer` opens **inline checkout on the page** — it does
-  NOT send anyone to `/apply`. If Paystack isn't configured yet it shows a short
-  "checkout is being set up" note and stays put.
-- Only the **`/learn`** page routes to `/apply` (book a call), plus one small
-  "not ready? book a call first" link at the very bottom of `/offer`.
-
-**Payment confirmation.** For going live fast, the button trusts Paystack's
-in-popup success. To harden it later, add a Paystack webhook (see the backend
-section) — no backend of your own required.
-
-The price shows **₦199,999** by default. Change it in one place:
-`NEXT_PUBLIC_OFFER_AMOUNT_KOBO` (kobo — ₦199,999 = `19999900`). The value-stack
-line items inside the page are illustrative anchors — edit them in
-`app/offer/page.tsx` to match what you actually deliver.
-
-### The book
-
-`public/growth-playbook.pdf` — **The Compounding Business**, a 74-page premium
-guide. It's a real lead magnet: teaches the whole seven-lever system, then
-transitions to the done-for-you offer. Swap the file (keep the name) to revise.
-
----
-
-## The funnel backend (Supabase + Paystack)
-
-Full step-by-step is in **SETUP.txt**. Summary:
-
-**Supabase (free) does lead storage + book email.** Paste your project URL and
-anon key into `lib/site.ts`. Run `supabase/migrations/0001_leads.sql` to create
-the `leads` table (RLS on, no public policies — only your Edge Functions can
-write). Deploy the two functions:
-
-- `subscribe` — saves the lead and emails the book via Resend.
-- `verify-payment` — re-checks a Paystack transaction with your secret key
-  before the buyer is marked paid (and rejects underpayment).
-
-Set these Supabase **secrets** (never in the repo): `RESEND_API_KEY`, `BOOK_URL`,
-`FROM_EMAIL`, `PAYSTACK_SECRET_KEY`, `EXPECTED_AMOUNT_KOBO=19999900`.
-
-**Resend (free) sends the book.** Verify your sending domain, create an API key,
-set it as `RESEND_API_KEY`. Every opt-in then gets the book automatically.
-
-**Paystack** — paste your **public** key (`pk_live_…`) into `lib/site.ts`; the
-**secret** key (`sk_live_…`) goes only into the `PAYSTACK_SECRET_KEY` Supabase
-secret. The checkout is inline on `/offer`; on success it verifies server-side
-and sends the buyer to `/guide`.
-
+- Keyboard reachable throughout, visible focus rings, skip link, focus trapped
+  in the modal, labelled form fields with inline errors.
+- `prefers-reduced-motion` disables entrance animation and smooth scrolling.
+- Above-the-fold animation is CSS-only, so the headline never waits on
+  JavaScript.
+- Every route is prerendered as static HTML.

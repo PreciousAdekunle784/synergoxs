@@ -1,31 +1,44 @@
-SYNERGOX SITE — BUILD 16
+SYNERGOX SITE — BUILD 17
 ========================
 
-LEARN PAGE — FIXED CTA + CONVERSION-FOCUSED (this build)
-  The problem: the learn page's main hero button said "Start with the free
-  checklist" and pointed to /#checklist — you wanted it to lead to the
-  BOOK-A-CALL page. Fixed, and rebuilt the whole page to funnel toward the
-  call:
+FUNNEL REDESIGN — WHITE / BLACK / GREEN, ONE CONVERSION GOAL (this build)
 
-    - Hero CTA now: "Book your free teardown call" -> /apply
-      (reframed copy: learning the system vs knowing which part moves YOUR
-       numbers first — so book the free teardown).
-    - NEW mid-page conversion band (after the 4 tracks): "Not sure which
-      track you actually need? Book your teardown" -> /apply.
-    - Closing section CTA still -> /apply ("Book a strategy call").
-    - ZERO checklist references left. Every primary (green) button on the
-      page now leads to book-a-call. Secondary ghost buttons point to
-      "Compare both paths" and "Run the teardown now" (supporting, not
-      competing).
+  ONE OBJECTIVE
+    Every green button on the site now does the same thing: books the free
+    30-minute growth teardown call (/apply). The free playbook is the
+    fallback for visitors who aren't ready to talk; its success screen
+    points back at the call instead of auto-redirecting to checkout.
 
-  So the /learn page is the do-it-yourself door, but its conversion goal —
-  getting the visitor onto a free teardown call — is now consistent top to
-  bottom.
+  NEW LOOK
+    White page, black type and a few black emphasis blocks, green for
+    buttons and highlights. Tokens live in tailwind.config.ts.
 
-EVERYTHING ELSE UNCHANGED FROM BUILD 15
-  - Footer redesign (clean 3-part structure).
-  - Leads fix (PROJECT_URL / SERVICE_ROLE_KEY — see FIX_LEADS.txt).
-  - Paystack v2 in-page; post-payment -> /thank-you (no call refs).
-  - Offer page: deliverables + comparison table + urgency/FOMO. ₦199,999.
+  HOME PAGE: 14 SECTIONS -> 11
+    Hero, Problem, Calculator, What we build, How it works, Case study,
+    Testimonials, Why Synergox, Guarantee, FAQ, Final CTA.
+    Method + Services + Journey + the 7-stage process were four answers to
+    one question; they are now two sections. The second lead magnet (the
+    "checklist", which never sent an email) is gone.
 
-Routes: 17. Build verified clean.
+  BOOKING: 10 QUESTIONS -> 5
+    Single-tap answers move on by themselves. Calendar appears on the same
+    page; a confirmed booking goes to the new /booked page.
+
+  REMOVED / FIXED
+    - /payment (placeholder checkout links)  -> redirects to /offer
+    - /guide (linked a PDF that didn't exist) -> redirects to /booked
+    - The "slots left" counter on /offer. It was calculated from the day of
+      the month, not from real bookings.
+    - The duplicated "cost of waiting" section on /offer.
+    - Struck-through "value" prices on /offer that had no source.
+
+  TESTIMONIALS
+    One verified quote (Kings Food Mart) plus six ILLUSTRATIVE examples
+    with fictional profiles, each labelled on the card. Swap in real ones
+    in components/Testimonials.tsx (flip kind to "verified").
+
+  UNCHANGED
+    Supabase lead capture + book email, Paystack inline checkout +
+    verify-payment, Calendly link, price (₦199,999), privacy + terms copy.
+
+Build verified clean. See README.md for the full map.
