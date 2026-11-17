@@ -19,6 +19,31 @@ export const CONSULTATION_STATUSES = [
 ] as const;
 export type ConsultationStatus = (typeof CONSULTATION_STATUSES)[number]["value"];
 
+export const ORDER_STATUSES = [
+  { value: "paid", label: "Paid" },
+  { value: "pending", label: "Not completed" },
+  { value: "failed", label: "Failed" },
+] as const;
+
+export const ONBOARDING_STATUSES = [
+  { value: "awaiting", label: "Awaiting brief" },
+  { value: "submitted", label: "Brief received" },
+  { value: "in_progress", label: "In progress" },
+  { value: "complete", label: "Delivered" },
+] as const;
+
+export const PURCHASE_STATUSES = [
+  { value: "customer", label: "Customer" },
+  { value: "checkout_started", label: "Started checkout" },
+  { value: "none", label: "No purchase" },
+] as const;
+
+export const orderStatusLabel = (v: string) => ORDER_STATUSES.find((s) => s.value === v)?.label ?? v;
+export const onboardingLabel = (v: string) => ONBOARDING_STATUSES.find((s) => s.value === v)?.label ?? v;
+export const purchaseLabel = (v: string) => PURCHASE_STATUSES.find((s) => s.value === v)?.label ?? v;
+export const offerSourceLabel = (v: string) =>
+  ({ sales_page: "Sales page", exit_popup: "Exit offer", email: "Email sequence", direct: "Direct link" })[v] ?? v;
+
 export const leadStatusLabel = (v: string) =>
   LEAD_STATUSES.find((s) => s.value === v)?.label ?? v;
 export const consultationStatusLabel = (v: string) =>
@@ -26,8 +51,10 @@ export const consultationStatusLabel = (v: string) =>
 
 /** Where a lead came from, in plain words. Unknown sources are shown as stored. */
 const SOURCES: Record<string, string> = {
-  "synergox.co/apply": "Teardown application",
-  "synergox.co/optin": "Playbook opt-in",
+  "synergox.co/blueprint": "Growth Blueprint opt-in",
+  "synergox.co/checkout": "Checkout",
+  "synergox.co/apply": "Call application",
+  "synergox.co/optin": "Playbook opt-in (old site)",
   "synergox.co/lead-capture": "Checklist (old form)",
   unknown: "Unknown",
 };

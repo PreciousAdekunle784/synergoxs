@@ -1,16 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
-import PlaybookLink from "./PlaybookLink";
+import { BOOKING_PAGE, OPTIN_PAGE, SALES_PAGE } from "@/lib/site";
+import Brand from "./Brand";
 import { useContact } from "./ContactProvider";
-import { FOCUS_PATHS } from "./Nav";
 
-export default function Footer({ hasResults = true }: { hasResults?: boolean }) {
+export default function Footer() {
   const pathname = usePathname();
   const contact = useContact();
-  const EMAIL = contact.email;
+  const year = new Date().getFullYear();
   const wa = contact.whatsapp.replace(/[^0-9]/g, "");
   const social = [
     { label: "WhatsApp", href: wa ? `https://wa.me/${wa}` : "" },
@@ -18,14 +17,15 @@ export default function Footer({ hasResults = true }: { hasResults?: boolean }) 
     { label: "Instagram", href: contact.instagram },
     { label: "X", href: contact.x },
   ].filter((s) => s.href);
-  const year = new Date().getFullYear();
 
-  /* Conversion pages get a legal line only — nothing to click away to. */
-  if (FOCUS_PATHS.includes(pathname)) {
+  /* Everywhere but the sales page: a legal line, and nothing to wander off to. */
+  if (pathname !== SALES_PAGE) {
     return (
       <footer className="border-t border-line bg-paper">
         <div className="shell flex flex-col gap-3 py-8 text-[0.84rem] text-mute sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Synergox · {contact.location}</p>
+          <p>
+            © {year} SYNERGOX · {contact.location}
+          </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition-colors hover:text-ink">
               Privacy
@@ -46,49 +46,38 @@ export default function Footer({ hasResults = true }: { hasResults?: boolean }) 
       <div className="shell py-16 md:py-20">
         <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-sm">
-            <div className="flex items-center gap-2.5">
-              <Image src="/logo.png" alt="" width={32} height={32} className="rounded-[9px]" />
-              <span className="font-display text-[1.1rem] font-extrabold tracking-tighter2">
-                Synergox
-              </span>
-            </div>
+            <Brand onDark />
             <p className="mt-5 text-[0.95rem] leading-relaxed text-ash">
-              We build the system that turns your traffic into customers —
-              offer, pages, ads and follow-up — and hand you the keys to it.
+              Websites, customer acquisition and conversion optimization, built to work as one growth system.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-x-14 gap-y-10 sm:grid-cols-3">
-            <nav aria-label="Explore">
-              <p className="eyebrow">Explore</p>
+            <nav aria-label="On this page">
+              <p className="eyebrow">On this page</p>
               <ul className="mt-5 space-y-3 text-[0.93rem]">
-                <li><Link href="/#how" className={linkCls}>How it works</Link></li>
-                {hasResults && <li><Link href="/#results" className={linkCls}>Results</Link></li>}
-                <li><Link href="/#guarantee" className={linkCls}>Guarantee</Link></li>
-                <li><Link href="/#faq" className={linkCls}>FAQ</Link></li>
+                <li><a href="#method" className={linkCls}>How it works</a></li>
+                <li><a href="#packages" className={linkCls}>Packages</a></li>
+                <li><a href="#suite" className={linkCls}>The Growth Suite</a></li>
+                <li><a href="#faq" className={linkCls}>Questions</a></li>
               </ul>
             </nav>
 
             <nav aria-label="More">
               <p className="eyebrow">More</p>
               <ul className="mt-5 space-y-3 text-[0.93rem]">
-                <li><Link href="/services" className={linkCls}>Services</Link></li>
-                <li><Link href="/learn" className={linkCls}>Learn the system</Link></li>
-                <li>
-                  <PlaybookLink className={`${linkCls} text-left`}>
-                    Free playbook
-                  </PlaybookLink>
-                </li>
+                <li><Link href={OPTIN_PAGE} className={linkCls}>The free Blueprint</Link></li>
+                <li><Link href={BOOKING_PAGE} className={linkCls}>Book a free call</Link></li>
               </ul>
             </nav>
 
             <div className="col-span-2 sm:col-span-1">
               <p className="eyebrow">Get in touch</p>
               <a
-                href={`mailto:${EMAIL}`}
+                href={`mailto:${contact.email}`}
                 className="mt-5 inline-block text-[0.93rem] font-medium text-white underline decoration-green decoration-2 underline-offset-4 transition-colors hover:text-green"
               >
-                {EMAIL}
+                {contact.email}
               </a>
               <p className="mt-4 text-[0.88rem] leading-relaxed text-ash">
                 {contact.location}
@@ -112,7 +101,7 @@ export default function Footer({ hasResults = true }: { hasResults?: boolean }) 
         </div>
 
         <div className="mt-14 flex flex-col gap-4 border-t border-lineDark pt-8 text-[0.84rem] text-ash sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Synergox. All rights reserved.</p>
+          <p>© {year} SYNERGOX. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition-colors hover:text-white">
               Privacy

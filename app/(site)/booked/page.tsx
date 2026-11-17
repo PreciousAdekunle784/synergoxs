@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  BOOKING_PAGE,
-  CALL_MINUTES,
-  PLAYBOOK_TITLE,
-} from "@/lib/site";
-import { Check, Tick } from "@/components/Icons";
-import PlaybookDownload from "@/components/PlaybookDownload";
+import { BLUEPRINT_FILE, BLUEPRINT_FILENAME, BLUEPRINT_PAGES, BLUEPRINT_TITLE, BOOKING_PAGE, CALL_MINUTES, SALES_PAGE } from "@/lib/site";
+import { Arrow, Check, Download, Included } from "@/components/Icons";
 import { getContent } from "@/lib/content/get";
 
 export const metadata: Metadata = {
   title: "You're booked",
-  description: "Your growth teardown is confirmed. Here's what happens next.",
+  description: "Your call is confirmed. Here's what happens next.",
   robots: { index: false, follow: false },
 };
 
@@ -26,15 +21,15 @@ const steps = [
   },
   {
     t: "We do our homework first",
-    d: "Before the call we go through your answers and model your funnel, so the conversation opens with what we found rather than twenty minutes of questions.",
+    d: "Before the call we go through your answers, so the conversation opens with what we found rather than twenty minutes of questions.",
   },
 ];
 
 const chapters = [
-  "Why more traffic is almost never the answer",
   "How to find the stage losing you the most buyers",
-  "Writing an offer people can't compare on price",
-  "The follow-up most businesses never send",
+  "The five-second test your page has to pass",
+  "The four parts of an offer people act on",
+  "A 12-point scorecard for your whole system",
 ];
 
 export default async function BookedPage() {
@@ -42,18 +37,17 @@ export default async function BookedPage() {
   return (
     <>
       <section className="pb-14 pt-[112px] md:pt-[148px]">
-        <div className="shell max-w-3xl text-center">
-          <span className="mx-auto flex h-16 w-16 animate-rise items-center justify-center rounded-full bg-green text-ink">
-            <Check size={30} />
+        <div className="shell max-w-3xl">
+          <span className="flex h-12 w-12 animate-rise items-center justify-center bg-green text-ink">
+            <Check size={24} />
           </span>
           <p className="eyebrow mt-7">Call confirmed</p>
-          <h1 className="h-display mt-4 text-[2.4rem] sm:text-[3.2rem]">
-            You&apos;re booked. <span className="hl">Good call.</span>
+          <h1 className="h-display mt-4 text-[2.6rem] sm:text-[3.6rem]">
+            You&apos;re booked. <span className="accent accent-green">Good call.</span>
           </h1>
-          <p className="lede mx-auto mt-5 max-w-xl">
-            Most owners guess where they&apos;re losing customers. In{" "}
-            {CALL_MINUTES} minutes you&apos;ll know, with a number on it. Here&apos;s
-            how to get the most from the time.
+          <p className="lede mt-5 max-w-xl">
+            Most owners guess where they&apos;re losing customers. In {CALL_MINUTES} minutes you&apos;ll know which part
+            of your system to fix first. Here&apos;s how to get the most from the time.
           </p>
         </div>
       </section>
@@ -61,14 +55,12 @@ export default async function BookedPage() {
       <section className="pb-16">
         <div className="shell max-w-3xl">
           <h2 className="eyebrow">What happens next</h2>
-          <ol className="mt-5 space-y-3">
+          <ol className="mt-5 border-t-2 border-ink">
             {steps.map((s, i) => (
-              <li key={s.t} className="card flex items-start gap-5 p-6 sm:p-7">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink font-display text-[0.9rem] font-extrabold text-white">
-                  {i + 1}
-                </span>
+              <li key={s.t} className="grid grid-cols-[auto_1fr] gap-x-5 border-b border-ink/15 py-6">
+                <span className="font-mono text-[0.74rem] uppercase tracking-[0.12em] text-mute sm:pt-1">Step {i + 1}</span>
                 <div>
-                  <h3 className="font-display text-[1.2rem] font-extrabold tracking-tighter2 text-ink">
+                  <h3 className="font-display text-[1.3rem] font-extrabold leading-tight text-ink" style={{ fontStretch: "86%" }}>
                     {s.t}
                   </h3>
                   <p className="mt-1.5 text-[0.97rem] leading-relaxed text-body">{s.d}</p>
@@ -79,33 +71,38 @@ export default async function BookedPage() {
         </div>
       </section>
 
-      {/* Head start: keeps them engaged between booking and the call */}
+      {/* A head start: keeps them engaged between booking and the call */}
       <section className="pb-20">
         <div className="shell max-w-3xl">
           <div className="on-dark rounded-slab bg-ink p-8 text-white md:p-11">
             <p className="eyebrow">A head start while you wait</p>
-            <h2 className="mt-4 font-display text-[1.8rem] font-extrabold leading-[1.08] tracking-tightest sm:text-[2.2rem]">
-              Read the playbook before we speak.
+            <h2 className="h-section mt-4 !text-[2rem] sm:!text-[2.5rem]">
+              Read the Blueprint <span className="accent accent-green">before we speak.</span>
             </h2>
             <p className="mt-4 max-w-xl text-[1rem] leading-relaxed text-ash">
-              {PLAYBOOK_TITLE} is the system we install for clients, written
-              down. Skim it first and you&apos;ll already know which stage
-              we&apos;ll be spending the call on.
+              {BLUEPRINT_TITLE} is {BLUEPRINT_PAGES} pages on where businesses lose customers they&apos;ve already paid
+              for. Do the scorecard first and you&apos;ll already know which part we&apos;ll spend the call on.
             </p>
             <ul className="mt-6 grid gap-3 sm:grid-cols-2">
               {chapters.map((c) => (
                 <li key={c} className="flex items-start gap-3 text-[0.95rem] leading-snug text-white">
-                  <Tick className="mt-0.5" />
+                  <Included />
                   {c}
                 </li>
               ))}
             </ul>
-            <PlaybookDownload />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a href={BLUEPRINT_FILE} download={BLUEPRINT_FILENAME} className="btn-primary">
+                <Download /> Download the Blueprint (PDF)
+              </a>
+              <Link href={SALES_PAGE} className="btn-outline">
+                See the growth packages <Arrow />
+              </Link>
+            </div>
           </div>
 
-          <p className="mt-8 text-center text-[0.92rem] leading-relaxed text-mute">
-            Need to move the call? Use the reschedule link in your invite, or
-            email{" "}
+          <p className="mt-8 text-[0.92rem] leading-relaxed text-mute">
+            Need to move the call? Use the reschedule link in your invite, or email{" "}
             <a href={`mailto:${EMAIL}`} className="link">
               {EMAIL}
             </a>

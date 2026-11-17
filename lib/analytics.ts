@@ -1,30 +1,41 @@
 /**
- * Lightweight analytics dispatch.
+ * Marketing analytics dispatch.
  *
  * Fires to Google Tag Manager's dataLayer and to gtag if present. If neither
- * is installed yet, it no-ops safely and logs in dev — so the funnel works
- * today and starts reporting the moment you add GTM or GA4, with no code change.
+ * is installed it does nothing, so the funnel works today and starts
+ * reporting the moment GTM or GA4 is added, with no code change.
  *
- * The events the funnel fires, in the order a visitor meets them:
- *   booking_page_viewed    → the booking page loaded
- *   application_submitted  → the short form before the calendar was sent
- *   call_booked            → Calendly confirmed a booking  ← the primary conversion
- *   lead_email_submitted   → playbook opt-in form submitted
- *   lead_book_sent         → playbook delivery triggered
- *   playbook_downloaded    → playbook saved from the "you're booked" page
- *   payment_page_viewed    → checkout button clicked on the paid offer
- *   purchase_completed     → Paystack payment succeeded
+ * (The dashboard's own numbers don't come from here: they are recorded
+ * first-party by TrackPageView and lib/funnel/client.ts.)
+ *
+ * Events, in the order a visitor meets them:
+ *   lead_email_submitted   → Blueprint opt-in form sent
+ *   lead_blueprint_sent    → opt-in saved; visitor moved to the sales page
+ *   blueprint_downloaded   → the PDF was downloaded on-site
+ *   package_selected       → a package's buy button was clicked
+ *   bundle_selected        → the Growth Suite's buy button was clicked
+ *   exit_offer_shown / exit_offer_accepted / exit_offer_dismissed
+ *   begin_checkout         → checkout form submitted, going to Paystack
+ *   purchase_completed     → payment verified by the server
+ *   onboarding_submitted   → project brief sent
+ *   booking_page_viewed / application_submitted / call_booked → the free-call route
  */
 
 type EventName =
+  | "lead_email_submitted"
+  | "lead_blueprint_sent"
+  | "blueprint_downloaded"
+  | "package_selected"
+  | "bundle_selected"
+  | "exit_offer_shown"
+  | "exit_offer_accepted"
+  | "exit_offer_dismissed"
+  | "begin_checkout"
+  | "purchase_completed"
+  | "onboarding_submitted"
   | "booking_page_viewed"
   | "application_submitted"
-  | "call_booked"
-  | "lead_email_submitted"
-  | "lead_book_sent"
-  | "playbook_downloaded"
-  | "payment_page_viewed"
-  | "purchase_completed";
+  | "call_booked";
 
 declare global {
   interface Window {
@@ -43,10 +54,6 @@ export function track(event: EventName, params: Record<string, unknown> = {}) {
     window.dataLayer.push(payload);
     if (typeof window.gtag === "function") {
       window.gtag("event", event, params);
-    }
-    if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
-      console.debug("[analytics]", event, params);
     }
   } catch {
     /* never let analytics break the flow */

@@ -1,11 +1,16 @@
 import type { MetadataRoute } from "next";
+import { SALES_PAGE, SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://synergox.co";
-  return ["", "/services", "/learn", "/privacy", "/terms"].map((p) => ({
-    url: `${base}${p}`,
+  return [
+    { path: "", priority: 1, changeFrequency: "monthly" as const },
+    { path: SALES_PAGE, priority: 0.9, changeFrequency: "weekly" as const },
+    { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },
+    { path: "/terms", priority: 0.3, changeFrequency: "yearly" as const },
+  ].map((p) => ({
+    url: `${SITE_URL}${p.path}`,
     lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: p === "" ? 1 : 0.7,
+    changeFrequency: p.changeFrequency,
+    priority: p.priority,
   }));
 }

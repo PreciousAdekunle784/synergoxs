@@ -38,6 +38,10 @@ const config: Config = {
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],
         sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        // Italic accent inside headlines, and the guide's own typography
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        // Labels, plan numbers and every price: figures that line up in a column
+        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       letterSpacing: {
         tightest: "-0.045em",
@@ -47,13 +51,16 @@ const config: Config = {
         shell: "1200px",
       },
       borderRadius: {
-        card: "20px",
-        slab: "28px",
+        // Deliberately tight: panels read as documents, not as bubbles
+        card: "6px",
+        slab: "10px",
+        btn: "4px",
       },
       boxShadow: {
         card: "0 1px 2px rgba(10,12,10,0.04), 0 12px 32px -18px rgba(10,12,10,0.14)",
         lift: "0 2px 4px rgba(10,12,10,0.04), 0 28px 56px -24px rgba(10,12,10,0.22)",
         cta: "0 10px 24px -12px rgba(0,197,81,0.65)",
+        doc: "0 1px 1px rgba(10,12,10,0.04), 0 30px 60px -30px rgba(10,12,10,0.35), 0 60px 120px -60px rgba(10,12,10,0.25)",
       },
       keyframes: {
         rise: {
@@ -90,6 +97,19 @@ const config: Config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        // The connecting line: a dash offset that runs from hidden to drawn
+        draw: {
+          from: { strokeDashoffset: "1" },
+          to: { strokeDashoffset: "0" },
+        },
+        pulse: {
+          "0%, 100%": { opacity: "0.35", transform: "scale(1)" },
+          "50%": { opacity: "0", transform: "scale(2.4)" },
+        },
+        travel: {
+          from: { offsetDistance: "0%" },
+          to: { offsetDistance: "100%" },
+        },
       },
       animation: {
         // CSS-only entrances for above-the-fold content: they run before
@@ -105,6 +125,9 @@ const config: Config = {
         drift: "drift 18s ease-in-out infinite",
         float: "float 7s ease-in-out infinite",
         fade: "fade 1.2s ease-out both",
+        draw: "draw 1.8s cubic-bezier(0.16,1,0.3,1) both",
+        ping: "pulse 2.6s ease-out infinite",
+        travel: "travel 7s linear infinite",
       },
     },
   },

@@ -5,10 +5,19 @@ import { redirect } from "next/navigation";
 import { rpc, type RpcResult } from "@/lib/supabase/rpc";
 import { signInWithPassword, signOut, updatePassword } from "@/lib/supabase/auth";
 import { CONTENT_TAG } from "@/lib/content/get";
-import { COPY_FIELDS, SERVICE_STAGES } from "@/lib/content/defaults";
+import { COPY_FIELDS } from "@/lib/content/defaults";
+import { FUNNEL_TAG } from "@/lib/funnel/get";
+import { parseMajor } from "@/lib/money";
+import { SITE_URL } from "@/lib/site";
+import { settleOrder } from "@/lib/server/orders";
+import { emailContext, runDueSequence } from "@/lib/server/sequence";
+import { sendEmail } from "@/lib/server/email";
+import { isConfigured } from "@/lib/server/env";
+import { SEQUENCE } from "@/lib/email/templates";
+import type { Order } from "@/lib/funnel/types";
 import { clearSession, accessToken, requireAdmin, setSession } from "./session";
 import { LOGIN_PATH } from "./cookies";
-import { CONSULTATION_STATUSES, LEAD_STATUSES, fromLocalInput } from "./constants";
+import { CONSULTATION_STATUSES, LEAD_STATUSES, ONBOARDING_STATUSES, fromLocalInput } from "./constants";
 import type { ActionState } from "./types";
 
 /**
@@ -183,6 +192,7 @@ export async function deleteConsultation(fd: FormData) {
 function published() {
   // The live site picks the change up on its next request.
   revalidateTag(CONTENT_TAG);
+  revalidatePath("/", "layout");
   revalidatePath("/admin/content");
 }
 
@@ -238,48 +248,6 @@ export async function saveContact(_prev: ActionState, fd: FormData): Promise<Act
   if (error) return dbError(error);
   published();
   return ok("Saved. The website is updated.");
-}
-
-export async function saveServices(_prev: ActionState, fd: FormData): Promise<ActionState> {
-  if (text(fd, "reset") === "1") {
-    const { error } = await adminRpc("admin_set_content", { p_key: "services", p_value: null });
-    if (error) return dbError(error);
-    published();
-    return ok("Services reset to the built-in list.");
-  }
-  let raw: unknown;
-  try {
-    raw = JSON.parse(String(fd.get("payload") ?? "[]"));
-  } catch {
-    return fail("The services list couldn't be read. Reload the page and try again.");
-  }
-  if (!Array.isArray(raw) || raw.length === 0) return fail("Keep at least one service.");
-  if (raw.length > 24) return fail("That's more services than the page is designed for (24).");
-
-  const clean = [];
-  for (const item of raw as Record<string, unknown>[]) {
-    const name = String(item?.name ?? "").trim();
-    const stage = String(item?.stage ?? "").trim();
-    const line = String(item?.line ?? "").trim();
-    const detail = String(item?.detail ?? "").trim();
-    const deliverables = Array.isArray(item?.deliverables)
-      ? item.deliverables.map((d) => String(d).trim()).filter(Boolean).slice(0, 8)
-      : [];
-    if (!name) return fail("Every service needs a name.");
-    if (name.length > 80) return fail(`"${name.slice(0, 30)}…" — names are limited to 80 characters.`);
-    if (!(SERVICE_STAGES as readonly string[]).includes(stage))
-      return fail(`"${name}" needs a stage from the list.`);
-    if (line.length > 300 || detail.length > 800)
-      return fail(`"${name}" — the descriptions are too long.`);
-    if (deliverables.some((d) => d.length > 60))
-      return fail(`"${name}" — each deliverable is limited to 60 characters.`);
-    clean.push({ name, stage, line, detail, deliverables });
-  }
-  const { error } = await adminRpc("admin_set_content", { p_key: "services", p_value: clean });
-  if (error) return dbError(error);
-  revalidatePath("/services");
-  published();
-  return ok("Saved. The services page is updated.");
 }
 
 export async function saveTestimonial(_prev: ActionState, fd: FormData): Promise<ActionState> {
@@ -381,4 +349,229 @@ export async function deleteProject(fd: FormData) {
   if (!UUID.test(id)) return;
   await adminRpc("admin_delete_project", { p_id: id });
   published();
+}
+
+/* ─────────────────────────── Packages, bundle, exit offer ─────────────────────────── */
+
+/** The public pages (and the emails) read the offer from a cache: clear it on every change. */
+function offerChanged() {
+  revalidateTag(FUNNEL_TAG);
+  revalidatePath("/", "layout");
+  revalidatePath("/admin", "layout");
+}
+
+const lines = (fd: FormData, key: string) =>
+  String(fd.get(key) ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+const slugify = (v: string) =>
+  v
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+
+export async function savePackage(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const id = text(fd, "id");
+  const name = text(fd, "name");
+  const audience = text(fd, "audience");
+  const description = text(fd, "description");
+  const delivery = text(fd, "delivery_time");
+  const deliverables = lines(fd, "deliverables");
+  const scope = lines(fd, "scope");
+  const price = parseMajor(text(fd, "price"));
+  const sort = Number.parseInt(text(fd, "sort_order") || "0", 10);
+  const slug = id ? null : slugify(text(fd, "slug") || name);
+
+  if (id && !UUID.test(id)) return fail("Unknown package.");
+  if (!name) return fail("Give the package a name.");
+  if (name.length > 80) return fail("The name is limited to 80 characters.");
+  if (!id && (!slug || slug.length < 2)) return fail("The name needs at least two letters or numbers to make a link.");
+  if (audience.length > 300) return fail("“Who it's for” is limited to 300 characters.");
+  if (description.length > 800) return fail("The description is limited to 800 characters.");
+  if (delivery.length > 120) return fail("The delivery time is limited to 120 characters.");
+  if (price === null) return fail("Enter the price as a number, like 150000 or 150,000.");
+  if (deliverables.length === 0) return fail("List at least one deliverable, one per line.");
+  if (deliverables.length > 14) return fail("Keep deliverables to 14 or fewer.");
+  if (deliverables.some((d) => d.length > 120)) return fail("Each deliverable is limited to 120 characters.");
+  if (scope.length > 10) return fail("Keep scope and delivery terms to 10 lines or fewer.");
+  if (scope.some((d) => d.length > 200)) return fail("Each scope line is limited to 200 characters.");
+  if (!Number.isFinite(sort) || Math.abs(sort) > 9999) return fail("Order must be a whole number.");
+  if (fd.get("checkout_enabled") === "on" && price <= 0) return fail("A package that can be bought online needs a price above zero.");
+
+  const { error } = await adminRpc("admin_save_package", {
+    p_id: id || null,
+    p_slug: slug,
+    p_name: name,
+    p_audience: audience,
+    p_description: description,
+    p_deliverables: deliverables,
+    p_scope: scope,
+    p_delivery_time: delivery,
+    p_price_minor: price,
+    p_active: fd.get("active") === "on",
+    p_checkout_enabled: fd.get("checkout_enabled") === "on",
+    p_sort: sort,
+  });
+  if (error) return dbError(error);
+  offerChanged();
+  return ok(id ? "Saved. The sales page is updated." : "Package added. It is live on the sales page if marked active.");
+}
+
+export async function deletePackage(fd: FormData) {
+  const id = text(fd, "id");
+  if (!UUID.test(id)) return;
+  await adminRpc("admin_delete_package", { p_id: id });
+  offerChanged();
+}
+
+export async function saveCurrency(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const currency = text(fd, "currency");
+  if (!["NGN", "GHS", "KES", "ZAR", "USD"].includes(currency)) return fail("Pick a currency from the list.");
+  const { error } = await adminRpc("admin_set_currency", { p_currency: currency });
+  if (error) return dbError(error);
+  offerChanged();
+  return ok("Currency saved. Check each price still reads correctly, and that your Paystack account accepts this currency.");
+}
+
+export async function saveBundle(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const name = text(fd, "name");
+  const headline = text(fd, "headline");
+  const description = text(fd, "description");
+  const price = parseMajor(text(fd, "price"));
+  const ids = fd.getAll("package_ids").map(String).filter((v) => UUID.test(v));
+  const extras = lines(fd, "extras");
+  const scope = lines(fd, "scope");
+  const active = fd.get("active") === "on";
+
+  if (!name) return fail("Give the bundle a name.");
+  if (name.length > 80) return fail("The name is limited to 80 characters.");
+  if (headline.length > 200) return fail("The headline is limited to 200 characters.");
+  if (description.length > 800) return fail("The description is limited to 800 characters.");
+  if (price === null) return fail("Enter the bundle price as a number, like 200000.");
+  if (extras.length > 8 || extras.some((d) => d.length > 120)) return fail("Keep the extras to 8 lines of up to 120 characters.");
+  if (scope.length > 10 || scope.some((d) => d.length > 200)) return fail("Keep the scope to 10 lines of up to 200 characters.");
+
+  const { error } = await adminRpc("admin_save_bundle", {
+    p_name: name,
+    p_headline: headline,
+    p_description: description,
+    p_price_minor: price,
+    p_package_ids: ids,
+    p_extras: extras,
+    p_scope: scope,
+    p_active: active,
+  });
+  if (error) return dbError(error);
+  offerChanged();
+  return ok(active ? "Saved. The Growth Suite is live with these figures." : "Saved. The bundle is switched off and hidden from the site.");
+}
+
+export async function saveExitOffer(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const headline = text(fd, "headline");
+  const subheadline = text(fd, "subheadline");
+  const body = text(fd, "body");
+  const cta = text(fd, "cta_label");
+  const dismiss = text(fd, "dismiss_label");
+  const specialRaw = text(fd, "special_price");
+  const special = specialRaw === "" ? null : parseMajor(specialRaw);
+  const seconds = Number.parseInt(text(fd, "min_seconds"), 10);
+  const scroll = Number.parseInt(text(fd, "min_scroll_percent"), 10);
+  const days = Number.parseInt(text(fd, "suppress_days"), 10);
+  const mobile = text(fd, "mobile_trigger");
+
+  if (!headline || headline.length > 120) return fail("The headline is required (up to 120 characters).");
+  if (subheadline.length > 200) return fail("The second headline is limited to 200 characters.");
+  if (body.length > 600) return fail("The supporting copy is limited to 600 characters.");
+  if (!cta || cta.length > 80) return fail("The main button needs a label (up to 80 characters).");
+  if (!dismiss || dismiss.length > 120) return fail("The “no thanks” line needs wording (up to 120 characters).");
+  if (specialRaw !== "" && special === null) return fail("Enter the special price as a number, or leave it empty.");
+  if (!Number.isFinite(seconds) || seconds < 5 || seconds > 600) return fail("Time on page must be between 5 and 600 seconds.");
+  if (!Number.isFinite(scroll) || scroll < 0 || scroll > 90) return fail("Scroll depth must be between 0 and 90 percent.");
+  if (!Number.isFinite(days) || days < 0 || days > 365) return fail("Days hidden after dismissal must be between 0 and 365.");
+  if (!["off", "back", "scroll_up", "back_and_scroll"].includes(mobile)) return fail("Pick a mobile trigger from the list.");
+
+  const { error } = await adminRpc("admin_save_exit_offer", {
+    p_enabled: fd.get("enabled") === "on",
+    p_headline: headline,
+    p_subheadline: subheadline,
+    p_body: body,
+    p_cta_label: cta,
+    p_dismiss_label: dismiss,
+    p_special_price_minor: special,
+    p_min_seconds: seconds,
+    p_min_scroll_percent: scroll,
+    p_desktop_trigger: fd.get("desktop_trigger") === "on",
+    p_mobile_trigger: mobile,
+    p_suppress_days: days,
+  });
+  if (error) return dbError(error);
+  offerChanged();
+  return ok("Saved. The exit offer is updated.");
+}
+
+/* ─────────────────────────── Orders ─────────────────────────── */
+
+export async function updateOrder(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const id = text(fd, "id");
+  const status = text(fd, "onboarding_status");
+  const notes = String(fd.get("admin_notes") ?? "");
+  if (!UUID.test(id)) return fail("Unknown order.");
+  if (!ONBOARDING_STATUSES.some((s) => s.value === status)) return fail("Pick a status from the list.");
+  if (notes.length > 4000) return fail("Notes are limited to 4,000 characters.");
+  const { data, error } = await adminRpc<boolean>("admin_update_order", {
+    p_id: id,
+    p_onboarding_status: status,
+    p_notes: notes,
+  });
+  if (error) return dbError(error);
+  if (!data) return fail("That order no longer exists.");
+  revalidatePath("/admin", "layout");
+  return ok("Saved.");
+}
+
+/** Asks Paystack again about an order that isn't marked paid, and records the answer. */
+export async function recheckOrder(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const id = text(fd, "id");
+  if (!UUID.test(id)) return fail("Unknown order.");
+  const { data: order, error } = await adminRpc<Order | null>("admin_get_order", { p_id: id });
+  if (error) return dbError(error);
+  if (!order) return fail("That order no longer exists.");
+  const result = await settleOrder(order.reference, "admin", SITE_URL);
+  revalidatePath("/admin", "layout");
+  if (result.state === "paid")
+    return ok(result.justNow ? "Paystack confirms this payment. The order is now marked paid and the receipt has been sent." : "Already paid and recorded.");
+  if (result.state === "unavailable") return fail(result.reason);
+  return fail(`Paystack does not show a successful payment for this order. ${result.reason}`);
+}
+
+/* ─────────────────────────── Emails ─────────────────────────── */
+
+export async function runEmailsNow(_prev: ActionState, _fd: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const r = await runDueSequence(80);
+  revalidatePath("/admin/emails");
+  if (r.errors.length && r.sent === 0 && r.due === 0) return fail(r.errors[0]);
+  if (r.due === 0) return ok("Nothing is due right now.");
+  const parts = [`${r.sent} sent`];
+  if (r.failed) parts.push(`${r.failed} failed${r.errors[0] ? ` (${r.errors[0]})` : ""}`);
+  if (r.skipped) parts.push(`${r.skipped} skipped`);
+  return r.failed && !r.sent ? fail(parts.join(", ") + ".") : ok(parts.join(", ") + ".");
+}
+
+/** Sends one of the sequence emails to the signed-in admin, to see it in a real inbox. */
+export async function sendTestEmail(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const admin = await requireAdmin();
+  const tpl = SEQUENCE.find((e) => e.key === text(fd, "key"));
+  if (!tpl) return fail("Unknown email.");
+  if (!isConfigured.email() || !isConfigured.database())
+    return fail("Email isn't connected yet. Set RESEND_API_KEY and SUPABASE_SERVICE_ROLE_KEY, then redeploy.");
+  const ctx = await emailContext({ token: "00000000-0000-4000-8000-000000000000", first_name: "there" });
+  const email = tpl.build(ctx);
+  const result = await sendEmail({ to: admin.email, key: "test", email: { ...email, subject: `[Test] ${email.subject}` } });
+  revalidatePath("/admin/emails");
+  return result.ok ? ok(`Sent to ${admin.email}.`) : fail(`It didn't send: ${result.error}`);
 }

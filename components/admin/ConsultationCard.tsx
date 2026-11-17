@@ -53,7 +53,7 @@ export default function ConsultationCard({
       {when && <p className="text-[0.8rem] text-mute">Applied {applied}</p>}
 
       {answers.length > 0 && (
-        <dl className="mt-4 grid gap-x-6 gap-y-2 rounded-xl bg-mist px-4 py-3 sm:grid-cols-2">
+        <dl className="mt-4 grid gap-x-6 gap-y-2 rounded-btn bg-mist px-4 py-3 sm:grid-cols-2">
           {answers.map((a) => (
             <div key={a.label} className="min-w-0">
               <dt className="text-[0.74rem] font-semibold uppercase tracking-[0.06em] text-mute">{a.label}</dt>

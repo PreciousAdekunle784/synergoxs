@@ -1,13 +1,14 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Funnel steps that only make sense mid-journey.
-      disallow: ["/admin", "/api", "/booked", "/thank-you", "/offer", "/guide", "/payment"],
+      // Steps that only make sense mid-journey, and everything private.
+      disallow: ["/admin", "/api", "/checkout", "/order", "/unsubscribe", "/apply", "/booked"],
     },
-    sitemap: "https://synergox.co/sitemap.xml",
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

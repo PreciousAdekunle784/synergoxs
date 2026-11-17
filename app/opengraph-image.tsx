@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 /* The card people see when the site is shared. Generated at build time. */
-export const alt = "Synergox — more customers from the traffic you already pay for";
+export const alt = "SYNERGOX — The Business Growth Blueprint, a free guide";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -16,31 +16,34 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           background: "#ffffff",
-          padding: "72px 80px",
+          padding: "68px 78px",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div style={{ width: 44, height: 8, borderRadius: 8, background: "#00C551" }} />
-          <div style={{ fontSize: 30, fontWeight: 700, color: "#0A0C0A", letterSpacing: -0.5 }}>
-            Synergox
-          </div>
+          <div style={{ width: 44, height: 6, background: "#00C551" }} />
+          <div style={{ fontSize: 28, fontWeight: 800, color: "#0A0C0A", letterSpacing: 3 }}>SYNERGOX</div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ fontSize: 24, color: "#5E665E", letterSpacing: 4, textTransform: "uppercase" }}>
+            Free guide · 24 pages
+          </div>
           <div
             style={{
-              fontSize: 82,
+              marginTop: 18,
+              fontSize: 80,
               fontWeight: 800,
-              lineHeight: 1.02,
-              letterSpacing: -3.5,
+              lineHeight: 1,
+              letterSpacing: -3,
               color: "#0A0C0A",
+              textTransform: "uppercase",
             }}
           >
-            More customers from the traffic you already pay for.
+            Your business could be losing customers
           </div>
-          <div style={{ marginTop: 26, fontSize: 30, color: "#454C45" }}>
-            Funnels, ads and follow-up, done for you.
+          <div style={{ marginTop: 10, fontSize: 64, fontStyle: "italic", lineHeight: 1.05, color: "#007A35" }}>
+            you already paid to attract.
           </div>
         </div>
 
@@ -50,15 +53,17 @@ export default function OpenGraphImage() {
               display: "flex",
               background: "#00C551",
               color: "#0A0C0A",
-              fontSize: 28,
-              fontWeight: 700,
-              padding: "18px 34px",
-              borderRadius: 999,
+              fontSize: 26,
+              fontWeight: 800,
+              padding: "18px 30px",
+              borderRadius: 4,
+              textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
-            Free 30-minute growth teardown
+            Get the Business Growth Blueprint
           </div>
-          <div style={{ fontSize: 26, color: "#5E665E" }}>synergox.co</div>
+          <div style={{ fontSize: 24, color: "#5E665E" }}>synergox.co</div>
         </div>
       </div>
     ),

@@ -1,28 +1,32 @@
 import Link from "next/link";
-import SiteShell from "@/components/SiteShell";
-import BookCall from "@/components/CTA";
+import Brand from "@/components/Brand";
+import { OPTIN_PAGE, SALES_PAGE } from "@/lib/site";
 
 export default function NotFound() {
   return (
-    <SiteShell>
-      <section className="flex min-h-[72vh] items-center pt-[100px]">
-        <div className="shell text-center">
-          <p className="eyebrow">404</p>
-          <h1 className="h-display mt-5 text-[2.6rem] sm:text-[3.4rem]">
-            This page leaked out of the funnel.
-          </h1>
-          <p className="lede mx-auto mt-5 max-w-md">
-            The link is broken or the page has moved. Everything worth reading is
-            one click away.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <BookCall />
-            <Link href="/" className="btn-outline">
-              Back to the home page
-            </Link>
-          </div>
+    <main className="flex min-h-screen flex-col bg-paper">
+      <div className="shell flex h-[72px] items-center">
+        <Link href={OPTIN_PAGE} aria-label="SYNERGOX home">
+          <Brand />
+        </Link>
+      </div>
+      <div className="shell flex flex-1 flex-col items-start justify-center pb-24">
+        <p className="eyebrow">Error 404</p>
+        <h1 className="h-display mt-5 text-[2.8rem] sm:text-[4.2rem]">
+          This page <span className="accent accent-green">isn't here.</span>
+        </h1>
+        <p className="lede mt-5 max-w-lg">
+          The link may be old, or the address may have a typo. These two pages are where everything starts.
+        </p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link href={OPTIN_PAGE} className="btn-primary">
+            Get the free Growth Blueprint
+          </Link>
+          <Link href={SALES_PAGE} className="btn-outline">
+            See the growth packages
+          </Link>
         </div>
-      </section>
-    </SiteShell>
+      </div>
+    </main>
   );
 }

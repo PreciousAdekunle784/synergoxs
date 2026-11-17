@@ -14,9 +14,10 @@ STEP 1 — RUN THE DATABASE SCRIPT
   Supabase → SQL Editor → New query
   Paste the whole of:   supabase/migrations/0002_admin_dashboard.sql
   Click Run.
+  Then do the same with: supabase/migrations/0003_sales_funnel.sql
 
-  It is safe to run more than once. It adds to your leads table (a status
-  column); it does not change or delete any existing lead.
+  Both are safe to run more than once. They add to your leads table; they
+  do not change or delete any existing lead.
 
 
 STEP 2 — CREATE YOUR ADMIN LOGIN
@@ -77,26 +78,28 @@ OPTIONAL — FILL IN CALL TIMES AUTOMATICALLY
 
 WHAT THE DASHBOARD DOES
 -----------------------
-  Overview        Visitors, leads, bookings, new inquiries, conversion rate,
-                  charts per day, pipeline, sources, latest submissions,
-                  recent activity. Real data only: anything not yet being
-                  collected is shown as "—" with the reason.
-  Leads           Search, filter, sort. Open a lead to see everything they
-                  submitted, change its status, add notes, or delete it.
-  Consultations   Every booking-form submission and whether it became a
-                  booked call. Set status, call time and notes.
-  Website content Headlines and copy, services, case studies, testimonials,
-                  contact details and links. Saves go live immediately.
-  Settings        Change password, see who can sign in, see what is and
-                  isn't connected.
+  Overview            Revenue, average order value, package and bundle sales,
+                      visitors, opt-ins and opt-in rate, sales-page visitors,
+                      exit popup impressions and conversion, checkouts started
+                      and abandoned, latest orders and leads.
+  Funnel analytics    The journey stage by stage, conversion rates, results
+                      per package, the exit offer, page visits, lead sources.
+  Leads               Search and filter (status, source, purchase), opt-in
+                      date, source and campaign, consent, purchases, notes,
+                      CSV export.
+  Orders              Every checkout, paid or not: customer, package, amount,
+                      Paystack reference, onboarding status and the brief.
+  Consultations       Applications for the free call, and booked calls.
+  Packages            Create, edit, price, show/hide, switch checkout on/off.
+  Growth Suite bundle Included packages, price, headline, description.
+  Exit-intent offer   On/off, wording, exit-only price, trigger and dismissal
+                      rules, and its own conversion numbers.
+  Emails              The sequence, previews, test sends, delivery log.
+  Website content     Headlines and copy, case studies, testimonials, contact.
+  Settings            Password, admins, and which integrations are connected.
 
-  Visitor numbers start from the first visit AFTER this version goes live.
-  The site counts its own visits: a page path, the referring site and a
-  random id that lasts one browser session. No cookies, no IP addresses.
-  Visitors whose browser sends "Do Not Track" are not counted.
-
-  Consultation records start from this version too. Earlier call
-  applications are still in Leads (source: Teardown application).
+  Every number is counted from recorded visits, events and orders. Anything
+  not being collected yet is shown as "—" with the reason, never estimated.
 
 
 HOW IT IS SECURED  (for whoever reviews this)
@@ -113,8 +116,10 @@ HOW IT IS SECURED  (for whoever reviews this)
     database functions; each admin_* function checks admin membership
     itself and raises "not authorised" otherwise. So even a bug in the
     website cannot hand data to a non-admin.
-  • The website only ever holds the public (anon) key. No service-role key
-    is used by this code.
+  • The browser only ever holds the public (anon) key. The service-role
+    key lives in the server environment (Vercel) and is used only by server
+    code to confirm payments and send emails, through svc_* functions that
+    nothing else may call.
   • /admin is noindex, no-store, cannot be framed, and is disallowed in
     robots.txt.
 

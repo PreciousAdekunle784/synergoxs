@@ -4,7 +4,7 @@ import { getContent } from "@/lib/content/get";
 
 export const metadata: Metadata = {
   title: "Terms of service",
-  description: "The terms that govern use of the Synergox website and services.",
+  description: "The terms that govern use of the SYNERGOX website, its free resources and its service packages.",
 };
 
 export default async function Terms() {
@@ -12,50 +12,72 @@ export default async function Terms() {
   return (
     <LegalPage
       title="Terms of service"
-      updated="July 2026"
+      updated="November 2026"
       sections={[
         {
           h: "About these terms",
           p: [
-            "These terms govern your use of this website. Client engagements are governed by a separate written agreement signed by both parties; where the two conflict, the signed agreement wins.",
+            "These terms govern your use of this website and the purchase of service packages through it. Where a separate written agreement is signed for an engagement and the two conflict, the signed agreement wins.",
           ],
         },
         {
           h: "Using this site",
           p: [
-            "You may read, share and reference the content here. You may not copy the site's code, copy or design system to build a competing offering, or use it in a way that misrepresents Synergox.",
+            "You may read, share and reference the content here. You may not copy the site's code, copy or design system to build a competing offering, or use it in a way that misrepresents SYNERGOX.",
           ],
         },
         {
-          h: "The teardown tool",
+          h: "The Business Growth Blueprint",
           p: [
-            "The interactive teardown is a model. It projects outcomes from the inputs you provide against typical mid-range benchmarks, and it is not a forecast, a valuation or a promise of results.",
-            "Nothing produced by the tool should be relied on as financial advice or used as the sole basis for a spending decision.",
+            "The Blueprint is a free educational guide. Its examples and figures are illustrations, not forecasts, and nothing in it is financial advice or a promise of results. You may share the guide as it is; you may not sell it or present it as your own.",
           ],
         },
         {
-          h: "Claims and results",
+          h: "Packages, prices and payment",
           p: [
-            "Case studies describe work delivered for specific clients in specific conditions. Your results will depend on your market, offer, delivery and budget.",
-            "We do not guarantee revenue outcomes. Where we offer a guarantee, it is a scope guarantee — work not delivered is not billed — and it is stated in your signed agreement.",
+            "Each package is a defined scope of work for a one-time price. The deliverables, the scope and delivery terms, and the price shown on the package and at checkout at the time you pay are what you are buying.",
+            "The Complete Growth Suite includes the packages listed with it at the time of purchase. Its price, the combined individual value and the saving shown are calculated from the prices in force at that moment.",
+            "Payment is taken in full in advance through Paystack. An order is confirmed only when we have verified the payment with Paystack; you will receive a receipt by email.",
+            "Advertising spend, domain names, hosting and other third-party fees are not included in any package unless the package says so. They are paid by you directly to the provider.",
+          ],
+        },
+        {
+          h: "Delivery",
+          p: [
+            "Work begins once we have received your project brief and any content the package depends on. Delivery times are estimates that assume feedback and approvals are returned within a few working days; delays in feedback extend the timeline by the same amount.",
+            "Accounts created for your project, including advertising accounts, are created in your name. Finished work is yours on delivery.",
+          ],
+        },
+        {
+          h: "Our scope guarantee, and refunds",
+          p: [
+            "We do not guarantee revenue or any specific commercial result. Results depend on your market, offer, pricing, delivery and budget.",
+            "We guarantee scope: every deliverable listed on the package you bought will be delivered. If we fail to deliver a listed item, we will refund the part of the fee that relates to it.",
+            "If you ask to cancel before any work has started, write to us and we will refund the payment less any transaction fees charged by the payment provider. Once work has started, completed work is not refundable.",
+          ],
+        },
+        {
+          h: "Claims and case studies",
+          p: [
+            "Case studies describe work delivered for specific clients in specific conditions. Your results will differ.",
           ],
         },
         {
           h: "Intellectual property",
           p: [
-            "The Synergox name, mark and site content belong to Synergox. Work produced for a client under a signed agreement transfers to that client on the terms set out in it.",
+            "The SYNERGOX name, mark and site content belong to SYNERGOX. Work produced for a client transfers to that client on delivery and full payment.",
           ],
         },
         {
-          h: "Third-party links",
+          h: "Third-party services",
           p: [
-            "This site links to third-party services such as Calendly. We aren't responsible for their content, availability or handling of your data.",
+            "This site relies on third-party services such as Paystack and Calendly. We aren't responsible for their availability or for how they handle your data under their own terms.",
           ],
         },
         {
           h: "Limitation of liability",
           p: [
-            "To the extent permitted by law, Synergox is not liable for indirect or consequential loss arising from use of this website.",
+            "To the extent permitted by law, SYNERGOX is not liable for indirect or consequential loss arising from use of this website or its resources, and our total liability for a package is limited to the amount you paid for it.",
           ],
         },
         {

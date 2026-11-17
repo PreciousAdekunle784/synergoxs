@@ -3,25 +3,13 @@
 import { createContext, useContext } from "react";
 import { DEFAULT_CONTACT, type Contact } from "@/lib/content/defaults";
 
-type Value = { contact: Contact; cta: string };
-const Ctx = createContext<Value>({ contact: DEFAULT_CONTACT, cta: "Book my free growth teardown" });
+const Ctx = createContext<Contact>(DEFAULT_CONTACT);
 
-/** Contact details and the main button text, as edited in the dashboard. */
+/** Contact details, as edited in the dashboard. */
 export function useContact() {
-  return useContext(Ctx).contact;
-}
-export function useCtaLabel() {
-  return useContext(Ctx).cta;
+  return useContext(Ctx);
 }
 
-export default function ContactProvider({
-  contact,
-  cta,
-  children,
-}: {
-  contact: Contact;
-  cta: string;
-  children: React.ReactNode;
-}) {
-  return <Ctx.Provider value={{ contact, cta }}>{children}</Ctx.Provider>;
+export default function ContactProvider({ contact, children }: { contact: Contact; children: React.ReactNode }) {
+  return <Ctx.Provider value={contact}>{children}</Ctx.Provider>;
 }
