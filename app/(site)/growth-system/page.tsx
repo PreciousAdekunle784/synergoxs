@@ -20,9 +20,9 @@ import Faq, { type FaqItem } from "@/components/funnel/Faq";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "The SYNERGOX Growth System — websites, customer acquisition and conversion optimization",
+  title: { absolute: "The SYNERGOX Growth System — websites, ads and conversion optimization" },
   description:
-    "Stop patching your marketing. SYNERGOX connects your website, customer acquisition and conversion optimization into one growth system. Fixed-scope packages for a one-time price, or the complete Growth Suite in one payment.",
+    "Connect your website, customer acquisition and conversion optimization into one growth system. Fixed-scope packages, one-time prices, or the full Growth Suite.",
   alternates: { canonical: "/growth-system" },
 };
 
@@ -317,9 +317,9 @@ export default async function SalesPage() {
 
       {/* ── 6. Proof: only real, published work ── */}
       {project && (
-        <section className="pb-20 md:pb-28" aria-labelledby="proof-h">
+        <section className="pb-20 md:pb-28" aria-labelledby="proof-title">
           <div className="shell">
-            <SectionHead eyebrow="Case study" title={copy["results.title"]} accent={copy["results.accent"]} />
+            <SectionHead id="proof-title" eyebrow="Case study" title={copy["results.title"]} accent={copy["results.accent"]} />
             <Reveal delay={0.1}>
               <article className="mt-12 grid border border-ink/15 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="flex flex-col justify-between gap-8 bg-mist p-7 sm:p-10">
@@ -374,6 +374,7 @@ export default async function SalesPage() {
       <section className="bg-mist py-20 md:py-28" aria-labelledby="after-h">
         <div className="shell">
           <SectionHead
+            id="after-h"
             eyebrow="After you pay"
             title="You'll know what happens next"
             accent="before you spend anything."

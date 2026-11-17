@@ -33,17 +33,20 @@ export default function Packages({ packages, currency }: { packages: Package[]; 
             </div>
 
             <div className="flex flex-1 flex-col px-6 pb-7 pt-6 sm:px-7">
-              <h3
-                id={`plan-${p.slug}-h`}
-                className="font-display text-[1.9rem] font-extrabold uppercase leading-[0.95] text-ink"
-                style={{ fontStretch: "78%", letterSpacing: "-0.01em" }}
-              >
-                {p.name}
-              </h3>
-              {p.audience && <p className="mt-3 text-[0.95rem] font-medium leading-snug text-ink">{p.audience}</p>}
-              {p.description && <p className="mt-3 text-[0.94rem] leading-relaxed text-body">{p.description}</p>}
+              {/* Name and audience get a reserved height on wide screens, so the
+                  three prices sit on one line whatever the copy. */}
+              <div className="lg:min-h-[8.6rem]">
+                <h3
+                  id={`plan-${p.slug}-h`}
+                  className="font-display text-[1.9rem] font-extrabold uppercase leading-[0.95] text-ink"
+                  style={{ fontStretch: "78%", letterSpacing: "-0.01em" }}
+                >
+                  {p.name}
+                </h3>
+                {p.audience && <p className="mt-3 text-[0.95rem] font-medium leading-snug text-ink">{p.audience}</p>}
+              </div>
 
-              <div className="mt-6 flex items-end justify-between gap-3 border-y border-ink/15 py-4">
+              <div className="mt-5 flex items-end justify-between gap-3 border-y border-ink/15 py-4">
                 <p className="num font-mono text-[1.9rem] font-medium leading-none tracking-tight text-ink">
                   {formatMoney(p.price_minor, currency)}
                 </p>
@@ -53,6 +56,8 @@ export default function Packages({ packages, currency }: { packages: Package[]; 
                   payment
                 </p>
               </div>
+
+              {p.description && <p className="mt-5 text-[0.94rem] leading-relaxed text-body">{p.description}</p>}
 
               <p className="mt-6 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-mute">What you get</p>
               <ul className="mt-3 space-y-2.5">

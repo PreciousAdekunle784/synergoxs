@@ -35,7 +35,7 @@ const mono = IBM_Plex_Mono({
 
 const TITLE = "SYNERGOX — The Business Growth Blueprint (free guide)";
 const DESCRIPTION =
-  "Your business could be losing customers you already paid to attract. Get the free Business Growth Blueprint from SYNERGOX and find the marketing and conversion problems costing you revenue.";
+  "Your business could be losing customers you already paid to attract. Get the free Business Growth Blueprint from SYNERGOX and find what's costing you revenue.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

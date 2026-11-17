@@ -14,7 +14,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: { absolute: "The Business Growth Blueprint — free guide from SYNERGOX" },
   description:
-    "Your business could be losing customers you already paid to attract. Get the free 24-page Business Growth Blueprint: find the marketing and conversion problems costing you revenue, and learn how to build a system that fixes them.",
+    "Your business could be losing customers you already paid to attract. Get the free 24-page Business Growth Blueprint and find what's costing you revenue.",
   alternates: { canonical: "/" },
 };
 
@@ -218,6 +218,7 @@ export default async function OptInPage() {
         <div className="shell">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <SectionHead
+              id="preview-h"
               eyebrow="A look inside"
               title="Real pages from the guide."
               accent="Nothing blurred."

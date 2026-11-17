@@ -1,54 +1,32 @@
-SYNERGOX SITE — BUILD 18
-========================
+SYNERGOX — BUILD 19: TWO-STEP SALES FUNNEL
+==========================================
 
-ADMIN DASHBOARD, CONTENT MANAGEMENT, ANIMATION (this build)
+THE FUNNEL
+  /                  The Business Growth Blueprint opt-in (24-page PDF guide)
+  /growth-system     Long-form sales page, 3 packages, the Growth Suite
+  exit intent        Growth Suite offer, desktop + mobile triggers
+  /checkout/…        Paystack hosted checkout, server-verified
+  /order/…           Confirmation, receipt, project brief
+  7 emails           Delivery → problem → education → solution → offer
+                     → objections → follow-up, with unsubscribe
 
-  ADMIN DASHBOARD — /admin            (setup: ADMIN_SETUP.txt)
-    Overview        Visitors, leads, bookings, new inquiries, conversion
-                    rate, per-day charts, pipeline, sources, latest
-                    submissions, recent activity. Real data only.
-    Leads           Search, filter, sort; per-lead status, notes, delete.
-    Consultations   Every booking-form submission and whether it became a
-                    booked call; status, call time, notes.
-    Website content Headlines and copy, services, case studies,
-                    testimonials, contact details and links. Live on save.
-    Settings        Password, who can sign in, what is connected.
+DASHBOARD (new screens)
+  Funnel analytics, Orders, Packages, Growth Suite bundle, Exit-intent
+  offer, Emails. Overview, Leads and Settings rebuilt for the funnel.
 
-    Secured with Supabase Auth, httpOnly session cookies, a middleware
-    guard, and database functions that each check admin rights. Every
-    table has row level security on with no policies.
+TO GO LIVE (SETUP.txt)
+  1. Run supabase/migrations/0003_sales_funnel.sql
+  2. Set SUPABASE_SERVICE_ROLE_KEY, PAYSTACK_SECRET_KEY, RESEND_API_KEY,
+     EMAIL_FROM, CRON_SECRET, NEXT_PUBLIC_SITE_URL in Vercel; redeploy
+  3. Paystack webhook → /api/paystack/webhook
+  4. Verify the sending domain in Resend
+  5. Rehearse with a Paystack test key, then switch to live
 
-  ONE-TIME SETUP NEEDED
-    Run supabase/migrations/0002_admin_dashboard.sql and create your admin
-    user (ADMIN_SETUP.txt). Until then the public site works as before and
-    /admin refuses sign-ins.
+REMOVED
+  The old home page sections, /offer, /services, /learn, /thank-you and
+  the inline Paystack popup (replaced by hosted checkout + verification).
+  Old addresses redirect. /apply and /booked are kept.
 
-  TESTIMONIALS
-    All "illustrative example" cards and labels are gone. The section now
-    shows only testimonials published from the dashboard, and is hidden
-    when there are none. Publishing asks you to confirm it is a real
-    client's own words.
-
-  KINGS FOOD MART
-    Still shown as the case study. The link to the external site is removed
-    everywhere (case study, testimonials, booking page, offer page); the
-    name is plain text.
-
-  ANIMATION
-    Hero word-by-word entrance and slow background movement; staggered
-    card grids; headline markers that draw in on scroll; button and card
-    hover effects; header that tightens on scroll; mobile menu items that
-    slide in; page-to-page fade. Reduced-motion settings are respected.
-
-  BOOKING FORM
-    Last step now also asks for business name and (optionally) phone or
-    WhatsApp, so the dashboard has them.
-
-  NEW, OPTIONAL
-    CALENDLY_API_TOKEN (Vercel env var) fills in call times automatically.
-
-  UNCHANGED
-    Supabase lead capture + book email (the subscribe function is not
-    touched), Paystack checkout + verification, price, privacy + terms.
-
-Build verified clean. See README.md for the full map.
+KEPT
+  Logo and name, Supabase Auth admin login and security model, leads,
+  notes, consultations, case study, testimonials, contact settings.

@@ -139,6 +139,7 @@ export function SectionHead({
   align = "left",
   as: Tag = "h2",
   wide = false,
+  id,
 }: {
   eyebrow: string;
   title: React.ReactNode;
@@ -147,6 +148,8 @@ export function SectionHead({
   align?: "left" | "center";
   as?: "h1" | "h2";
   wide?: boolean;
+  /** for aria-labelledby on the surrounding section */
+  id?: string;
 }) {
   const center = align === "center";
   const width = wide ? "max-w-4xl" : "max-w-3xl";
@@ -156,7 +159,7 @@ export function SectionHead({
         <Eyebrow center={center}>{eyebrow}</Eyebrow>
       </Reveal>
       <Reveal delay={0.05}>
-        <Tag className="h-section mt-5 text-balance">
+        <Tag id={id} className="h-section mt-5 text-balance">
           {title}
           {accent ? (
             <>
