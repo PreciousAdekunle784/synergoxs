@@ -112,7 +112,7 @@ export function ConfirmDelete({
         {label}
       </summary>
       <div
-        className={`absolute z-20 mt-2 w-64 max-w-[calc(100vw-3rem)] rounded-2xl border border-line bg-paper p-4 shadow-lift ${
+        className={`absolute z-20 mt-2 w-64 max-w-[calc(100vw-3rem)] rounded-card border border-line bg-paper p-4 shadow-lift ${
           align === "right" ? "right-0" : "left-0"
         }`}
       >

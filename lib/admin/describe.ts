@@ -4,6 +4,13 @@ import type { Lead } from "./types";
 const KEY_LABELS: Record<string, string> = {
   source: "Came from",
   leadMagnet: "Requested",
+  interestedIn: "Started checkout for",
+  referrer: "Referring site",
+  utm_source: "Campaign source",
+  utm_medium: "Campaign medium",
+  utm_campaign: "Campaign name",
+  utm_content: "Campaign content",
+  optin_at: "Opted in at",
   magnet: "Requested",
   company: "Business name",
   phone: "Phone / WhatsApp",
@@ -44,7 +51,8 @@ export function inquiry(lead: Pick<Lead, "meta" | "source">): string {
     const parts = [s("biggestBottleneck"), s("businessModel"), s("monthlyRevenue")].filter(Boolean);
     return parts.join(" · ");
   }
-  if (s("leadMagnet")) return `Requested the playbook: ${s("leadMagnet")}`;
+  if (s("interestedIn")) return `Started checkout: ${s("interestedIn")}`;
+  if (s("leadMagnet")) return `Requested: ${s("leadMagnet")}`;
   if (s("magnet")) return `Requested: ${s("magnet")}`;
   return "—";
 }

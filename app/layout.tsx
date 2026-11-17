@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+import { Bricolage_Grotesque, IBM_Plex_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 /* Self-hosted at build time: no render-blocking request to Google, no layout shift. */
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["600", "800"],
+  // Variable weight + width: the condensed poster headlines and the regular
+  // section heads are one file.
+  axes: ["wdth"],
   variable: "--font-display",
   display: "swap",
 });
@@ -15,24 +18,38 @@ const body = Instrument_Sans({
   variable: "--font-body",
   display: "swap",
 });
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+const mono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+  preload: false,
+});
 
-const TITLE = "Synergox — More customers from the traffic you already pay for";
+const TITLE = "SYNERGOX — The Business Growth Blueprint (free guide)";
 const DESCRIPTION =
-  "Synergox is a growth marketing agency. We find the stage of your funnel losing the most customers and rebuild it — offer, pages, ads and follow-up — into a system with a cost per customer you can forecast. Start with a free 30-minute growth teardown.";
+  "Your business could be losing customers you already paid to attract. Get the free Business Growth Blueprint from SYNERGOX and find the marketing and conversion problems costing you revenue.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://synergox.co"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: "%s · Synergox",
+    template: "%s · SYNERGOX",
   },
   description: DESCRIPTION,
+  applicationName: "SYNERGOX",
   openGraph: {
     title: TITLE,
-    description:
-      "Funnels, ads and follow-up, done for you. Start with a free 30-minute growth teardown of your own numbers.",
-    url: "https://synergox.co",
-    siteName: "Synergox",
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "SYNERGOX",
     type: "website",
   },
   twitter: { card: "summary_large_image" },
@@ -46,12 +63,12 @@ export const viewport: Viewport = {
 };
 
 /**
- * The root layout is only the document shell and fonts. The public website
- * (navigation, footer) lives in app/(site); the dashboard lives in app/admin.
+ * The root layout is only the document shell and fonts. The public funnel
+ * lives in app/(site); the dashboard lives in app/admin.
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${serif.variable} ${mono.variable}`}>
       <body className="bg-paper font-sans text-ink antialiased">{children}</body>
     </html>
   );

@@ -165,7 +165,7 @@ function Choice({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`group flex min-h-[60px] w-full items-center gap-3.5 rounded-2xl border px-5 py-3.5 text-left transition-all duration-200 ${
+      className={`group flex min-h-[60px] w-full items-center gap-3.5 rounded-card border px-5 py-3.5 text-left transition-all duration-200 ${
         selected
           ? "border-ink bg-ink text-white"
           : "border-line bg-paper text-ink hover:border-ink"
@@ -721,7 +721,7 @@ export default function Apply({ testimonial }: { testimonial?: Testimonial }) {
       <section className="pb-24 pt-[104px] md:pt-[128px]">
         <div className="shell max-w-4xl">
           <div className="text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-greenTint px-4 py-2 text-[0.8rem] font-semibold text-greenDeep">
+            <span className="inline-flex items-center gap-2 rounded-[3px] bg-greenTint px-3 py-2 text-[0.8rem] font-semibold text-greenDeep">
               <Check size={13} />
               Answers received · One step left
             </span>
@@ -739,7 +739,7 @@ export default function Apply({ testimonial }: { testimonial?: Testimonial }) {
           </div>
 
           {failed && (
-            <p role="alert" className="mx-auto mt-6 max-w-2xl rounded-2xl border border-line bg-mist px-5 py-4 text-[0.92rem] leading-relaxed text-ink">
+            <p role="alert" className="mx-auto mt-6 max-w-2xl rounded-card border border-line bg-mist px-5 py-4 text-[0.92rem] leading-relaxed text-ink">
               One thing: your answers didn&apos;t reach us. Book your time
               below anyway, then email{" "}
               <a href={`mailto:${EMAIL}`} className="link">

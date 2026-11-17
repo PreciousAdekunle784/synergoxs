@@ -128,51 +128,94 @@ export function Mark({ children }: { children: React.ReactNode }) {
 
 /* ------------------------------------------------------------------ */
 /* SectionHead — eyebrow + heading + optional lede.                     */
-/* `accent` is the second half of the headline: either marked in green  */
-/* ("mark") or set in grey ("muted").                                   */
+/* `accent` is the phrase set in italic serif: the one idea the section */
+/* turns on.                                                            */
 /* ------------------------------------------------------------------ */
 export function SectionHead({
   eyebrow,
   title,
   accent,
-  accentStyle = "muted",
   lede,
   align = "left",
   as: Tag = "h2",
+  wide = false,
 }: {
   eyebrow: string;
   title: React.ReactNode;
   accent?: string;
-  accentStyle?: "mark" | "muted";
   lede?: React.ReactNode;
   align?: "left" | "center";
   as?: "h1" | "h2";
+  wide?: boolean;
 }) {
   const center = align === "center";
+  const width = wide ? "max-w-4xl" : "max-w-3xl";
   return (
-    <div className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
+    <div className={center ? `mx-auto ${width} text-center` : width}>
       <Reveal>
         <Eyebrow center={center}>{eyebrow}</Eyebrow>
       </Reveal>
       <Reveal delay={0.05}>
-        <Tag className="h-section mt-5">
+        <Tag className="h-section mt-5 text-balance">
           {title}
           {accent ? (
             <>
               {" "}
-              {accentStyle === "mark" ? <Mark>{accent}</Mark> : <span className="text-mute">{accent}</span>}
+              <span className="accent accent-green">{accent}</span>
             </>
           ) : null}
         </Tag>
       </Reveal>
       {lede && (
         <Reveal delay={0.1}>
-          <p className={`lede mt-5 max-w-2xl ${center ? "mx-auto" : ""}`}>{lede}</p>
+          <p className={`lede mt-6 max-w-2xl ${center ? "mx-auto" : ""}`}>{lede}</p>
         </Reveal>
       )}
     </div>
   );
 }
 
-/** Headline copy for one section, as edited in the dashboard. */
-export type HeadCopy = { title: string; accent?: string; lede?: string };
+/* ------------------------------------------------------------------ */
+/* InView — adds `is-in` the first time its children scroll into view.  */
+/* Drives the CSS-only effects: struck prices, drawn lines.             */
+/* ------------------------------------------------------------------ */
+export function InView({
+  children,
+  className = "",
+  as: Tag = "div",
+  margin = "0px 0px -15% 0px",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  as?: "div" | "span" | "section" | "li";
+  margin?: string;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setSeen(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setSeen(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: margin }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [margin]);
+
+  const Comp = Tag as React.ElementType;
+  return (
+    <Comp ref={ref} className={`${className} ${seen ? "is-in" : ""}`}>
+      {children}
+    </Comp>
+  );
+}

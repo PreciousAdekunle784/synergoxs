@@ -19,6 +19,8 @@ type Point = { day: string; value: number };
 
 const dayFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 const longFmt = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+/** 25000 → "25K": axis labels stay inside the margin whatever the scale. */
+const compact = new Intl.NumberFormat("en-GB", { notation: "compact", maximumFractionDigits: 1 });
 const asDate = (day: string) => new Date(`${day}T00:00:00Z`);
 
 /** A clean axis maximum and step for small whole numbers. */
@@ -33,7 +35,7 @@ function niceScale(max: number) {
 /** Top corners rounded, baseline square. */
 function barPath(x: number, y: number, w: number, h: number) {
   if (h <= 0) return "";
-  const r = Math.min(4, w / 2, h);
+  const r = Math.min(2, w / 2, h);
   return `M${x},${y + h} V${y + r} Q${x},${y} ${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h} Z`;
 }
 
@@ -66,7 +68,7 @@ export function ColumnChart({
   const { top, step } = useMemo(() => niceScale(Math.max(0, ...data.map((d) => d.value))), [data]);
   const total = useMemo(() => data.reduce((a, d) => a + d.value, 0), [data]);
 
-  const m = { top: 10, right: 6, bottom: 26, left: 30 };
+  const m = { top: 10, right: 6, bottom: 26, left: 36 };
   const iw = width - m.left - m.right;
   const ih = height - m.top - m.bottom;
   const slot = iw / Math.max(1, data.length);
@@ -102,7 +104,7 @@ export function ColumnChart({
 
       <div id={`${id}-view`}>
         {table ? (
-          <div className="max-h-[260px] overflow-y-auto rounded-xl border border-line" tabIndex={0}>
+          <div className="max-h-[260px] overflow-y-auto rounded-btn border border-line" tabIndex={0}>
             <table className="w-full text-left text-[0.88rem]">
               <thead className="sticky top-0 bg-mist">
                 <tr>
@@ -137,7 +139,7 @@ export function ColumnChart({
                 <g key={t}>
                   <line x1={m.left} x2={width - m.right} y1={y(t)} y2={y(t)} stroke={GRID} strokeWidth={1} />
                   <text x={m.left - 8} y={y(t) + 4} textAnchor="end" className="num fill-mute text-[11px]">
-                    {t}
+                    {compact.format(t)}
                   </text>
                 </g>
               ))}
@@ -180,7 +182,7 @@ export function ColumnChart({
             {cur && active !== null && (
               <div
                 role="status"
-                className="pointer-events-none absolute z-10 -translate-x-1/2 whitespace-nowrap rounded-xl bg-ink px-3 py-2 text-white shadow-lift"
+                className="pointer-events-none absolute z-10 -translate-x-1/2 whitespace-nowrap rounded-btn bg-ink px-3 py-2 text-white shadow-lift"
                 style={{
                   left: Math.min(Math.max(m.left + active * slot + slot / 2, 70), width - 70),
                   top: Math.max(0, y(cur.value) - 58),

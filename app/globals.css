@@ -44,32 +44,55 @@ body {
     @apply py-20 md:py-28;
   }
 
-  /* Black emphasis slab: inset and rounded so white still frames the page.
+  /* Black emphasis slab: inset so white still frames the page.
      Pair with `on-dark` so nested type, links and focus rings invert. */
   .slab-dark {
     @apply mx-3 rounded-slab bg-ink text-white sm:mx-5 lg:mx-8;
   }
 
+  /* Small mono label: plan numbers, column heads, anything that names a thing */
   .eyebrow {
-    @apply text-[0.74rem] font-semibold uppercase tracking-[0.16em] text-mute;
+    @apply font-mono text-[0.72rem] font-medium uppercase tracking-[0.14em] text-mute;
   }
   .on-dark .eyebrow {
     @apply text-ash;
   }
 
+  /* The poster headline: condensed, uppercase, tight. Used for the few
+     moments that have to stop someone — hero, bundle, exit offer. */
   .h-display {
-    @apply font-display font-extrabold leading-[0.98] tracking-tightest text-ink;
+    @apply font-display font-extrabold uppercase leading-[0.9] text-ink;
+    font-stretch: 78%;
+    letter-spacing: -0.012em;
   }
   .h-section {
-    @apply font-display text-[2.1rem] font-extrabold leading-[1.03] tracking-tightest text-ink sm:text-[2.7rem] lg:text-[3.2rem];
+    @apply font-display text-[2.15rem] font-extrabold leading-[0.98] text-ink sm:text-[2.8rem] lg:text-[3.4rem];
+    font-stretch: 84%;
+    letter-spacing: -0.022em;
   }
   .on-dark .h-display,
   .on-dark .h-section {
     @apply text-white;
   }
+  /* The one italic phrase inside a headline */
+  .accent {
+    @apply font-serif font-normal normal-case italic;
+    font-stretch: 100%;
+    letter-spacing: -0.02em;
+  }
+  .h-display .accent {
+    font-size: 1.04em;
+    line-height: 0.86;
+  }
+  .accent-green {
+    @apply text-greenDeep;
+  }
+  .on-dark .accent-green {
+    @apply text-green;
+  }
 
   .lede {
-    @apply text-[1.05rem] leading-[1.65] text-body md:text-[1.125rem];
+    @apply text-[1.05rem] leading-[1.65] text-body md:text-[1.14rem];
   }
   .on-dark .lede {
     @apply text-ash;
@@ -85,8 +108,6 @@ body {
     box-decoration-break: clone;
     padding-bottom: 0.04em;
   }
-
-  /* The marker draws itself the first time it scrolls into view (see <Mark>) */
   .hl-draw {
     background-size: 0% 0.2em;
     transition: background-size 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
@@ -97,10 +118,12 @@ body {
 
   /* Buttons — green is the ONE primary action. Everything else is quieter. */
   .btn {
-    @apply inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-center text-[0.98rem] font-semibold leading-tight transition-all duration-300 ease-out active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[54px] items-center justify-center gap-3 rounded-btn px-6 py-3.5 text-center font-display text-[1rem] font-extrabold uppercase leading-[1.05] transition-all duration-300 ease-out active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50;
+    font-stretch: 86%;
+    letter-spacing: 0.012em;
   }
   .btn-primary {
-    @apply btn relative overflow-hidden bg-green text-ink shadow-cta hover:-translate-y-0.5 hover:bg-greenBright hover:shadow-[0_16px_30px_-12px_rgba(0,197,81,0.75)];
+    @apply btn relative overflow-hidden bg-green text-ink shadow-cta hover:bg-greenBright hover:shadow-[0_18px_34px_-14px_rgba(0,197,81,0.8)];
   }
   /* A soft band of light crosses the button once on hover */
   .btn-primary::after {
@@ -116,23 +139,35 @@ body {
     transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-dark {
-    @apply btn bg-ink text-white hover:-translate-y-0.5 hover:bg-[#1c211c];
+    @apply btn bg-ink text-white hover:bg-[#1c211c];
   }
   .btn-outline {
-    @apply btn border border-line bg-paper text-ink hover:border-ink;
+    @apply btn border border-ink/15 bg-paper text-ink hover:border-ink;
   }
   .on-dark .btn-outline {
-    @apply border-lineDark bg-transparent text-white hover:border-white;
+    @apply border-white/25 bg-transparent text-white hover:border-white;
   }
   .btn-lg {
-    @apply min-h-[60px] px-6 text-[1rem] sm:px-9 sm:text-[1.05rem];
+    @apply min-h-[64px] px-7 text-[1.08rem] sm:px-8 sm:text-[1.16rem];
   }
-  /* The arrow inside a button nudges forward on hover */
+  /* The arrow sits in its own black tile and slides on hover */
   .btn .arrow {
     @apply transition-transform duration-300 ease-out;
   }
   .btn:hover .arrow {
     @apply translate-x-1;
+  }
+  .btn .arrow-tile {
+    @apply -my-1 -mr-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] bg-ink text-green transition-transform duration-300 ease-out;
+  }
+  .btn-lg .arrow-tile {
+    @apply h-11 w-11;
+  }
+  .btn:hover .arrow-tile {
+    @apply translate-x-1;
+  }
+  .btn-dark .arrow-tile {
+    @apply bg-green text-ink;
   }
 
   .link {
@@ -146,7 +181,7 @@ body {
     @apply rounded-card border border-line bg-paper;
   }
   .card-hover {
-    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:border-ink/20 hover:shadow-lift;
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:border-ink/25 hover:shadow-lift;
   }
 
   /* A green line grows across the top edge of a card on hover */
@@ -171,56 +206,96 @@ body {
   }
 
   .field {
-    @apply w-full rounded-2xl border border-line bg-paper px-5 py-4 text-[1rem] text-ink transition-colors placeholder:text-mute/70 hover:border-ink/30 focus:border-greenDeep focus:outline-none focus:ring-4 focus:ring-green/20;
+    @apply w-full rounded-btn border border-ink/15 bg-paper px-4 py-[0.95rem] text-[1rem] text-ink transition-colors placeholder:text-mute/60 hover:border-ink/40 focus:border-ink focus:outline-none focus:ring-4 focus:ring-green/25;
   }
   .field-label {
-    @apply mb-2 block text-[0.9rem] font-semibold text-ink;
+    @apply mb-2 block text-[0.86rem] font-semibold text-ink;
+  }
+  .on-dark .field {
+    @apply border-white/20 bg-white/[0.06] text-white placeholder:text-white/40 hover:border-white/40 focus:border-green;
+  }
+  .on-dark .field-label {
+    @apply text-white;
   }
 
   .num {
     @apply tabular-nums;
   }
+
+  /* ── The ledger: every price on the site is set as a line in an account ── */
+  .ledger-row {
+    @apply flex items-baseline justify-between gap-4 py-3;
+  }
+  .ledger-row + .ledger-row {
+    @apply border-t border-dashed border-ink/15;
+  }
+  .on-dark .ledger-row + .ledger-row {
+    @apply border-white/15;
+  }
+  .ledger-label {
+    @apply font-mono text-[0.74rem] uppercase tracking-[0.1em] text-mute;
+  }
+  .on-dark .ledger-label {
+    @apply text-ash;
+  }
+  .ledger-figure {
+    @apply whitespace-nowrap font-mono text-[1rem] font-medium tabular-nums text-ink;
+  }
+  .on-dark .ledger-figure {
+    @apply text-white;
+  }
+  /* A struck price: the line is drawn across it when it scrolls into view */
+  .strike {
+    position: relative;
+    white-space: nowrap;
+  }
+  .strike::after {
+    content: "";
+    position: absolute;
+    left: -3%;
+    right: -3%;
+    top: 52%;
+    height: 0.09em;
+    min-height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+  }
+  .strike.is-in::after,
+  .is-in .strike::after {
+    transform: scaleX(1);
+  }
+
+  /* Faint drafting grid, for the sections that talk about building */
+  .bg-grid {
+    background-image: linear-gradient(to right, rgba(10, 12, 10, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(10, 12, 10, 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .on-dark.bg-grid,
+  .on-dark .bg-grid {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  }
+
+  /* Headline lines that rise from behind a mask as the page loads */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .line-mask > span {
+    display: block;
+    animation: word 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
-/* Range inputs (teardown calculator) */
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
-  height: 28px;
-}
-input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: 4px;
-  background: #e3e6e1;
-}
-input[type="range"]::-moz-range-track {
-  height: 4px;
-  border-radius: 4px;
-  background: #e3e6e1;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  height: 22px;
-  width: 22px;
-  margin-top: -9px;
-  border-radius: 50%;
-  background: #0a0c0a;
-  border: 3px solid #00c551;
-  box-shadow: 0 2px 8px rgba(10, 12, 10, 0.25);
-  transition: transform 0.2s ease;
-}
-input[type="range"]::-moz-range-thumb {
-  height: 16px;
-  width: 16px;
-  border-radius: 50%;
-  background: #0a0c0a;
-  border: 3px solid #00c551;
-  box-shadow: 0 2px 8px rgba(10, 12, 10, 0.25);
-}
-input[type="range"]:active::-webkit-slider-thumb {
-  transform: scale(1.12);
+/* When the "your Blueprint is on its way" bar is showing, it clears the fixed
+   header instead of the hero. */
+.welcome-bar + .sales-hero {
+  padding-top: 2.75rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -252,10 +327,10 @@ input[type="range"]:active::-webkit-slider-thumb {
     @apply mb-1.5 block text-[0.84rem] font-semibold text-ink;
   }
   .a-input {
-    @apply w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[0.95rem] text-ink transition-colors placeholder:text-mute/70 hover:border-ink/30 focus:border-greenDeep focus:outline-none focus:ring-4 focus:ring-green/20;
+    @apply w-full rounded-btn border border-line bg-paper px-3.5 py-2.5 text-[0.95rem] text-ink transition-colors placeholder:text-mute/70 hover:border-ink/30 focus:border-greenDeep focus:outline-none focus:ring-4 focus:ring-green/20;
   }
   .a-btn {
-    @apply inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full px-5 py-2 text-[0.9rem] font-semibold leading-tight transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[42px] items-center justify-center gap-2 rounded-btn px-4 py-2 text-[0.9rem] font-semibold leading-tight transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
   }
   .a-btn-primary {
     @apply a-btn bg-green text-ink hover:bg-greenBright;

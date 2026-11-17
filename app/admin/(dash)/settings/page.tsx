@@ -3,7 +3,8 @@ import { requireAdmin } from "@/lib/admin/session";
 import { rpc } from "@/lib/supabase/rpc";
 import { logout } from "@/lib/admin/actions";
 import { BUSINESS_TZ_LABEL, formatDate } from "@/lib/admin/constants";
-import { PAYSTACK_PUBLIC_KEY, SUPABASE_URL } from "@/lib/site";
+import { SITE_URL, SUPABASE_URL } from "@/lib/site";
+import { integrationStatus } from "@/lib/server/env";
 import { getContent } from "@/lib/content/get";
 import { LoadError, PageHeader } from "@/components/admin/Bits";
 import PasswordForm from "@/components/admin/PasswordForm";
@@ -29,7 +30,7 @@ function Source({ name, state, children }: { name: string; state: "on" | "waitin
         <p className="text-[0.95rem] font-semibold text-ink">{name}</p>
         <p className="mt-1 text-[0.88rem] leading-relaxed text-body">{children}</p>
       </div>
-      <span className={`inline-flex shrink-0 items-center self-start rounded-full px-2.5 py-1 text-[0.74rem] font-semibold ${tone}`}>{word}</span>
+      <span className={`inline-flex shrink-0 items-center self-start rounded-[3px] px-2.5 py-1 text-[0.74rem] font-semibold ${tone}`}>{word}</span>
     </li>
   );
 }
@@ -41,6 +42,12 @@ export default async function SettingsPage() {
     getContent(),
   ]);
   const calendly = !!process.env.CALENDLY_API_TOKEN;
+  const io = integrationStatus();
+  const { data: f } = await rpc<{ packages: number; orders: number; subscribers: number; events: number; emails_sent: number }>(
+    "admin_funnel_status",
+    {},
+    admin.token
+  );
   const host = (() => {
     try {
       return new URL(SUPABASE_URL).host;
@@ -117,11 +124,33 @@ export default async function SettingsPage() {
                 ? "A Calendly token is set, so the chosen call time is filled in when someone books."
                 : "Bookings are recorded, but the call time has to be typed in. To automate it, add a Calendly personal access token as CALENDLY_API_TOKEN in Vercel and redeploy."}
             </Source>
-            <Source name="Payments (Paystack)" state={PAYSTACK_PUBLIC_KEY && !PAYSTACK_PUBLIC_KEY.startsWith("PASTE_") ? "on" : "off"}>
-              Checkout on the offer page. Payments themselves are managed in your Paystack dashboard, not here.
+            <Source name="Sales funnel database" state={f ? "on" : "off"}>
+              {f
+                ? `${f.packages} packages, ${f.orders.toLocaleString("en-GB")} orders, ${f.subscribers.toLocaleString("en-GB")} email subscribers.`
+                : "The packages, orders and email tables aren't there yet. Run supabase/migrations/0003_sales_funnel.sql in Supabase."}
+            </Source>
+            <Source name="Server access to the database" state={io.serviceKey ? "on" : "off"}>
+              {io.serviceKey
+                ? "The service-role key is set, so the server can confirm payments and run the email sequence."
+                : "Set SUPABASE_SERVICE_ROLE_KEY in Vercel and redeploy. Without it no order can be marked paid and no email can be sent."}
+            </Source>
+            <Source name="Payments (Paystack)" state={io.paystack ? "on" : "off"}>
+              {io.paystack
+                ? `A ${io.paystackMode === "live" ? "LIVE" : io.paystackMode === "test" ? "TEST" : ""} secret key is set. Every payment is verified with Paystack before an order is marked paid. Webhook address to enter in Paystack: ${SITE_URL}/api/paystack/webhook`
+                : "Set PAYSTACK_SECRET_KEY in Vercel and redeploy. Until then checkout tells buyers that online payment isn't available and takes no money."}
+            </Source>
+            <Source name="Email (Resend)" state={io.resend ? "on" : "off"}>
+              {io.resend
+                ? `Sending as ${io.emailFrom}. ${f ? `${f.emails_sent.toLocaleString("en-GB")} emails sent so far.` : ""}`
+                : "Set RESEND_API_KEY (and EMAIL_FROM) in Vercel and redeploy. Until then opt-ins are saved and the Blueprint is delivered by on-page download only."}
+            </Source>
+            <Source name="Scheduled email run" state={io.cron ? "on" : "off"}>
+              {io.cron
+                ? "CRON_SECRET is set. Vercel runs the email sequence once a day; you can also run it by hand under Emails."
+                : "Set CRON_SECRET in Vercel and redeploy so the daily run can start. Emails 2 to 7 are sent by that run."}
             </Source>
             <Source name="Google Analytics / Tag Manager" state="off">
-              Not installed. The dashboard doesn&apos;t need it: visits are counted by the site itself.
+              Not installed. The dashboard doesn&apos;t need it: visits and funnel events are counted by the site itself.
             </Source>
           </ul>
         </section>

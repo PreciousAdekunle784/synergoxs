@@ -9,8 +9,65 @@ export type Lead = {
   company: string | null;
   website: string | null;
   source: string | null;
+  /** customer = has a paid order · checkout_started = began one · none */
+  purchase?: "customer" | "checkout_started" | "none";
+  paid_minor?: number;
+  subscription?: "subscribed" | "unsubscribed" | null;
   meta: Record<string, unknown>;
   record: Record<string, unknown>;
+};
+
+/** admin_funnel_overview: the whole funnel, counted from recorded visits, events and orders. */
+export type FunnelOverview = {
+  days: number;
+  from: string;
+  to: string;
+  tracking_since: string | null;
+  currency: string;
+  visitors: number;
+  optin_visitors: number;
+  optins: number;
+  optins_all_time: number;
+  optin_rate: number | null;
+  sales_visitors: number;
+  checkout_visitors: number;
+  orders_started: number;
+  orders_started_paid: number;
+  abandonment_rate: number | null;
+  orders_paid: number;
+  package_sales: number;
+  bundle_sales: number;
+  revenue_minor: number;
+  revenue_all_time_minor: number;
+  orders_paid_all_time: number;
+  aov_minor: number | null;
+  sales_rate: number | null;
+  package_rate: number | null;
+  bundle_rate: number | null;
+  exit_shown: number;
+  exit_clicks: number;
+  exit_dismissed: number;
+  exit_purchases: number;
+  exit_revenue_minor: number;
+  exit_click_rate: number | null;
+  exit_rate: number | null;
+  awaiting_onboarding: number;
+  by_item: { slug: string; name: string; kind: "package" | "bundle"; clicks: number; checkouts: number; sales: number; revenue_minor: number }[];
+  series: { day: string; visitors: number; optins: number; sales: number; revenue_minor: number }[];
+  top_pages: { path: string; n: number }[];
+  by_source: { source: string; n: number }[];
+  recent_orders: import("@/lib/funnel/types").Order[];
+};
+
+export type EmailStats = {
+  subscribers: number;
+  subscribed: number;
+  unsubscribed: number;
+  due_now: number;
+  stalled: number;
+  by_step: Record<string, number>;
+  by_key: Record<string, { sent: number; failed: number; last: string | null }>;
+  recent: { created_at: string; email: string; email_key: string; status: "sent" | "failed"; error: string | null }[];
 };
 
 export type LeadNote = {

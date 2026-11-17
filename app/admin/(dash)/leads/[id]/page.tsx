@@ -7,7 +7,9 @@ import type { Lead, LeadNote } from "@/lib/admin/types";
 import { formatDateTime, leadStatusLabel, sourceLabel } from "@/lib/admin/constants";
 import { keyLabel, showValue } from "@/lib/admin/describe";
 import { deleteLead, deleteLeadNote } from "@/lib/admin/actions";
-import { ConsultationBadge, LeadStatusBadge, LoadError } from "@/components/admin/Bits";
+import { ConsultationBadge, LeadStatusBadge, LoadError, OnboardingBadge, OrderStatusBadge, PurchaseBadge } from "@/components/admin/Bits";
+import { formatMoney } from "@/lib/money";
+import type { Order } from "@/lib/funnel/types";
 import { ConfirmDelete } from "@/components/admin/Form";
 import { LeadNoteForm, LeadStatusForm } from "@/components/admin/LeadForms";
 
@@ -39,6 +41,11 @@ export default async function LeadPage({ params }: { params: { id: string } }) {
   if (error) return <LoadError message={error.message} />;
   if (!data) notFound();
 
+  type Sub = { status: string; consent_at: string | null; consent_text: string | null; sequence_step: number; next_email_at: string | null; unsubscribed_at: string | null };
+  const { data: more } = await rpc<{ orders: Order[]; subscriber: Sub | null }>("admin_lead_orders", { p_id: id }, admin.token);
+  const orders = more?.orders ?? [];
+  const sub = more?.subscriber ?? null;
+
   const { lead, notes, consultations } = data;
   const answers = Object.entries(lead.meta ?? {}).filter(([k, v]) => !SHOWN_ELSEWHERE.has(k) && v !== "" && v !== null);
   const extra = Object.entries(lead.record ?? {}).filter(([k, v]) => !RECORD_HIDDEN.has(k) && v !== null && v !== "");
@@ -53,6 +60,7 @@ export default async function LeadPage({ params }: { params: { id: string } }) {
       <div className="mb-7 mt-3 flex flex-wrap items-center gap-3">
         <h1 className="a-h1">{lead.name || lead.email || "Unnamed lead"}</h1>
         <LeadStatusBadge status={lead.status} />
+        <PurchaseBadge status={lead.purchase ?? "none"} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
@@ -83,8 +91,52 @@ export default async function LeadPage({ params }: { params: { id: string } }) {
                 {site ? <a href={site} target="_blank" rel="noopener noreferrer nofollow" className="link">{lead.website}</a> : <span className="text-mute">Not given</span>}
               </Row>
               <Row label="Came from">{sourceLabel(lead.source)}</Row>
-              <Row label="Received">{formatDateTime(lead.created_at)} WAT</Row>
+              <Row label="First recorded">{formatDateTime(lead.created_at)} WAT</Row>
             </dl>
+          </section>
+
+          <section className="a-card" aria-labelledby="orders-h">
+            <h2 id="orders-h" className="a-h2">Purchases</h2>
+            {orders.length === 0 ? (
+              <p className="mt-3 text-[0.92rem] text-mute">No checkout started yet.</p>
+            ) : (
+              <ul className="mt-2 divide-y divide-line">
+                {orders.map((o) => (
+                  <li key={o.id}>
+                    <Link href={`/admin/orders/${o.id}`} className="-mx-2 flex flex-wrap items-center justify-between gap-3 rounded-btn px-2 py-3 transition-colors hover:bg-mist">
+                      <span className="min-w-0">
+                        <span className="block text-[0.95rem] font-semibold text-ink">{o.item_name}</span>
+                        <span className="block text-[0.82rem] text-mute">{o.reference} · {formatDateTime(o.created_at)}</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="num font-mono text-[0.92rem] text-ink">{formatMoney(o.amount_paid_minor ?? o.amount_minor, o.currency)}</span>
+                        <OrderStatusBadge status={o.status} />
+                        {o.status === "paid" && <OnboardingBadge status={o.onboarding_status} />}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="a-card" aria-labelledby="sub-h">
+            <h2 id="sub-h" className="a-h2">Email subscription</h2>
+            {!sub ? (
+              <p className="mt-3 text-[0.92rem] leading-relaxed text-mute">
+                Not on the email list. This person hasn&apos;t requested the Blueprint, so they receive no marketing emails.
+              </p>
+            ) : (
+              <dl className="mt-2 divide-y divide-line">
+                <Row label="Status">{sub.status === "subscribed" ? "Subscribed" : `Unsubscribed${sub.unsubscribed_at ? ` on ${formatDateTime(sub.unsubscribed_at)}` : ""}`}</Row>
+                <Row label="Consent given">{sub.consent_at ? `${formatDateTime(sub.consent_at)} WAT` : "—"}</Row>
+                <Row label="They agreed to"><span className="text-[0.88rem] text-body">{sub.consent_text ?? "—"}</span></Row>
+                <Row label="Sequence">
+                  {sub.sequence_step} of 7 sent
+                  {sub.status === "subscribed" && sub.next_email_at ? ` · next on ${formatDateTime(sub.next_email_at)}` : sub.sequence_step < 7 && sub.status === "subscribed" ? " · stopped (they bought, or sending stalled)" : ""}
+                </Row>
+              </dl>
+            )}
           </section>
 
           <section className="a-card" aria-labelledby="answers-h">

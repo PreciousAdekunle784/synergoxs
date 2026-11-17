@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/admin/session";
 import { rpc } from "@/lib/supabase/rpc";
-import { cleanProjects, cleanServices, cleanTestimonials, mergeContact, mergeCopy } from "@/lib/content/get";
-import { DEFAULT_SERVICES } from "@/lib/content/defaults";
+import { cleanProjects, cleanTestimonials, mergeContact, mergeCopy } from "@/lib/content/get";
 import { LoadError, PageHeader, Pills } from "@/components/admin/Bits";
 import {
   ContactEditor,
   CopyEditor,
   ProjectsEditor,
-  ServicesEditor,
   TestimonialsEditor,
 } from "@/components/admin/ContentEditors";
 
@@ -16,7 +14,6 @@ export const metadata: Metadata = { title: "Website content" };
 
 const TABS = [
   { key: "copy", label: "Headlines and copy" },
-  { key: "services", label: "Services" },
   { key: "projects", label: "Case studies" },
   { key: "testimonials", label: "Testimonials" },
   { key: "contact", label: "Contact and links" },
@@ -39,7 +36,7 @@ export default async function ContentPage({ searchParams }: { searchParams: { ta
     <>
       <PageHeader
         title="Website content"
-        description="Changes go live on the website as soon as you save. No code, no redeploy."
+        description="The wording on the opt-in and sales pages, your case study and testimonials, and your contact details. Changes go live as soon as you save. Packages and prices are under Packages."
       />
       <div className="mb-6">
         <Pills
@@ -52,11 +49,6 @@ export default async function ContentPage({ searchParams }: { searchParams: { ta
         <LoadError message={error?.message ?? "No data returned."} />
       ) : tab === "copy" ? (
         <CopyEditor copy={mergeCopy(data.copy)} />
-      ) : tab === "services" ? (
-        <ServicesEditor
-          services={cleanServices(data.services) ?? DEFAULT_SERVICES}
-          customised={!!cleanServices(data.services)}
-        />
       ) : tab === "projects" ? (
         <ProjectsEditor projects={cleanProjects(data.projects)} />
       ) : tab === "testimonials" ? (

@@ -20,10 +20,10 @@ export default function LegalPage({
           {sections.map((s, i) => (
             <div key={s.h}>
               <div className="flex items-baseline gap-3.5">
-                <span className="num text-[0.82rem] font-semibold text-greenDeep">
+                <span className="num font-mono text-[0.78rem] font-medium text-greenDeep">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h2 className="font-display text-[1.4rem] font-extrabold tracking-tighter2 text-ink">
+                <h2 className="font-display text-[1.4rem] font-extrabold tracking-tighter2 text-ink [font-stretch:88%]">
                   {s.h}
                 </h2>
               </div>

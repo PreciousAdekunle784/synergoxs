@@ -3,13 +3,11 @@ import { rpc } from "@/lib/supabase/rpc";
 import {
   DEFAULT_CONTACT,
   DEFAULT_COPY,
-  DEFAULT_SERVICES,
   FALLBACK_PROJECTS,
   FALLBACK_TESTIMONIALS,
   type Contact,
   type Copy,
   type Project,
-  type Service,
   type Testimonial,
 } from "./defaults";
 
@@ -18,7 +16,6 @@ export const CONTENT_TAG = "site-content";
 export type SiteContent = {
   copy: Copy;
   contact: Contact;
-  services: Service[];
   projects: Project[];
   testimonials: Testimonial[];
   /** false when the database couldn't be reached and built-in text is showing */
@@ -53,21 +50,6 @@ export function mergeContact(overrides: Record<string, unknown> | null | undefin
     out[k] = v.trim();
   }
   return out;
-}
-
-export function cleanServices(v: unknown): Service[] | null {
-  if (!Array.isArray(v) || v.length === 0) return null;
-  const out = v
-    .map((s) => s as Record<string, unknown>)
-    .filter((s) => s && str(s.name).trim() !== "")
-    .map((s) => ({
-      name: str(s.name),
-      stage: str(s.stage) || "Acquire",
-      line: str(s.line),
-      detail: str(s.detail),
-      deliverables: Array.isArray(s.deliverables) ? s.deliverables.map(str).filter(Boolean) : [],
-    }));
-  return out.length ? out : null;
 }
 
 export function cleanProjects(v: unknown): Project[] {
@@ -110,7 +92,6 @@ async function load(): Promise<SiteContent> {
     return {
       copy: { ...DEFAULT_COPY },
       contact: { ...DEFAULT_CONTACT },
-      services: DEFAULT_SERVICES,
       projects: FALLBACK_PROJECTS,
       testimonials: FALLBACK_TESTIMONIALS,
       fromDatabase: false,
@@ -119,7 +100,6 @@ async function load(): Promise<SiteContent> {
   return {
     copy: mergeCopy(data.copy),
     contact: mergeContact(data.contact),
-    services: cleanServices(data.services) ?? DEFAULT_SERVICES,
     projects: cleanProjects(data.projects),
     testimonials: cleanTestimonials(data.testimonials),
     fromDatabase: true,
@@ -131,7 +111,7 @@ async function load(): Promise<SiteContent> {
  * saved in the dashboard (the save calls revalidateTag(CONTENT_TAG)); the
  * five-minute timer is only a backstop.
  */
-export const getContent = unstable_cache(load, ["site-content-v1"], {
+export const getContent = unstable_cache(load, ["site-content-v2"], {
   tags: [CONTENT_TAG],
   revalidate: 300,
 });

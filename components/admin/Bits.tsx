@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { consultationStatusLabel, leadStatusLabel } from "@/lib/admin/constants";
+import { consultationStatusLabel, leadStatusLabel, onboardingLabel, orderStatusLabel, purchaseLabel } from "@/lib/admin/constants";
 
 /* Small server-safe pieces shared across dashboard pages. */
 
@@ -21,7 +21,7 @@ const consultTone: Record<string, string> = {
 };
 
 const badge =
-  "inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-[0.74rem] font-semibold leading-none";
+  "inline-flex items-center whitespace-nowrap rounded-[3px] px-2 py-1 text-[0.72rem] font-semibold leading-none";
 
 export function LeadStatusBadge({ status }: { status: string }) {
   return <span className={`${badge} ${leadTone[status] ?? leadTone.contacted}`}>{leadStatusLabel(status)}</span>;
@@ -32,6 +32,69 @@ export function ConsultationBadge({ status }: { status: string }) {
     <span className={`${badge} ${consultTone[status] ?? consultTone.requested}`}>
       {consultationStatusLabel(status)}
     </span>
+  );
+}
+
+const orderTone: Record<string, string> = {
+  paid: "bg-green text-ink",
+  pending: "border border-ink/25 bg-paper text-ink",
+  failed: "bg-mist text-mute line-through",
+};
+const onboardingTone: Record<string, string> = {
+  awaiting: "border border-ink bg-paper text-ink",
+  submitted: "bg-ink text-white",
+  in_progress: "bg-greenTint text-greenDeep",
+  complete: "bg-mist text-mute",
+};
+const purchaseTone: Record<string, string> = {
+  customer: "bg-green text-ink",
+  checkout_started: "border border-ink/25 bg-paper text-ink",
+  none: "bg-mist text-mute",
+};
+
+export function OrderStatusBadge({ status }: { status: string }) {
+  return <span className={`${badge} ${orderTone[status] ?? orderTone.pending}`}>{orderStatusLabel(status)}</span>;
+}
+export function OnboardingBadge({ status }: { status: string }) {
+  return <span className={`${badge} ${onboardingTone[status] ?? onboardingTone.awaiting}`}>{onboardingLabel(status)}</span>;
+}
+export function PurchaseBadge({ status }: { status: string }) {
+  return <span className={`${badge} ${purchaseTone[status] ?? purchaseTone.none}`}>{purchaseLabel(status)}</span>;
+}
+
+/** One headline number. `value` is "—" (and `muted`) when its data isn't being collected yet. */
+export function Tile({
+  label,
+  value,
+  sub,
+  href,
+  muted = false,
+  strong = false,
+}: {
+  label: string;
+  value: string;
+  sub?: React.ReactNode;
+  href?: string;
+  muted?: boolean;
+  /** the black tile: one per screen, for the number that matters most */
+  strong?: boolean;
+}) {
+  const body = (
+    <>
+      <p className={`text-[0.82rem] font-medium ${strong ? "text-ash" : "text-body"}`}>{label}</p>
+      <p className={`num mt-2 font-mono text-[1.65rem] font-medium leading-none tracking-tight ${strong ? "text-white" : muted ? "text-mute" : "text-ink"}`}>
+        {value}
+      </p>
+      {sub && <p className={`mt-2 text-[0.78rem] leading-snug ${strong ? "text-ash" : "text-mute"}`}>{sub}</p>}
+    </>
+  );
+  const cls = strong ? "min-w-0 rounded-card bg-ink p-5 sm:p-6" : "a-card";
+  return href ? (
+    <Link href={href} className={`${cls} block transition-all duration-200 hover:-translate-y-0.5 ${strong ? "" : "hover:border-ink/25 hover:shadow-card"}`}>
+      {body}
+    </Link>
+  ) : (
+    <div className={cls}>{body}</div>
   );
 }
 
@@ -71,7 +134,7 @@ export function Pills({
           href={i.href}
           aria-current={i.active ? "page" : undefined}
           scroll={false}
-          className={`inline-flex min-h-[38px] items-center gap-2 rounded-full px-4 py-1.5 text-[0.86rem] font-semibold transition-colors duration-200 ${
+          className={`inline-flex min-h-[38px] items-center gap-2 rounded-btn px-3.5 py-1.5 text-[0.86rem] font-semibold transition-colors duration-200 ${
             i.active ? "bg-ink text-white" : "border border-line bg-paper text-body hover:border-ink hover:text-ink"
           }`}
         >
